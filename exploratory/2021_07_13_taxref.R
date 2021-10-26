@@ -8,8 +8,11 @@ taxref <- read.csv2("data/TAXREF/TAXREF14.0_FR_Continental_13_07_2021.csv")
 # #   filter(grepl("Bromus hordeaceus", NOM_VALIDE))
 
 # Example on the leafmorpho sheet ####
-leafmorpho <-  read.table("data/La Fage/LeafMorpho_traits.txt",header=T,sep="\t") %>% 
-  mutate(occurrenceID = paste("FAG",Treatment,Day,Code_Sp,"1",sep = "_")) # 1 = group of traits 1 (i.e. leafmorpho)
+# leafmorpho <-  read.table("data/La Fage/LeafMorpho_traits.txt",header=T,sep="\t") %>% 
+#   mutate(occurrenceID = paste("FAG",Treatment,Day,Code_Sp,"1",sep = "_")) # 1 = group of traits 1 (i.e. leafmorpho)
+
+leafmorpho <-  read.csv("data/La Fage/LeafMorpho_traits.csv",sep=";") %>% 
+  mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_"))
 
 # I) TAXREF: standard taxon name ####
 # I.1) Add scientificName ####
