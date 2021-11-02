@@ -1,36 +1,54 @@
 library(tidyverse)
-library("xlsx") 
-# /!\ with this package, NAs are replaced by NaN within numeric columns. Il faudra que je les retire dans le fichier final
+library("openxlsx")
 
-# function
+
+# functions
 source("functions/TAXREF and TOP.R")
-site <- "La Fage"
+
+
 # I) Import datasets ####
 # I.1) TaXREF and TOP
 taxref <- read.csv2("data/TAXREF/TAXREF14.0_FR_Continental_13_07_2021.csv") # long to charge
 TOP <- read.csv2("data/TOP/TOP_info.csv",fill=T)
 
 # I.2) Traits
+DATA_FILES <- c("Bargemon_PlantTraitsDP_vp.xlsx",
+                "Cazarils_PlantTraitsDP_vp.xlsx" ,
+                "CRE_O2LA_Leaf TraitsDP_vp.xlsx" ,
+                "CRE_PDM_PlantTraitsDP_vp.xlsx" ,
+                "Garraf_PlantTraitsDP_vp.xlsx" ,
+                "HGM_PlantTraitsDP_vp.xlsx" ,
+                "LaFage_PlantTraitsDP_vp.xlsx"
+)
+
+data_file <- DATA_FILES[7]
+
 # NB : pas besoin de LeafDimensions (info redondante avec LeafMorpho: que L_Area!)
 
-LeafMorpho <-  read.xlsx2("data/La Fage/LaFage_PlantTraits.xls",sheetName = "LeafMorpho_traits",colClasses=NA)
-  read.csv(paste0("data/",site,"/LeafMorpho_traits.csv"),sep=";" ,dec=",") %>% 
+LeafMorpho <-  read.xlsx(paste0("data/",data_file), sheet = "LeafMorpho_traits", startRow = 1, colNames = TRUE) %>% 
   mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_")) 
 
-LeafDimensions <-read.csv(paste0("data/",site,"/LeafDimensions.csv"),sep=";",dec=",") %>% 
+LeafDimensions <- read.xlsx(paste0("data/",data_file), sheet = "LeafDimensions", startRow = 1, colNames = TRUE) %>% 
+  mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_")) 
+
+LeafCN <- read.xlsx(paste0("data/",data_file), sheet = "LeafC&N", startRow = 1, colNames = TRUE) %>% 
   mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_"))
 
-LeafCN <- read.csv(paste0("data/",site,"/LeafC&N.csv"),sep=";",dec=",") %>% 
+LeafP <- read.xlsx(paste0("data/",data_file), sheet = "LeafP", startRow = 1, colNames = TRUE) %>% 
   mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_"))
 
-LeafP <- read.csv(paste0("data/",site,"/LeafP.csv"),sep=";",dec=",") %>% 
-  mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_")) 
+Leaf13C <- read.xlsx(paste0("data/traits/",data_file), sheet = "Leaf13C", startRow = 1, colNames = TRUE) %>% 
+  mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_"))
 
-Biovolume <- read.csv(paste0("data/",site,"/Biovolume.csv"),sep=";",dec=",") %>% 
-  mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_")) 
+Biovolume <- read.xlsx(paste0("data/",data_file), sheet = "Biovolume", startRow = 1, colNames = TRUE) %>% 
+  mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_"))
 
-Seed <- read.csv(paste0("data/",site,"/Seed.csv"),sep=";",dec=",") %>% 
-  mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_")) 
+Pheno <- read.xlsx(paste0("data/traits/",data_file), sheet = "Pheno", startRow = 1, colNames = TRUE) %>% 
+  mutate(Rep = "none") %>% 
+  mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_"))
+
+Seed <- read.xlsx(paste0("data/",data_file), sheet = "Seed", startRow = 1, colNames = TRUE) %>% 
+  mutate(verbatimOccurrenceID = paste("FAG",Treatment,Day,Code_Sp,Rep,sep = "_"))
 
 # NB pour l'occurrenceID, je ferais peut-être mieux de ne pas pooler en une colonne, mais de faire comme pour measurementOfFact:
 # 1) Inclure les colonnes de l'extension Occurrence dans le tableau Traitdata
@@ -41,6 +59,14 @@ Seed <- read.csv(paste0("data/",site,"/Seed.csv"),sep=";",dec=",") %>%
 # verbatimOccurrenceID (bijection), pour faire la correspondance.
 # 6) Veiller à la correspondance entre cet occurrenceID du tableau Traitdata et dee l'extension Occurrence.
 
+######################################################################################
+# Change : to insert TAXREF and TOP info:
+# Take the file
+# ex: files <- read_files("LaFage")
+# focus <- files[[1]]
+# List of traits to extract by removing columns other than traits.
+# Then proceed using the code below
+######################################################################################
 
 # II) TAXREF info ####
 TRAITS <- list(c("SLA","LDMC","L_Area"), # list of traits for each group of traits

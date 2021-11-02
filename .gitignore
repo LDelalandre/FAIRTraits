@@ -1,0 +1,15 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.csv
+*.docx
+*.xlsx
+*.pdf
+*.png
+*.jpg
+*.html
+data
+info
+notebook
+output
