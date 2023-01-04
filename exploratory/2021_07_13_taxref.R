@@ -6,6 +6,9 @@ library(tidyverse)
 taxref <- read.csv2("data/TAXREF/TAXREF14.0_FR_Continental_13_07_2021.csv")
 # # taxref %>%
 # #   filter(grepl("Bromus hordeaceus", NOM_VALIDE))
+taxref %>% 
+  pull(RANG) %>% 
+  unique()
 
 # Example on the leafmorpho sheet ####
 # leafmorpho <-  read.table("data/La Fage/LeafMorpho_traits.txt",header=T,sep="\t") %>% 

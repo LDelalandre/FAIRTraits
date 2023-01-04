@@ -1,6 +1,11 @@
 library(tidyverse)
 library("openxlsx")
 
+# Problems : 
+# Biovolume à Cazarils : date pas bonne. Et du coup pas bon verbatimOccurrenceID
+# Idem à Garraf
+
+
 # Traits ####
 DATA_FILES <- c("LaFage_PlantTraitsDP_vp.xlsx",
                 "Bargemon_PlantTraitsDP_vp.xlsx",
@@ -39,6 +44,15 @@ read_files <- function(site){ # Calls the following (site-specific) functions
   }
 } 
 
+change_format <- function(data_imported){
+  data_imported %>% 
+    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
+    mutate(Day2 = str_replace_all(Day,"-","")) %>% 
+    mutate(Site2 = str_replace(Site," ","")) %>% 
+    mutate(Treatment2 = str_replace_all(Treatment,"_","")) %>% 
+    mutate(verbatimOccurrenceID = paste(Code_Sp,Site2,Block,Plot,Treatment2,Day2,Rep,sep = "_")) %>% 
+    select(-c(Day2,Site2,Treatment2))
+}
 
 read_LaFage <- function(SITES){
   data_file <- SITES %>% 
@@ -46,33 +60,31 @@ read_LaFage <- function(SITES){
     pull(file)
   
   LeafMorpho <-  read.xlsx(paste0("data/",data_file), sheet = "LeafMorpho_traits", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
 
   LeafCN <- read.xlsx(paste0("data/",data_file), sheet = "LeafC&N", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   LeafP <- read.xlsx(paste0("data/",data_file), sheet = "LeafP", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   Leaf13C15N <- read.xlsx(paste0("data/",data_file), sheet = "Leaf13C", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   Biovolume <- read.xlsx(paste0("data/",data_file), sheet = "Biovolume", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   Pheno <- read.xlsx(paste0("data/",data_file), sheet = "Pheno", startRow = 1, colNames = TRUE) %>% 
     mutate(Rep = "none") %>% 
     mutate(Day = "none") %>%
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    mutate(Day2 = str_replace_all(Day,"-","")) %>% 
+    mutate(Site2 = str_replace(Site," ","")) %>% 
+    mutate(Treatment2 = str_replace_all(Treatment,"_","")) %>% 
+    mutate(verbatimOccurrenceID = paste(Code_Sp,Site2,Block,Plot,Treatment2,Day2,Plot,Rep,sep = "_")) %>% 
+    select(-c(Day2,Site2,Treatment2))
   
   Seed <- read.xlsx(paste0("data/",data_file), sheet = "Seed", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   list(LeafMorpho,LeafCN,LeafP,Leaf13C15N,Biovolume,Pheno,Seed)
 }
@@ -83,16 +95,13 @@ read_Bargemont <- function(SITES){
     pull(file)
   
   LeafMorpho <-  read.xlsx(paste0("data/",data_file), sheet = "LeafMorpho_traits", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   LeafCN <- read.xlsx(paste0("data/",data_file), sheet = "LeafC&N", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   Leaf13C15N <- read.xlsx(paste0("data/",data_file), sheet = "Leaf13C&15N", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   list(LeafMorpho,LeafCN,Leaf13C15N)
 }
@@ -103,24 +112,19 @@ read_Cazarils <- function(SITES){
     pull(file)
   
   LeafMorpho <-  read.xlsx(paste0("data/",data_file), sheet = "LeafMorpho_traits", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   LeafDimensions <- read.xlsx(paste0("data/",data_file), sheet = "LeafDimensions", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   LeafCN <- read.xlsx(paste0("data/",data_file), sheet = "LeafC&N", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   LeafP <- read.xlsx(paste0("data/",data_file), sheet = "LeafP", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   Leaf13C15N <- read.xlsx(paste0("data/",data_file), sheet = "Leaf13C&15N", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   Biovolume <- read.xlsx(paste0("data/",data_file), sheet = "Biovolume", startRow = 1, colNames = TRUE) %>% 
     # mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>%
@@ -129,16 +133,13 @@ read_Cazarils <- function(SITES){
   
   Pheno <- read.xlsx(paste0("data/",data_file), sheet = "Pheno", startRow = 1, colNames = TRUE) %>% 
     mutate(Rep = "none") %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format() 
   
   Seed <- read.xlsx(paste0("data/",data_file), sheet = "SeedM", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   SeedS <- read.xlsx(paste0("data/",data_file), sheet = "SeedS", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   list(LeafMorpho,LeafDimensions,LeafCN,LeafP,Leaf13C15N,Biovolume,Pheno,Seed,SeedS)
 }
@@ -149,20 +150,16 @@ read_CampRedon <- function(SITES){
     pull(file)
   
   LeafMorpho <-  read.xlsx(paste0("data/",data_file), sheet = "LeafMorpho_traits", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   LeafElements <- read.xlsx(paste0("data/",data_file), sheet = "LeafElements", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format() 
   
   LeafIsotopes <- read.xlsx(paste0("data/",data_file), sheet = "LeafIsotopes", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   LeafOtherElements <- read.xlsx(paste0("data/",data_file), sheet = "LeafOtherElements", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   list(LeafMorpho,LeafElements,LeafIsotopes,LeafOtherElements)
 }
@@ -173,24 +170,19 @@ read_Garraf <- function(SITES){
     pull(file)
   
   LeafMorpho <-  read.xlsx(paste0("data/",data_file), sheet = "LeafMorpho_traits", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   LeafDimensions <- read.xlsx(paste0("data/",data_file), sheet = "LeafDimensions", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   LeafCN <- read.xlsx(paste0("data/",data_file), sheet = "LeafC&N", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   LeafP <- read.xlsx(paste0("data/",data_file), sheet = "LeafP", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format() 
   
   Leaf13C15N <- read.xlsx(paste0("data/",data_file), sheet = "Leaf13C&15N", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+    change_format()
   
   Biovolume <- read.xlsx(paste0("data/",data_file), sheet = "Biovolume", startRow = 1, colNames = TRUE) %>% 
     # mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>%
@@ -198,8 +190,7 @@ read_Garraf <- function(SITES){
     mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
   
   Seed <- read.xlsx(paste0("data/",data_file), sheet = "SeedM", startRow = 1, colNames = TRUE) %>% 
-    mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>% 
-    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_"))
+    change_format()
   
   list(LeafMorpho,LeafDimensions,LeafCN,LeafP,Leaf13C15N,Biovolume,Seed)
 }
