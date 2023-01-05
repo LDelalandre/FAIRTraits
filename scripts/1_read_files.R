@@ -5,6 +5,10 @@ library("openxlsx")
 # Biovolume à Cazarils : date pas bonne. Et du coup pas bon verbatimOccurrenceID
 # Idem à Garraf
 
+# Pour tous les Gas exchange: 
+# mutate(nameOfProject = NA, measurementDeterminedBy = NA)
+# A virer quand l'info sera complétée
+
 
 # Traits ####
 DATA_FILES <- c("LaFage_PlantTraitsDP_vp.xlsx",
@@ -103,11 +107,13 @@ read_Bargemont <- function(SITES){
   Leaf13C15N <- read.xlsx(paste0("data/",data_file), sheet = "Leaf13C&15N", startRow = 1, colNames = TRUE) %>% 
     change_format()
   
-  LLS <- read.xlsx(paste0("data/",data_file), sheet = "LLS", startRow = 1, colNames = TRUE)
+  LLS <- read.xlsx(paste0("data/",data_file), sheet = "LLS", startRow = 1, colNames = TRUE) %>% 
+    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
   # Day = "none" --> I don't change the format
   
   GasExchange <- read.xlsx(paste0("data/",data_file), sheet = "GasExchange", startRow = 1, colNames = TRUE) %>% 
-    change_format()
+    change_format() %>% 
+    mutate(nameOfProject = NA, measurementDeterminedBy = NA)
   
   list(LeafMorpho,LeafCN,Leaf13C15N,LLS,GasExchange)
 }
@@ -135,7 +141,8 @@ read_Cazarils <- function(SITES){
     mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
   
   Pheno <- read.xlsx(paste0("data/",data_file), sheet = "Pheno", startRow = 1, colNames = TRUE) %>% 
-    mutate(Rep = "none")
+    mutate(Rep = "none") %>% 
+    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_"))
   
   Seed <- read.xlsx(paste0("data/",data_file), sheet = "SeedM", startRow = 1, colNames = TRUE) %>% 
     change_format()
@@ -143,10 +150,12 @@ read_Cazarils <- function(SITES){
   SeedS <- read.xlsx(paste0("data/",data_file), sheet = "SeedS", startRow = 1, colNames = TRUE) %>% 
     change_format()
   
-  LLS <- read.xlsx(paste0("data/",data_file), sheet = "LLS", startRow = 1, colNames = TRUE)
+  LLS <- read.xlsx(paste0("data/",data_file), sheet = "LLS", startRow = 1, colNames = TRUE) %>% 
+    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_"))
   
   GasExchange <- read.xlsx(paste0("data/",data_file), sheet = "GasExchange", startRow = 1, colNames = TRUE) %>% 
-    change_format()
+    change_format() %>% 
+    mutate(nameOfProject = NA, measurementDeterminedBy = NA)
   
   list(LeafMorpho,LeafCN,LeafP,Leaf13C15N,Biovolume,Pheno,Seed,SeedS,LLS,GasExchange,LLS,GasExchange)
 }
@@ -197,7 +206,8 @@ read_Garraf <- function(SITES){
     change_format()
   
   GasExchange <- read.xlsx(paste0("data/",data_file), sheet = "GasExchange", startRow = 1, colNames = TRUE) %>% 
-    change_format()
+    change_format() %>% 
+    mutate(nameOfProject = NA, measurementDeterminedBy = NA)
   
   list(LeafMorpho,LeafCN,LeafP,Leaf13C15N,Biovolume,Seed,GasExchange)
 }
