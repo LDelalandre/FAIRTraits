@@ -103,7 +103,13 @@ read_Bargemont <- function(SITES){
   Leaf13C15N <- read.xlsx(paste0("data/",data_file), sheet = "Leaf13C&15N", startRow = 1, colNames = TRUE) %>% 
     change_format()
   
-  list(LeafMorpho,LeafCN,Leaf13C15N)
+  LLS <- read.xlsx(paste0("data/",data_file), sheet = "LLS", startRow = 1, colNames = TRUE)
+  # Day = "none" --> I don't change the format
+  
+  GasExchange <- read.xlsx(paste0("data/",data_file), sheet = "GasExchange", startRow = 1, colNames = TRUE) %>% 
+    change_format()
+  
+  list(LeafMorpho,LeafCN,Leaf13C15N,LLS,GasExchange)
 }
 
 read_Cazarils <- function(SITES){
@@ -112,9 +118,6 @@ read_Cazarils <- function(SITES){
     pull(file)
   
   LeafMorpho <-  read.xlsx(paste0("data/",data_file), sheet = "LeafMorpho_traits", startRow = 1, colNames = TRUE) %>% 
-    change_format()
-  
-  LeafDimensions <- read.xlsx(paste0("data/",data_file), sheet = "LeafDimensions", startRow = 1, colNames = TRUE) %>% 
     change_format()
   
   LeafCN <- read.xlsx(paste0("data/",data_file), sheet = "LeafC&N", startRow = 1, colNames = TRUE) %>% 
@@ -132,8 +135,7 @@ read_Cazarils <- function(SITES){
     mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
   
   Pheno <- read.xlsx(paste0("data/",data_file), sheet = "Pheno", startRow = 1, colNames = TRUE) %>% 
-    mutate(Rep = "none") %>% 
-    change_format() 
+    mutate(Rep = "none")
   
   Seed <- read.xlsx(paste0("data/",data_file), sheet = "SeedM", startRow = 1, colNames = TRUE) %>% 
     change_format()
@@ -141,7 +143,12 @@ read_Cazarils <- function(SITES){
   SeedS <- read.xlsx(paste0("data/",data_file), sheet = "SeedS", startRow = 1, colNames = TRUE) %>% 
     change_format()
   
-  list(LeafMorpho,LeafDimensions,LeafCN,LeafP,Leaf13C15N,Biovolume,Pheno,Seed,SeedS)
+  LLS <- read.xlsx(paste0("data/",data_file), sheet = "LLS", startRow = 1, colNames = TRUE)
+  
+  GasExchange <- read.xlsx(paste0("data/",data_file), sheet = "GasExchange", startRow = 1, colNames = TRUE) %>% 
+    change_format()
+  
+  list(LeafMorpho,LeafCN,LeafP,Leaf13C15N,Biovolume,Pheno,Seed,SeedS,LLS,GasExchange,LLS,GasExchange)
 }
 
 read_CampRedon <- function(SITES){
@@ -172,9 +179,6 @@ read_Garraf <- function(SITES){
   LeafMorpho <-  read.xlsx(paste0("data/",data_file), sheet = "LeafMorpho_traits", startRow = 1, colNames = TRUE) %>% 
     change_format()
   
-  LeafDimensions <- read.xlsx(paste0("data/",data_file), sheet = "LeafDimensions", startRow = 1, colNames = TRUE) %>% 
-    change_format()
-  
   LeafCN <- read.xlsx(paste0("data/",data_file), sheet = "LeafC&N", startRow = 1, colNames = TRUE) %>% 
     change_format()
   
@@ -192,7 +196,10 @@ read_Garraf <- function(SITES){
   Seed <- read.xlsx(paste0("data/",data_file), sheet = "SeedM", startRow = 1, colNames = TRUE) %>% 
     change_format()
   
-  list(LeafMorpho,LeafDimensions,LeafCN,LeafP,Leaf13C15N,Biovolume,Seed)
+  GasExchange <- read.xlsx(paste0("data/",data_file), sheet = "GasExchange", startRow = 1, colNames = TRUE) %>% 
+    change_format()
+  
+  list(LeafMorpho,LeafCN,LeafP,Leaf13C15N,Biovolume,Seed,GasExchange)
 }
 
 

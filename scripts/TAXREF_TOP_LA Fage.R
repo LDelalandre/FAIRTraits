@@ -17,12 +17,18 @@ TOP <- read.csv2("data/traits/traits_V2.csv",fill=T)
 # generate data frame in the good format for the data paper
 columns_other_than_traits <- 
   c("Site", "Block" ,"Plot", "Treatment", "Year"     ,   "Day"       ,       "Species" , "Code_Sp"   ,    "Family" ,
-    "LifeForm1" ,"LifeForm2" ,  "Rep",
-    "nameOfProject" ,"measurementDeterminedBy","verbatimOccurrenceID")
+    "LifeForm1" ,"LifeForm2" , 
+    "plantType",	"leafType",
+    "Rep",
+    "nameOfProject" ,"measurementDeterminedBy","verbatimOccurrenceID",
+    #columns for gas exchange:
+    "dataType"  , "instrumentOutputStatus", "leafStatus" , "leafAreaBasis", "leafAreaMethod"  ,
+    "plantAge" , "leafAge", "canopyPosition" ,"lightExposure" , "timeOfDay"   )
 
 TIDY <- NULL
 
 fsites <- sites[c(1,2,3,4,6)] # focal sites
+fsites <- sites[c(2)] # focal sites
 
 # NB : il faut peut-être ajouter le paddock dans verbatim occurrence id pour tous les sites. Fait pour la Fage.
 for (site in sites){ # site
@@ -31,13 +37,17 @@ for (site in sites){ # site
   for (i in c(1:length(files))){ # excel sheet
     focus <- files[[i]]
     
+    # which of columns_other_than_traits are present in the focal sheet
+    fcolnames <- colnames(focus)
+    fcolumns_other_than_traits <- intersect(fcolnames,columns_other_than_traits)
+    
     focus_traits <- focus %>%
-      select(!all_of(columns_other_than_traits)) %>%
+      select(!all_of(fcolumns_other_than_traits)) %>%
       colnames() # extract the name of the traits available on that sheet
     
     for (trait in focus_traits){
       focus_trait <- focus %>% 
-        select(columns_other_than_traits,all_of(trait)) %>% 
+        select(all_of(fcolumns_other_than_traits),all_of(trait)) %>% 
         gather(all_of(trait) ,key=verbatimTraitName,value=verbatimTraitValue)
       focus_trait$Day <- as.character(focus_trait$Day)
 
