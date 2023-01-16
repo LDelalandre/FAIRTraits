@@ -113,7 +113,7 @@ read_Bargemont <- function(SITES){
   
   GasExchange <- read.xlsx(paste0("data/",data_file), sheet = "GasExchange", startRow = 1, colNames = TRUE) %>% 
     change_format() %>% 
-    mutate(nameOfProject = NA, measurementDeterminedBy = NA)
+    mutate(nameOfProject = "MELODY", measurementDeterminedBy = "Catherine Roumet")
   
   list(LeafMorpho,LeafCN,Leaf13C15N,LLS,GasExchange)
 }
@@ -155,7 +155,7 @@ read_Cazarils <- function(SITES){
   
   GasExchange <- read.xlsx(paste0("data/",data_file), sheet = "GasExchange", startRow = 1, colNames = TRUE) %>% 
     change_format() %>% 
-    mutate(nameOfProject = NA, measurementDeterminedBy = NA)
+    mutate(nameOfProject = "MELODY", measurementDeterminedBy = "Catherine Roumet")
   
   list(LeafMorpho,LeafCN,LeafP,Leaf13C15N,Biovolume,Pheno,Seed,SeedS,LLS,GasExchange,LLS,GasExchange)
 }
@@ -207,7 +207,7 @@ read_Garraf <- function(SITES){
   
   GasExchange <- read.xlsx(paste0("data/",data_file), sheet = "GasExchange", startRow = 1, colNames = TRUE) %>% 
     change_format() %>% 
-    mutate(nameOfProject = NA, measurementDeterminedBy = NA)
+    mutate(nameOfProject = "DynEcoMed", measurementDeterminedBy = "Catherine Roumet")
   
   list(LeafMorpho,LeafCN,LeafP,Leaf13C15N,Biovolume,Seed,GasExchange)
 }

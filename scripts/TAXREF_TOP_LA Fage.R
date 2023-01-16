@@ -8,8 +8,9 @@ source("scripts/1_read_files.R")
 
 
 # TaXREF and TOP
-taxref <- read.csv2("data/TAXREF/TAXREF14.0_FR_Continental_13_07_2021.csv") # long to charge
-TOP <- read.csv2("data/traits/traits_V2.csv",fill=T)
+# taxref <- read.csv2("data/TAXREF/TAXREF14.0_FR_Continental_13_07_2021.csv") # long to charge
+taxref <- read.table("data/TAXREF_v16/TAXREFv16.txt",header=T,sep = "\t")
+TOP <- read.csv2("data/traits/list of traits_jan2023_part_per_thousand.csv",fill=T,fileEncoding="latin1")
 
 
 #_______________________________________________________________________________
@@ -98,20 +99,22 @@ write.csv2(TIDY2,"output/ETS_format_Bar_Caz_Gar.csv",row.names=F)
 #_______________________________________________________________________________
 # TOP ####
 TIDY <- read.csv2("output/ETS_format_Bar_Caz_Gar.csv")
-TIDY[1:10,] %>% 
-  mutate(site2 = str_replace(Site," ",""))
 
+focus_trait_TOP <- merge(focus_trait,TOP,by="verbatimTraitName") %>% 
+  select(all_of(colnames(TIDY)),everything())
 
-# III.2) Add Standard trait name from TOP
-TOP2 <- TOP %>% 
-  select(c("verbatimTraitName","traitName","LocalIdentifier","traitID","verbatimTraitUnit"))
-focus_trait_TOP <- merge(focus_trait,TOP2,by="verbatimTraitName")
-# focus_trait_TOP$Day <- as.character(focus_trait_TOP$Day)
-
+TIDY_traits <- merge(TIDY,TOP,by="verbatimTraitName") %>% 
+  select(all_of(colnames(TIDY)),everything()) %>% 
+  relocate("verbatimTraitValue", .after = last_col()) %>% 
+  relocate("verbatimTraitUnit", .after = last_col())%>% 
+  relocate("measurementMethod", .after = last_col())
 
 #_______________________________________________________________________________
 # TAXREF ####
-list_sp <- read.csv2("output/Species_Code_Sp.csv")
+# list_sp <- read.csv2("output/Species_Code_Sp.csv")
+list_sp <- TIDY %>% 
+  select(Species,Code_Sp) %>% 
+  unique()
 
 list_sp_scientificName <- list_sp %>% 
   mutate(scientificName = map_chr(Species,get_scientificName,taxref)) 
@@ -121,19 +124,21 @@ list_sp_name_id <- list_sp_scientificName %>%
   mutate(scientificName = if_else(Species == "Myosostis ramosissima subsp. ramosissima","Myosotis ramosissima Rochel, 1814 subsp. ramosissima",scientificName)) %>% 
   mutate(taxonID = if_else(Species == "Myosostis ramosissima subsp. ramosissima","https://inpn.mnhn.fr/espece/cd_nom/137934",taxonID))
 
-write.csv2(list_sp_name_id,"output/list of species_TAXREF.csv",row.names=F)
+list_sp_name_id_cd <- list_sp_name_id %>% 
+  mutate(CD_NOM = map_chr(Species,get_CD_NOM,taxref)) 
+
+write.csv2(list_sp_name_id,"output/list of species_TAXREF_Bar_Caz_Gar.csv",row.names=F)
 
 # Add taxref info ####
 # NB: in fine, I will add all the info from the species data frame (LifeForm1, etc.), 
 # with the info from the floras, etc.
-list_sp_name_id_short <- list_sp_name_id %>% 
-  select(Species,scientificName,taxonID)
 
-TIDY_TAXREF <- TIDY %>% 
-  merge(list_sp_name_id_short,by="Species") %>% # add TAXREF info
+TIDY_traits_TAXREF <- TIDY_traits %>% 
+  merge(list_sp_name_id,by=c("Species","Code_Sp")) %>% # add TAXREF info
+  select(Species,scientificName,taxonID,everything(),verbatimTraitValue,verbatimTraitUnit) %>% 
   rename(verbatimScientificName = Species)
 
-write.csv2(TIDY_TAXREF,"output/Traitdata_test_taxref.csv",row.names=F)
+write.csv2(TIDY_traits_TAXREF,"output/ETS_format_Bar_Caz_Gar_traits_TAXREF.csv",row.names=F,fileEncoding="latin1")
 
 
 #_______________________________________________________________________________
