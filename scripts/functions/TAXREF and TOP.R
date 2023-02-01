@@ -7,30 +7,41 @@
 # ORDRE == SSES : sous-espèce. Présent dans taxref
 # On n'a que les rangs en-dessous de l'espèce.
 
+
+info_taxref <- function(verbatim_name,finfo){
+  # finfo can be either NOM_VALIDE, URL, CD_NOM, FAMILLE...
+  valid_name <- taxref %>% 
+    filter(LB_NOM == verbatim_name %>% 
+             gsub(" sp\\.","",.)) %>%
+    pull(finfo)
+  valid_name[1]
+}
+
 get_scientificName <- function(verbatim_name,taxref){
   valid_name <- taxref %>% 
     filter(LB_NOM == verbatim_name %>% 
-             gsub(" sp.","",.)) %>%
+             gsub(" sp\\.","",.) ) %>%
     pull(NOM_VALIDE)
   valid_name[1]
 }
 
 # essai pour genre
 # verbatim_name <- "Carex sp."
-# get_scientificName(verbatim_name,taxref)
+# get_scientificName("Kickxia spuria",taxref)
+# taxref %>% filter(LB_NOM == "Kickxia spuria")
 
-get_taxon_id <- function(verbatim_name,taxref){
-  taxon_id <- taxref %>% 
+get_URL <- function(verbatim_name,taxref){
+  URL <- taxref %>% 
     filter(LB_NOM == verbatim_name%>% 
-             gsub(" sp.","",.)) %>%
+             gsub(" sp\\.","",.)) %>%
     pull(URL)
-  taxon_id[1]
+  URL[1]
 }
 
 get_CD_NOM <- function(verbatim_name,taxref){
   cd_nom <- taxref %>% 
     filter(LB_NOM == verbatim_name%>% 
-             gsub(" sp.","",.)) %>%
+             gsub(" sp\\.","",.)) %>%
     pull(CD_NOM)
   cd_nom[1]
 }

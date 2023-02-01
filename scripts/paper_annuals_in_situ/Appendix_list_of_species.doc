@@ -1,0 +1,642 @@
+<table class="table table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Species </th>
+   <th style="text-align:left;"> Life Form (Raunk.) </th>
+   <th style="text-align:left;"> Life History </th>
+   <th style="text-align:left;"> Taxon ID </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Alyssum alyssoides (L.) L., 1759 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/81878 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Aphanes arvensis L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/83159 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Arenaria serpyllifolia L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/83653 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Anisantha diandra (Roth) Tutin ex Tzvelev, 1963 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/86589 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Bromus hordeaceus L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/86634 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Anisantha sterilis (L.) Nevski, 1934 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/86763 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Bupleurum baldense Turra, 1764 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/87027 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Capsella bursa-pastoris (L.) Medik., 1792 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/87849 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cardamine flexuosa With., 1796 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/87929 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cerastium glomeratum Thuill., 1799 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/90017 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cerastium pumilum Curtis, 1777 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/90076 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Crepis sancta (L.) Bornm., 1913 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/93129 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Crepis sancta (L.) Bornm., 1913 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/133518 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Crepis vesicaria subsp. taraxacifolia (Thuill.) Thell., 1914 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/133529 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Erodium cicutarium (L.) L'Hér., 1789 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/96895 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Draba verna L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/97008 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Filago pyramidata L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/98699 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Geranium dissectum L., 1755 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/100052 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Geranium molle L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/100104 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Geranium rotundifolium L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/100144 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Hordeum murinum L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/102974 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Hornungia petraea (L.) Rchb., 1838 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/103019 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Lamium amplexicaule L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/104855 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Linaria supina (L.) Chaz., 1790 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/106226 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Medicago minima (L.) L., 1754 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/107658 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Medicago rigidula (L.) All., 1785 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/107706 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Sabulina tenuifolia (L.) Rchb., 1832 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/108597 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Myosotis ramosissima subsp. ramosissima Rochel, 1814 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/137934 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Reseda lutea L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/117458 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Rhinanthus pumilus (Sterneck) Soldano, 1986 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/117625 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Saxifraga tridactylites L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/121201 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Sherardia arvensis L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/123164 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Stellaria media (L.) Vill., 1789 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/125014 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Trifolium aureum Pollich, 1777 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/127258 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Trifolium incarnatum L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/127340 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Trifolium scabrum L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/127470 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Valerianella coronata (L.) DC., 1805 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/128489 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Veronica arvensis L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/128801 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Vicia sativa L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/142236 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Vicia sativa L., 1753 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/142236 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Vulpia alopecuros (Schousb.) Dumort., 1824 </td>
+   <td style="text-align:left;"> The </td>
+   <td style="text-align:left;"> annual </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/621041 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Anthyllis montana L., 1753 </td>
+   <td style="text-align:left;"> Cha </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/82985 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Arenaria aggregata (L.) Loisel., 1827 </td>
+   <td style="text-align:left;"> Cha </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/83535 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Coronilla minima L., 1756 </td>
+   <td style="text-align:left;"> Cha </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/92527 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Fumana procumbens (Dunal) Gren. &amp; Godr., 1847 </td>
+   <td style="text-align:left;"> Cha </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/99028 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Helianthemum apenninum (L.) Mill., 1768 </td>
+   <td style="text-align:left;"> Cha </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/100896 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Helianthemum oelandicum var. canescens (Hartm.) Fr., 1824 </td>
+   <td style="text-align:left;"> Cha </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/100905 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Ononis striata Gouan, 1773 </td>
+   <td style="text-align:left;"> Cha </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/110237 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Teucrium chamaedrys L., 1753 </td>
+   <td style="text-align:left;"> Cha </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/125981 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Teucrium montanum L., 1753 </td>
+   <td style="text-align:left;"> Cha </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/126008 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Thymus dolomiticus H.J.Coste, 1893 </td>
+   <td style="text-align:left;"> Cha </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/126514 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Aphyllanthes monspeliensis L., 1753 </td>
+   <td style="text-align:left;"> Geo </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/83171 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Convolvulus arvensis L., 1753 </td>
+   <td style="text-align:left;"> Geo </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/92302 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Euphorbia duvalii Lecoq &amp; Lamotte, 1847 </td>
+   <td style="text-align:left;"> Geo </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/97504 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Filipendula vulgaris Moench, 1794 </td>
+   <td style="text-align:left;"> Geo </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/98718 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Muscari neglectum Guss. ex Ten., 1842 </td>
+   <td style="text-align:left;"> Geo </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/108898 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Ornithogalum collinum Guss., 1825 </td>
+   <td style="text-align:left;"> Geo </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/717992 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Ornithogalum kochii Parl., 1857 </td>
+   <td style="text-align:left;"> Geo </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/620057 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Prospero autumnale (L.) Speta, 1982 </td>
+   <td style="text-align:left;"> Geo </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/115975 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Ranunculus bulbosus L., 1753 </td>
+   <td style="text-align:left;"> Geo </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/116952 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Ranunculus gramineus L., 1753 </td>
+   <td style="text-align:left;"> Geo </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/117049 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Achillea millefolium L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/79908 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Anthyllis vulneraria L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/82999 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Asperula cynanchica L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/84306 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Astragalus monspessulanus L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/84869 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Bellis perennis L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/85740 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Bromopsis erecta (Huds.) Fourr., 1869 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/86601 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Carduus nutans L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/88167 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Carex halleriana Asso, 1779 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/88560 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Carex humilis Leyss., 1758 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/88582 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Carthamus mitissimus L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/89235 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Centaurea pectinata L., 1763 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/89663 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Centaurea pectinata L., 1763 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/132983 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Eryngium campestre L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/97141 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Euphorbia seguieriana Neck., 1770 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/97660 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Festuca christiani-bernardi Kerguélen, 1979 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/98141 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Galium corrudifolium Vill., 1779 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/99406 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Globularia vulgaris L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/100356 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Pilosella officinarum F.W.Schultz &amp; Sch.Bip., 1862 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/102352 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Inula montana L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/103639 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Koeleria vallesiana (Honck.) Gaudin, 1808 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/104680 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Leucanthemum graminifolium (L.) Lam., 1779 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/105793 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Leucanthemum vulgare Lam., 1779 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/105817 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Linum appressum Caball., 1944 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/161206 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Lotus corniculatus L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/106653 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Phleum pratense L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/113221 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Plantago lanceolata L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/113893 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Plantago media L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/113906 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Poa badensis Haenke ex Willd., 1797 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/114124 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Poa bulbosa L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/114136 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Poa pratensis L., 1753 [nom. et typ. cons.] </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/114332 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Poa pratensis L., 1753 [nom. et typ. cons.] </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/114417 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Potentilla verna L., 1753 [nom. et typ. cons.] </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/115570 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Rumex acetosa L., 1753 [nom. et typ. cons.] </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/119418 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Salvia pratensis L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/120685 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Poterium sanguisorba L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/120753 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Scabiosa columbaria L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/121334 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Seseli montanum L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/123037 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Silene latifolia Poir., 1789 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/141165 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Stipa pennata L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/125173 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Taraxacum fulvum Raunk., 1906 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/125602 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Taraxacum erythrospermum Andrz. ex Besser, 1821 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/125643 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Taraxacum officinale F.H.Wigg., 1780 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/717630 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Thesium humifusum subsp. divaricatum (Mert. &amp; W.D.J.Koch) Bonnier &amp; Layens, 1894 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/141645 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Trifolium repens L., 1753 </td>
+   <td style="text-align:left;"> Hem </td>
+   <td style="text-align:left;"> perennial </td>
+   <td style="text-align:left;"> https://inpn.mnhn.fr/espece/cd_nom/127454 </td>
+  </tr>
+</tbody>
+</table>

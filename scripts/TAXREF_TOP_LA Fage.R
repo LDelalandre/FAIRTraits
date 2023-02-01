@@ -91,17 +91,22 @@ TIDY2 <- TIDY %>%
                               Species == "Myosostis ramosissima subsp. ramosissima" ~ "Myosotis ramosissima subsp. ramosissima", # s en trop
                               Species == "Helichrysum stoechas ssp. stoechas" ~ "Helichrysum stoechas subsp. stoechas",
                               Species == "Viola alba ssp. scotophylla" ~ "Viola alba subsp. scotophylla",
+                              Species == "Carex hallerana" ~  "Carex halleriana",
+                              Species == "Plantago lanceola" ~ "Plantago lanceolata",
+                              Species == "Catananche coerulea" ~ "Catananche caerulea",
+                              Species == "Chamærops humilis" ~ "Chamaerops humilis",
                               TRUE ~ Species)) %>% 
   filter(!(Species == "Geranium dissectum - pétiole"))
 
 write.csv2(TIDY2,"output/ETS_format_Bar_Caz_Gar.csv",row.names=F)
+# write.csv2(TIDY2,"output/ETS_format_LaFage.csv",row.names=F)
 
 #_______________________________________________________________________________
 # TOP ####
 TIDY <- read.csv2("output/ETS_format_Bar_Caz_Gar.csv")
 
-focus_trait_TOP <- merge(focus_trait,TOP,by="verbatimTraitName") %>% 
-  select(all_of(colnames(TIDY)),everything())
+# focus_trait_TOP <- merge(focus_trait,TOP,by="verbatimTraitName") %>% 
+#   select(all_of(colnames(TIDY)),everything())
 
 TIDY_traits <- merge(TIDY,TOP,by="verbatimTraitName") %>% 
   select(all_of(colnames(TIDY)),everything()) %>% 
@@ -116,26 +121,28 @@ list_sp <- TIDY %>%
   select(Species,Code_Sp) %>% 
   unique()
 
+
+
 list_sp_scientificName <- list_sp %>% 
   mutate(scientificName = map_chr(Species,get_scientificName,taxref)) 
 
-list_sp_name_id <- list_sp_scientificName %>% 
-  mutate(taxonID = map_chr(Species,get_taxon_id,taxref)) %>% 
-  mutate(scientificName = if_else(Species == "Myosostis ramosissima subsp. ramosissima","Myosotis ramosissima Rochel, 1814 subsp. ramosissima",scientificName)) %>% 
-  mutate(taxonID = if_else(Species == "Myosostis ramosissima subsp. ramosissima","https://inpn.mnhn.fr/espece/cd_nom/137934",taxonID))
+list_sp_name_URL <- list_sp_scientificName %>% 
+  mutate(taxonID = map_chr(Species,get_CD_NOM,taxref))
+  # mutate(scientificName = if_else(Species == "Myosostis ramosissima subsp. ramosissima","Myosotis ramosissima Rochel, 1814 subsp. ramosissima",scientificName)) %>% 
+  # mutate(taxonID = if_else(Species == "Myosostis ramosissima subsp. ramosissima","https://inpn.mnhn.fr/espece/cd_nom/137934",taxonID))
 
-list_sp_name_id_cd <- list_sp_name_id %>% 
-  mutate(CD_NOM = map_chr(Species,get_CD_NOM,taxref)) 
+list_sp_name_URL_id <- list_sp_name_id %>% 
+  mutate(taxonURL = map_chr(Species,get_URL,taxref)) 
 
-write.csv2(list_sp_name_id,"output/list of species_TAXREF_Bar_Caz_Gar.csv",row.names=F)
+write.csv2(list_sp_name_URL_id,"output/list of species_TAXREF_Bar_Caz_Gar.csv",row.names=F)
 
 # Add taxref info ####
 # NB: in fine, I will add all the info from the species data frame (LifeForm1, etc.), 
 # with the info from the floras, etc.
 
 TIDY_traits_TAXREF <- TIDY_traits %>% 
-  merge(list_sp_name_id,by=c("Species","Code_Sp")) %>% # add TAXREF info
-  select(Species,scientificName,taxonID,everything(),verbatimTraitValue,verbatimTraitUnit) %>% 
+  merge(list_sp_name_URL_id,by=c("Species","Code_Sp")) %>% # add TAXREF info
+  select(Species,scientificName,taxonID,taxonURL,everything(),verbatimTraitValue,verbatimTraitUnit) %>% 
   rename(verbatimScientificName = Species)
 
 write.csv2(TIDY_traits_TAXREF,"output/ETS_format_Bar_Caz_Gar_traits_TAXREF.csv",row.names=F,fileEncoding="latin1")

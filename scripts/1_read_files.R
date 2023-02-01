@@ -19,7 +19,7 @@ DATA_FILES <- c("LaFage_PlantTraitsDP_vp.xlsx",
                 "Garraf_PlantTraitsDP_vp.xlsx" ,
                 "HGM_PlantTraitsDP_vp.xlsx" 
 )
-sites <- c("LaFage","Bargemont","Cazarils","CampRedon","PDM","Garraf","HGM")
+sites <- c("LaFage","Bargemon","Cazarils","CampRedon","PDM","Garraf","HGM")
 
 SITES <- data.frame(cbind(sites,DATA_FILES))
 colnames(SITES) <- c("site","file")
@@ -28,8 +28,8 @@ colnames(SITES) <- c("site","file")
 read_files <- function(site){ # Calls the following (site-specific) functions
   if (site == "LaFage"){
     read_LaFage(SITES)
-  } else if (site == "Bargemont"){
-    read_Bargemont(SITES)
+  } else if (site == "Bargemon"){
+    read_Bargemon(SITES)
   } else if (site == "Cazarils"){
     read_Cazarils(SITES)
   } else if (site == "CampRedon"){
@@ -93,9 +93,9 @@ read_LaFage <- function(SITES){
   list(LeafMorpho,LeafCN,LeafP,Leaf13C15N,Biovolume,Pheno,Seed)
 }
 
-read_Bargemont <- function(SITES){
+read_Bargemon <- function(SITES){
   data_file <- SITES %>% 
-    filter(site=="Bargemont") %>% 
+    filter(site=="Bargemon") %>% 
     pull(file)
   
   LeafMorpho <-  read.xlsx(paste0("data/",data_file), sheet = "LeafMorpho_traits", startRow = 1, colNames = TRUE) %>% 
