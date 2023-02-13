@@ -2,7 +2,7 @@ library(tidyverse)
 library("openxlsx")
 
 # functions
-source("scripts/1_read_files.R")
+source("scripts/functions/1_read_files.R")
 
 
 #_______________________________________________________________________________
