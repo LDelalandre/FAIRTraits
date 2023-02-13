@@ -42,6 +42,8 @@ SPECIES2 <- SPECIES %>%
                               Species == "Chamærops humilis" ~ "Chamaerops humilis",
                               Species == "Cirsium acaule" ~ "Cirsium acaulon",
                               Species == "Inula conyza" ~ "Inula conyzae",
+                              Species == "Festuca christiani-bernardii" ~ "Festuca christiani-bernardi",
+                              # "Linum tenuifolium subsp. tenuifolium" n'existe pas dans TAXREF
                               TRUE ~ Species)) %>% 
   filter(!(Species == "Geranium dissectum - pétiole"))%>% 
   filter(!(Species == "Geranium dissectum - limbe"))
@@ -60,45 +62,92 @@ sp_CR <- data.frame(Species = c("Pallenis maritima",
                      "MUSCCOMO",
                      "CREPPULC"))
 
+species_leo <- read.csv2("data/species/species_leo.csv") 
+sp_LD <- data.frame(Species = c("Hornungia petraea",
+                                "Saxifraga tridactylites",
+                                "Valerianella pumila"),
+                    Code_Sp = c("HORNPETR",
+                                "SAXITRID",
+                                "VALEPUMI"))
+
 SPECIES3 <- SPECIES2 %>% 
   select(Species,Code_Sp) %>% 
   unique() %>% 
-  rbind(sp_CR)
+  rbind(sp_CR) %>% 
+  rbind(sp_LD) %>% 
+  mutate(Code_Sp = case_when(Code_Sp == "AMPEMAURI" ~ "AMPEMAUR",
+                             Code_Sp == "AVENBRO" ~ "AVENBROM",
+                             Code_Sp == "CATACOER" ~ "CATACAER",
+                             Code_Sp == "DACTGLOM" ~ "DACTGLOM-HIS",
+                             Code_Sp == "HELISTOE" ~ "HELISTOE-STO",
+                             Code_Sp == "RUBUSPEC" ~ "RUBUSP",
+                             Code_Sp == "VIOLALBA" ~ "VIOLALBA-SCO",
+                             Code_Sp == "XEREINAP" ~ "XERAINAP",
+                             TRUE ~Code_Sp
+  )) %>% 
+  unique()
 
+# one species duplicated: subspecies sometimes only
 sp_dupl <- SPECIES3[which(duplicated(SPECIES3$Code_Sp)),]$Code_Sp
 SPECIES3 %>% 
   filter(Code_Sp%in% sp_dupl) %>% 
   arrange(Code_Sp) %>% arrange(Species)
 
+sp_dupl <- SPECIES3[which(duplicated(SPECIES3$Species)),]$Species
+SPECIES3 %>% 
+  filter(Species%in% sp_dupl) %>% 
+  arrange(Species)
+
+SPECIES3 
+
+SPECIES4 <- SPECIES3 %>% 
+  mutate(family = map_chr(Species,info_taxref,"FAMILLE"))
+
+
+write.csv2(SPECIES4 %>% arrange(family),"data/species/Fichier_sp_flores/Species_Code_Sp.csv",row.names = F)
+
+dim(SPECIES4)
+
+
+# garder l'info sur la forme de vie quand elle y est, et compléter seulement quand besoin !
+# colonnes à ajouter :
+
+# LifeForm1 # DPh et EPh (deciduous et evergreen) for phanerophytes (evt. a posteriori)
+# LifeForm2
+# Woodiness (as diaz database, evt. a posteriori)
+# LifeHistory (perenne, annuelle, bisannuelle), à déduire de LifeForm1 et LifeForm2 ? Mais pour bisannuelle?
+# PHflora (prendre le plus haut, e.g. 10-25 : prendre 25 cm)
+# Phénologie de la floraison (début et fin)
+# Chorologie (chez Tison et Bernard, voir si homogène)
 
 
 
-write.csv2(SPECIES3,"data/species/Fichier_sp_flores/Species_Code_Sp.csv",row.names = F)
-
-
-
-#_______________________________________________________________________
-# to delete?
-# Species per site ###
-SPECIES2 <- NULL
-
-for (site in sites){
-  files <- read_files(site)
-  
-  if(class(files) == "list"){
-    for (i in c(1:length(files))){
-      file <- files[[i]] %>% 
-        select(Species, Code_Sp, Family, LifeForm1, LifeForm2,Site) %>% 
-        unique()
-      SPECIES2 <- rbind(SPECIES2,file)
-    }
-  } else if (class(files) == "data.frame"){
-    file <- files %>% 
-      mutate(Site = if_else(site == "HGM","HGM","PDM"))
-    SPECIES2 <- rbind(SPECIES2,file)
-  }
-  SPECIES2 <- unique(SPECIES2)
+#___________________________________________________________________
+# Espèces en commun La Fage et Cazarils ####
+# Pour voir quelle flore on choisit
+files <- read_files("LaFage")
+SPECIES <- NULL
+for (i in c(1:length(files))){
+  file <- files[[i]] %>% 
+    select(Species, Code_Sp) %>% 
+    unique()
+  SPECIES <- rbind(SPECIES,file)
 }
-SPECIES2 <- unique(SPECIES2)
+sp_lafage<- unique(SPECIES)
 
-write.csv2(SPECIES,"output/list of species_per_site.csv",row.names = F)
+files <- read_files("Cazarils")
+SPECIES <- NULL
+for (i in c(1:length(files))){
+  file <- files[[i]] %>% 
+    select(Species, Code_Sp) %>% 
+    unique()
+  SPECIES <- rbind(SPECIES,file)
+}
+sp_cazarils<- unique(SPECIES)
+
+sp_common <- intersect(sp_cazarils$Species,sp_lafage$Species)
+df <- data.frame(Species = sp_common) %>% 
+  arrange(Species)
+write.csv2(df,"data/species/Fichier_sp_flores/sp_common_cazarils_lafage.csv",row.names=F)
+
+read.csv2("data/species/Fichier_sp_flores/sp_common_cazarils_lafage_completed.csv")

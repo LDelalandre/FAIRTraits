@@ -95,8 +95,22 @@ TIDY2 <- TIDY %>%
                               Species == "Plantago lanceola" ~ "Plantago lanceolata",
                               Species == "Catananche coerulea" ~ "Catananche caerulea",
                               Species == "Chamærops humilis" ~ "Chamaerops humilis",
+                              Species == "Cirsium acaule" ~ "Cirsium acaulon",
+                              Species == "Inula conyza" ~ "Inula conyzae",
+                              Species == "Festuca christiani-bernardii" ~ "Festuca christiani-bernardi",
+                              # "Linum tenuifolium subsp. tenuifolium" n'existe pas dans TAXREF
                               TRUE ~ Species)) %>% 
-  filter(!(Species == "Geranium dissectum - pétiole"))
+  filter(!(Species == "Geranium dissectum - pétiole")) %>% 
+  mutate(Code_Sp = case_when(Code_Sp == "AMPEMAURI" ~ "AMPEMAUR",
+                             Code_Sp == "AVENBRO" ~ "AVENBROM",
+                             Code_Sp == "CATACOER" ~ "CATACAER",
+                             Code_Sp == "DACTGLOM" ~ "DACTGLOM-HIS",
+                             Code_Sp == "HELISTOE" ~ "HELISTOE-STO",
+                             Code_Sp == "RUBUSPEC" ~ "RUBUSP",
+                             Code_Sp == "VIOLALBA" ~ "VIOLALBA-SCO",
+                             Code_Sp == "XEREINAP" ~ "XERAINAP",
+                             TRUE ~Code_Sp
+  ))
 
 write.csv2(TIDY2,"output/ETS_format_Bar_Caz_Gar.csv",row.names=F)
 # write.csv2(TIDY2,"output/ETS_format_LaFage.csv",row.names=F)
