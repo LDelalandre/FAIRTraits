@@ -127,31 +127,6 @@ TIDY_traits <- merge(TIDY,TOP,by="verbatimTraitName") %>%
 
 #_______________________________________________________________________________
 # TaXREF and TOP
-# taxref <- read.csv2("data/TAXREF/TAXREF14.0_FR_Continental_13_07_2021.csv") # long to charge
-taxref <- read.table("data/TAXREF_v16/TAXREFv16.txt",header=T,sep = "\t")
-
-
-# TAXREF ####
-# list_sp <- read.csv2("output/Species_Code_Sp.csv")
-list_sp <- TIDY %>% 
-  select(Species,Code_Sp) %>% 
-  unique()
-
-
-
-list_sp_scientificName <- list_sp %>% 
-  mutate(scientificName = map_chr(Species,get_scientificName,taxref)) 
-
-list_sp_name_URL <- list_sp_scientificName %>% 
-  mutate(taxonID = map_chr(Species,get_CD_NOM,taxref))
-  # mutate(scientificName = if_else(Species == "Myosostis ramosissima subsp. ramosissima","Myosotis ramosissima Rochel, 1814 subsp. ramosissima",scientificName)) %>% 
-  # mutate(taxonID = if_else(Species == "Myosostis ramosissima subsp. ramosissima","https://inpn.mnhn.fr/espece/cd_nom/137934",taxonID))
-
-list_sp_name_URL_id <- list_sp_name_id %>% 
-  mutate(taxonURL = map_chr(Species,get_URL,taxref)) 
-
-write.csv2(list_sp_name_URL_id,"output/list of species_TAXREF_Bar_Caz_Gar.csv",row.names=F)
-
 # Add taxref info ####
 # NB: in fine, I will add all the info from the species data frame (LifeForm1, etc.), 
 # with the info from the floras, etc.
@@ -162,7 +137,6 @@ TIDY_traits_TAXREF <- TIDY_traits %>%
   rename(verbatimScientificName = Species)
 
 write.csv2(TIDY_traits_TAXREF,"output/ETS_format_Bar_Caz_Gar_traits_TAXREF.csv",row.names=F,fileEncoding="latin1")
-
 
 #_______________________________________________________________________________
 # List of all the traits ####

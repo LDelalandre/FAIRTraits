@@ -17,6 +17,7 @@ info_taxref <- function(verbatim_name,finfo){
   valid_name[1]
 }
 
+
 get_scientificName <- function(verbatim_name,taxref){
   valid_name <- taxref %>% 
     filter(LB_NOM == verbatim_name %>% 
