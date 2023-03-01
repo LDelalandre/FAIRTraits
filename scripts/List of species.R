@@ -2,6 +2,7 @@ source(("scripts/1_read_files.R"))
 
 # Per species ####
 SPECIES <- NULL
+SPECIES_site <- NULL # avec les espèces par site
 
 for (site in sites){
   files <- read_files(site)
@@ -12,15 +13,23 @@ for (site in sites){
         select(Species, Code_Sp, Family, LifeForm1, LifeForm2) %>% 
         unique()
       SPECIES <- rbind(SPECIES,file)
+      SPECIES_site <- rbind(SPECIES_site,file %>% mutate(site=site))
     }
   } else if (class(files) == "data.frame"){
     file <- files
     SPECIES <- rbind(SPECIES,file)
+    SPECIES_site <- rbind(SPECIES_site,file %>% mutate(site=site))
   }
   SPECIES <- unique(SPECIES)
 }
 SPECIES <- unique(SPECIES)
 dim(SPECIES)
+
+sp_tison <- read.xlsx("data/species/Fichier_sp_flores/Species_completed_Tison.xlsx")
+setdiff(sp_tison$Species,SPECIES$Species)
+setdiff(SPECIES$Species,sp_tison$Species)
+
+
 
 # correct typos in species names
 SPECIES2 <- SPECIES %>% 

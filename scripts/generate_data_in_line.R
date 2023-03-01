@@ -33,6 +33,7 @@ columns_gas_exchange_metadata <- c(  "dataType"  , "instrumentOutputStatus",
 TIDY <- NULL
 
 fsites <- sites[c(2,3,6)] # focal sites
+fsites <- sites
 
 # NB : il faut peut-être ajouter le paddock dans verbatim occurrence id pour tous les sites. Fait pour la Fage.
 for (site in fsites){ # site

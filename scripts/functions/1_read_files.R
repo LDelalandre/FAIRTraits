@@ -214,6 +214,38 @@ read_Garraf <- function(SITES){
 
 
 
+read_PDM <- function(SITES){
+  data_file <- SITES %>% 
+    filter(site=="PDM") %>% 
+    pull(file)
+  
+  LeafMorpho <-  read.xlsx(paste0("data/",data_file), sheet = "LeafMorpho_traits", startRow = 1, colNames = TRUE) %>% 
+    change_format()
+  
+  LeafCN <- read.xlsx(paste0("data/",data_file), sheet = "LeafC&N", startRow = 1, colNames = TRUE) %>% 
+    change_format()
+  
+  LeafP <- read.xlsx(paste0("data/",data_file), sheet = "LeafP", startRow = 1, colNames = TRUE) %>% 
+    change_format() 
+  
+  Leaf13C15N <- read.xlsx(paste0("data/",data_file), sheet = "Leaf13C&15N", startRow = 1, colNames = TRUE) %>% 
+    change_format()
+  
+  Biovolume <- read.xlsx(paste0("data/",data_file), sheet = "Biovolume", startRow = 1, colNames = TRUE) %>% 
+    # mutate(Day = as.Date(Day- 25569, origin = "1970-01-01")) %>%
+    # Problem : Day parfois de la forme xx/5 --> Lecture non possible
+    mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Day,Rep,sep = "_")) 
+  
+  Seed <- read.xlsx(paste0("data/",data_file), sheet = "SeedM", startRow = 1, colNames = TRUE) %>% 
+    change_format()
+  
+  GasExchange <- read.xlsx(paste0("data/",data_file), sheet = "GasExchange", startRow = 1, colNames = TRUE) %>% 
+    change_format() %>% 
+    mutate(nameOfProject = "DynEcoMed", measurementDeterminedBy = "Catherine Roumet")
+  
+  list(LeafMorpho,LeafCN,LeafP,Leaf13C15N,Biovolume,Seed,GasExchange)
+}
+
 
 
 
