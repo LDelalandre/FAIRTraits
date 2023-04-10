@@ -40,7 +40,7 @@ read_file <- function(fsite,SITES=SITES){
   x
 }
 
-
+#_______________________________________________________________________________
 # Version antérieure ####
 read_files <- function(site){ # Calls the following (site-specific) functions
   if (site == "LaFage"){
