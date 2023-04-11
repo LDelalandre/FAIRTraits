@@ -25,21 +25,6 @@ SITES <- data.frame(cbind(sites,DATA_FILES))
 colnames(SITES) <- c("site","file")
 
 
-
-# En cours: Importer automatiquement tous les feuillets pour un site ####
-# A utiliser quand les fichiers source seront propores (noms de colonnes définitifs...)
-read_file <- function(fsite,SITES=SITES){
-  filename <- SITES %>% 
-    filter(site == fsite) %>% 
-    pull(file)
-  path_filename <- paste0("data/",filename)
-  
-  sheets <- readxl::excel_sheets(path_filename)
-  x <- lapply(sheets, function(X) readxl::read_excel(path_filename, sheet = X))
-  names(x) <- sheets
-  x
-}
-
 #_______________________________________________________________________________
 # Version antérieure ####
 read_files <- function(site){ # Calls the following (site-specific) functions
