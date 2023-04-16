@@ -46,10 +46,3 @@ get_CD_NOM <- function(verbatim_name,taxref){
     pull(CD_NOM)
   cd_nom[1]
 }
-
-# TOP ####
-get_info_TOP <- function(trait,columnWanted,top){
-  TOP %>% 
-    filter(verbatimTraitName == trait) %>% 
-    pull(columnWanted)
-}
