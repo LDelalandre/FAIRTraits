@@ -20,6 +20,7 @@ sp_info_name_URL_id <- sp_info_name_URL %>%
 
 # checké avec TAXREF: les familles botaniques sont bien renseignées.
 
-write.csv2(sp_info_name_URL_id,"output/taxon_extension.csv",row.names=F,fileEncoding = "Latin1")
+write.csv2(sp_info_name_URL_id %>% 
+             select(-Remarques),"output/taxon_extension.csv",row.names=F,fileEncoding = "Latin1")
 
 

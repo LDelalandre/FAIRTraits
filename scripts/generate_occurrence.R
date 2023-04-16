@@ -130,7 +130,7 @@ TIDY3 <- TIDY2 %>%
                              TRUE ~ Species))
 
 
-write.csv2(TIDY2,"output/Core_vavr2023.csv",row.names=F,fileEncoding = 'Latin1')
+write.csv2(TIDY3,"output/Core_vavr2023.csv",row.names=F,fileEncoding = 'Latin1')
 
 
 # vérifs ####
