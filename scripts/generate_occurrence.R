@@ -123,19 +123,67 @@ TIDY2 <- TIDY %>%
   filter(verbatimTraitName %in% trait_names) # remove traits that are not listed in MeasurementOrFact(traits)
 
 
+
 # Corrections ####
 TIDY3 <- TIDY2 %>% 
+  filter(!(is.na(verbatimTraitValue))) %>% 
+  filter(!(Species %in% c("Geranium dissectum - p\xe9tiole","Geranium dissectum - pétiole"))) %>% 
   mutate(Species = case_when(Species == "Thymus serpyllum" ~ "Thymus sp.",
                              Species == "Taraxacum officinale" ~ "Taraxacum sp.",
-                             TRUE ~ Species))
+                             Species == "Carex humilis?" ~"Carex sp.",
+                             Species == "Cratægus monogyna" ~ "Crataegus monogyna",
+                             Species == "Chamærops humilis" ~ "Chamaerops humilis",
+                             Species == "Erophila verna" ~ "Draba verna",
+                             Species == "Bromus steriis" ~ "Bromus sterilis",
+                             Species == "Festuca christiani-bernardi" ~ "Festuca christiani-bernardii",
+                             Species == "Geranium dissectum - limbe" ~ "Geranium dissectum",
+                             Species == "Festuca ovina (sp)?" ~ "Festuca christiani-bernardii",
+                             TRUE ~ Species)) %>% 
+  mutate(Species = case_when( Species == "Potentilla reptens" ~ "Potentilla reptans" ,
+                              Species == "Vicia heteophylla" ~ "Vicia heterophylla",
+                              Species == "Ampelodesmos mauritanica" ~ "Ampelodesmos mauritanicus",
+                              Species == "Kickxia spruria" ~ "Kickxia spuria", # r en trop
+                              Species == "Convovulus arvensis" ~ "Convolvulus arvensis", # manque un l
+                              Species == "Cratægus monogyna" ~ "Crataegus monogyna",
+                              Species == "Carex humilis?" ~ "Carex sp.",
+                              Species == "Myosostis ramosissima subsp. ramosissima" ~ "Myosotis ramosissima subsp. ramosissima", # s en trop
+                              Species == "Helichrysum stoechas ssp. stoechas" ~ "Helichrysum stoechas subsp. stoechas",
+                              Species == "Viola alba ssp. scotophylla" ~ "Viola alba subsp. scotophylla",
+                              Species == "Carex hallerana" ~  "Carex halleriana",
+                              Species == "Plantago lanceola" ~ "Plantago lanceolata",
+                              Species == "Catananche coerulea" ~ "Catananche caerulea",
+                              Species == "Chamærops humilis" ~ "Chamaerops humilis",
+                              Species == "Cirsium acaule" ~ "Cirsium acaulon",
+                              Species == "Inula conyza" ~ "Inula conyzae",
+                              # "Linum tenuifolium subsp. tenuifolium" n'existe pas dans TAXREF
+                              TRUE ~ Species)) 
 
 
 write.csv2(TIDY3,"output/Core_vavr2023.csv",row.names=F,fileEncoding = 'Latin1')
 
+#_______________________________________________________________________________
+# vérifications ####
 
-# vérifs ####
-
-TIDY2 <- read.csv2("output/Core_vavr2023_1.csv")
-dim(TIDY2)
+core <- read.csv2("output/Core_vavr2023.csv")
+dim(core)
 
 
+## checker que l'extension taxons correspond bien aux espèces du core ####
+taxon <- read.csv2("output/taxon_extension.csv")
+sp_core <- core %>% 
+  select(Species) %>% 
+  unique()
+
+test_taxon <- sp_core%>% 
+  merge(taxon)
+
+test_taxon %>% dim()
+taxon %>% dim()
+
+# espèces dans l'extension taxon, mais pas dans le core
+setdiff(taxon$Species,sp_core$Species)
+# "Lolium perenne"
+
+# espèces dans le core, mais pas dans l'extension taxon
+setdiff(sp_core$Species,taxon$Species)
+# "Festuca ovina (sp.)?"
