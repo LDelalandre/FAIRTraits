@@ -23,4 +23,3 @@ sp_info_name_URL_id <- sp_info_name_URL %>%
 write.csv2(sp_info_name_URL_id %>% 
              select(-Remarques),"output/taxon_extension.csv",row.names=F,fileEncoding = "Latin1")
 
-

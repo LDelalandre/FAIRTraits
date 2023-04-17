@@ -135,9 +135,10 @@ TIDY3 <- TIDY2 %>%
                              Species == "Chamærops humilis" ~ "Chamaerops humilis",
                              Species == "Erophila verna" ~ "Draba verna",
                              Species == "Bromus steriis" ~ "Bromus sterilis",
-                             Species == "Festuca christiani-bernardi" ~ "Festuca christiani-bernardii",
+                             Species == "Festuca christiani-bernardii" ~ "Festuca christiani-bernardi",
                              Species == "Geranium dissectum - limbe" ~ "Geranium dissectum",
-                             Species == "Festuca ovina (sp)?" ~ "Festuca christiani-bernardii",
+                             Species == "Festuca ovina (sp)?" ~ "Festuca christiani-bernardi",
+                             Species == "Linum tenuifolium subsp. tenuifolium" ~ "Linum tenuifolium",
                              TRUE ~ Species)) %>% 
   mutate(Species = case_when( Species == "Potentilla reptens" ~ "Potentilla reptans" ,
                               Species == "Vicia heteophylla" ~ "Vicia heterophylla",
