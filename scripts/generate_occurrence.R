@@ -3,7 +3,11 @@ library("openxlsx")
 
 # Names of traits that we keep
 MeasurementOrFact_traits <- openxlsx::read.xlsx("data/Versions_Avril2023/Supp_Extensions_FAIRTraits_vavril2023.xlsx", sheet = "MeasurementOrFact(traits)", startRow = 1, colNames = TRUE)
-trait_names <- MeasurementOrFact_traits$verbatimTraitName
+trait_names <- MeasurementOrFact_traits$verbatimTraitName_old
+correspondence_traits_old_new <- MeasurementOrFact_traits %>% 
+  select(verbatimTraitName_old,verbatimTraitName_new) %>% 
+  rename(verbatimTraitName = verbatimTraitName_old)
+
 
 sites <- c("LaFage","Cazarils","PDM","O2LA","Garraf","HGM","LesAgros")
 
@@ -160,12 +164,74 @@ TIDY3 <- TIDY2 %>%
                               TRUE ~ Species)) 
 
 
+#_____________________________
+# Change trait names ####
+TIDY4 <- TIDY3 %>% 
+  merge(correspondence_traits_old_new) %>% 
+  select(-verbatimTraitName) %>% 
+  rename(verbatimTraitName = verbatimTraitName_new)
+
+#_____________________________
+# Add samplingProtocol and measurementMethod ####
+info_traits <- MeasurementOrFact_traits %>% 
+  select(-verbatimTraitName_old) %>% 
+  rename(verbatimTraitName = verbatimTraitName_new)
+
+# CHANGE MERGE for FULL_JOIN ?
+# (Il y a des lignes qui disparaissent dans la procédure, alors que normalement j'ai séléectionné uniquement els traits listés dans MeasurementOrFact. Lesquels ?)
+
+#__
+## traits whose samplingProtocol and measurementMethod are identical whatever the site ####
+traits_identical_all_sites <-  info_traits %>% 
+  filter(Site == "All") %>% 
+  pull(verbatimTraitName)
+
+# subset of core with these traits
+TIDY4_commontraits <- TIDY4 %>% 
+  filter(verbatimTraitName %in% traits_identical_all_sites)
+
+intersect(TIDY4_commontraits %>% colnames(),
+          info_traits %>% colnames())
+
+# add columns of the MeasurementOrFact(traits) extension (to be splitted into extension later)
+TIDY4_commontraits_ext <- TIDY4_commontraits %>% 
+  merge(info_traits %>% 
+          filter(Site == "All") %>% 
+          select(-Site), 
+        by = c("verbatimTraitName"))
+
+#--
+## traits whose samplingProtocol and measurementMethod differ depending on the site ####
+traits_f_site <- info_traits %>% 
+  filter(!(Site == "All")) %>% 
+  pull(verbatimTraitName)
+
+# subset of core with these traits
+TIDY4_differingtraits <- TIDY4 %>% 
+  filter(!(verbatimTraitName %in% traits_identical_all_sites))
+
+intersect(TIDY4_differingtraits %>% colnames(),
+          info_traits %>% colnames())
+
+# add columns of the MeasurementOrFact(traits) extension (to be splitted into extension later)
+TIDY4_differingtraits_ext <- TIDY4_differingtraits %>% 
+  merge(info_traits %>% 
+          filter(!(Site == "All")), 
+        by = c("Site","verbatimTraitName"))
+
+TIDY5 <- rbind(TIDY4_commontraits_ext,TIDY4_differingtraits_ext)
+
+
+dim(TIDY4)
+dim(TIDY5)
+# on a perdu des lignes!
+
 write.csv2(TIDY3,"output/Core_vavr2023.csv",row.names=F,fileEncoding = 'Latin1')
 
 #_______________________________________________________________________________
 # vérifications ####
 
-core <- read.csv2("output/Core_vavr2023.csv")
+TIDY3 <- read.csv2("output/Core_vavr2023.csv")
 dim(core)
 
 
