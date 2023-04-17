@@ -73,6 +73,8 @@ for (focalsite in sites){
     # work on each excel sheet successively
     focus <- files[[i]]
     focus$feuillet <- names(files[i])
+    if(focalsite == "PDM") {focus$Site <- "PDM"}
+    if(focalsite == "O2LA") {focus$Site <- "O2LA"}
     
     if (!(names(files[i]) %in% feuillets_to_remove)){
       # names of the traits in the focal sheet
@@ -164,12 +166,17 @@ TIDY3 <- TIDY2 %>%
                               TRUE ~ Species)) 
 
 
+
+
 #_____________________________
 # Change trait names ####
 TIDY4 <- TIDY3 %>% 
   merge(correspondence_traits_old_new) %>% 
   select(-verbatimTraitName) %>% 
   rename(verbatimTraitName = verbatimTraitName_new)
+
+write.csv2(TIDY4,"output/Core_vavr2023.csv",row.names=F,fileEncoding = 'Latin1')
+TIDY4 <- read.csv2("output/Core_vavr2023.csv")
 
 #_____________________________
 # Add samplingProtocol and measurementMethod ####
@@ -194,39 +201,92 @@ intersect(TIDY4_commontraits %>% colnames(),
           info_traits %>% colnames())
 
 # add columns of the MeasurementOrFact(traits) extension (to be splitted into extension later)
+info_commontraits_tomerge <- info_traits %>% 
+  filter(Site == "All") %>% 
+  select(-Site)
+
 TIDY4_commontraits_ext <- TIDY4_commontraits %>% 
-  merge(info_traits %>% 
-          filter(Site == "All") %>% 
-          select(-Site), 
-        by = c("verbatimTraitName"))
+  merge(info_commontraits_tomerge,by = c("verbatimTraitName"))
+
+TIDY4_commontraits %>% dim()
+TIDY4_commontraits_ext %>% dim()
+# ok, mêmes dimensions
 
 #--
 ## traits whose samplingProtocol and measurementMethod differ depending on the site ####
+# PB1: dans le CORE, l'info PDM et O2LA est dégradée en CAmp Redon. Changer à la lecture de ces sites le nom du site, puis le rechanger à la toute fin.
+# PB2: il manque des sites dans le fichier de mapping des traits!!
+
 traits_f_site <- info_traits %>% 
   filter(!(Site == "All")) %>% 
   pull(verbatimTraitName)
 
 # subset of core with these traits
 TIDY4_differingtraits <- TIDY4 %>% 
-  filter(!(verbatimTraitName %in% traits_identical_all_sites))
+  filter(verbatimTraitName %in% traits_f_site)
 
 intersect(TIDY4_differingtraits %>% colnames(),
           info_traits %>% colnames())
 
 # add columns of the MeasurementOrFact(traits) extension (to be splitted into extension later)
+info_traits_tomerge <- info_traits %>% filter(!(Site == "All"))
+
+info_traits_tomerge %>% pull(Site) %>% unique()
+TIDY4_differingtraits %>% pull(Site) %>% unique()
+
 TIDY4_differingtraits_ext <- TIDY4_differingtraits %>% 
-  merge(info_traits %>% 
-          filter(!(Site == "All")), 
-        by = c("Site","verbatimTraitName"))
+  merge(info_traits_tomerge, by = c("Site","verbatimTraitName"))
+
+
+
+TIDY4_differingtraits %>% dim()
+TIDY4_differingtraits_ext %>% dim()
+# IL MANQUE ENVIRON 16000 lignes...
+
+missing <- setdiff(TIDY4_differingtraits$verbatimOccurrenceID, TIDY4_differingtraits_ext$verbatimOccurrenceID) %>% # plein de lignes manquantes dans info_traits_tomerge
+  as.data.frame()
+colnames(missing) <- "verbatimOccurrenceID"
+
+missing2 <- missing %>% 
+  separate(verbatimOccurrenceID, into = c("Code_Sp","Site","Block","Plot","Treatment","Year","Month","Day","Rep","verbatimTraitName"),
+           sep = "_")
+
+
+missing2 %>% pull(Site) %>% unique()
+missing2 %>% pull(verbatimTraitName) %>% unique()
+missing2 %>% pull(Code_Sp) %>% unique()
+
+# isoler Species, Site, verbatimTraitName
+
+setdiff(TIDY4_differingtraits_ext$verbatimOccurrenceID, TIDY4_differingtraits$verbatimOccurrenceID) # 0
+
+
+
 
 TIDY5 <- rbind(TIDY4_commontraits_ext,TIDY4_differingtraits_ext)
-
-
 dim(TIDY4)
 dim(TIDY5)
 # on a perdu des lignes!
 
-write.csv2(TIDY3,"output/Core_vavr2023.csv",row.names=F,fileEncoding = 'Latin1')
+
+# generate core and extension ####
+
+core <- TIDY5 %>% 
+  select(Site,	Block	,Plot,	Treatment,	Year,	Month,	Day,	Species,
+         Entity,	Rep,	feuillet ,verbatimTraitName,	verbatimTraitValue	, nameOfProject,	measurementDeterminedBy,
+         verbatimOccurrenceID, verbatimOccurrenceID_echantillon,	verbatimOccurrenceID_population	
+)
+write.csv2(core,"output/Core_vavr2023.csv",fileEncoding = "Latin1")
+
+
+MeasurementOrFact <- TIDY5 %>% 
+  select(verbatimOccurrenceID,Site,	verbatimTraitName,	traitName,	traitEntity,	Quality,	verbatimTraitUnit,
+         LocalIdentifier,	traitID	,samplingProtocol,	measurementMethod
+)
+
+write.csv2(MeasurementOrFact,"output/MeasurementOrFact(traits).csv",fileEncoding = "Latin1")
+
+
 
 #_______________________________________________________________________________
 # vérifications ####
