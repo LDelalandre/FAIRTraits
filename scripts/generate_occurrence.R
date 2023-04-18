@@ -56,7 +56,6 @@ read_file <- function(fsite){
   x
 }
 
-
 # Centralize data in one "tidy" data frame with info in row ####
 
 feuillets_to_remove <- c("LeafDimensions (àsupprimer)","Climate data")
@@ -163,7 +162,8 @@ TIDY3 <- TIDY2 %>%
                               Species == "Cirsium acaule" ~ "Cirsium acaulon",
                               Species == "Inula conyza" ~ "Inula conyzae",
                               # "Linum tenuifolium subsp. tenuifolium" n'existe pas dans TAXREF
-                              TRUE ~ Species)) 
+                              TRUE ~ Species)) %>% 
+  mutate(Treatment = paste("Treatment",Treatment,sep="_"))
 
 
 
@@ -175,8 +175,9 @@ TIDY4 <- TIDY3 %>%
   select(-verbatimTraitName) %>% 
   rename(verbatimTraitName = verbatimTraitName_new)
 
-write.csv2(TIDY4,"output/Core_vavr2023.csv",row.names=F,fileEncoding = 'Latin1')
-TIDY4 <- read.csv2("output/Core_vavr2023.csv")
+# write.csv2(TIDY4,"output/Core_vavr2023.csv",row.names=F,fileEncoding = 'Latin1')
+# TIDY4 <- read.csv2("output/Core_vavr2023.csv") %>% 
+#   select(-X)
 
 #_____________________________
 # Add samplingProtocol and measurementMethod ####
@@ -187,15 +188,30 @@ info_traits <- MeasurementOrFact_traits %>%
 # CHANGE MERGE for FULL_JOIN ?
 # (Il y a des lignes qui disparaissent dans la procédure, alors que normalement j'ai séléectionné uniquement els traits listés dans MeasurementOrFact. Lesquels ?)
 
-#__
-## traits whose samplingProtocol and measurementMethod are identical whatever the site ####
 traits_identical_all_sites <-  info_traits %>% 
   filter(Site == "All") %>% 
   pull(verbatimTraitName)
 
+traits_f_site <- info_traits %>% 
+  filter(!(Site == "All")) %>% 
+  pull(verbatimTraitName)
+
+# quels traits sont mesurés à la fois dans les sites où il y a des différences, et dans "All"
+intersect(traits_f_site,traits_identical_all_sites)
+# Il y a juste LCC et TotStDMC pour lesquels il y a des méthodes de mesure différentes entre "All" et les sites particuliers
+# Voir à quels sites ça correspond et dupliquer les lignes en conséquence
+
+# TotRpDM: il y a des problèmes: 1)même chose appelée différemment dans traitName
+# 2) ça s'appelle TotRpDM, alors que dans certains cas, mesuré juste sur l'organe
+
+#__
+## traits whose samplingProtocol and measurementMethod are identical whatever the site ####
+
+
 # subset of core with these traits
 TIDY4_commontraits <- TIDY4 %>% 
-  filter(verbatimTraitName %in% traits_identical_all_sites)
+  filter(verbatimTraitName %in% traits_identical_all_sites) %>% 
+  filter(!verbatimTraitName %in% c("LCC","TotStDM"))
 
 intersect(TIDY4_commontraits %>% colnames(),
           info_traits %>% colnames())
@@ -217,9 +233,7 @@ TIDY4_commontraits_ext %>% dim()
 # PB1: dans le CORE, l'info PDM et O2LA est dégradée en CAmp Redon. Changer à la lecture de ces sites le nom du site, puis le rechanger à la toute fin.
 # PB2: il manque des sites dans le fichier de mapping des traits!!
 
-traits_f_site <- info_traits %>% 
-  filter(!(Site == "All")) %>% 
-  pull(verbatimTraitName)
+
 
 # subset of core with these traits
 TIDY4_differingtraits <- TIDY4 %>% 
@@ -234,31 +248,42 @@ info_traits_tomerge <- info_traits %>% filter(!(Site == "All"))
 info_traits_tomerge %>% pull(Site) %>% unique()
 TIDY4_differingtraits %>% pull(Site) %>% unique()
 
+# left join (pour database sans perte de données)
 TIDY4_differingtraits_ext <- TIDY4_differingtraits %>% 
+  left_join(info_traits_tomerge, by = c("Site","verbatimTraitName"))
+
+# merge (pour voir ce qui manque)
+TIDY4_differingtraits_ext_check <- TIDY4_differingtraits %>% 
   merge(info_traits_tomerge, by = c("Site","verbatimTraitName"))
 
-
-
 TIDY4_differingtraits %>% dim()
-TIDY4_differingtraits_ext %>% dim()
-# IL MANQUE ENVIRON 16000 lignes...
+TIDY4_differingtraits_ext_check %>% dim()
 
-missing <- setdiff(TIDY4_differingtraits$verbatimOccurrenceID, TIDY4_differingtraits_ext$verbatimOccurrenceID) %>% # plein de lignes manquantes dans info_traits_tomerge
+missing_MoF <- TIDY4_differingtraits_ext %>% 
+  filter(is.na(samplingProtocol))
+write.csv2(missing_MoF,"output/missing_MoF_avr2023.CSV",row.names=F)
+
+# IL MANQUE ENVIRON 667 lignes... (= on n'a pas les métadonnées de mesures de trait pour ces données)
+
+# Concerne les sites Cazarils et Les Agros
+# concerne uniquement le trait LCC
+# Hautes Garrigues et PDM : whole plant
+# Autres sites : mature leaf
+
+
+missing <- setdiff(TIDY4_differingtraits$verbatimOccurrenceID, TIDY4_differingtraits_ext_check$verbatimOccurrenceID) %>% # plein de lignes manquantes dans info_traits_tomerge
   as.data.frame()
 colnames(missing) <- "verbatimOccurrenceID"
 
+# isoler Species, Site, verbatimTraitName
 missing2 <- missing %>% 
   separate(verbatimOccurrenceID, into = c("Code_Sp","Site","Block","Plot","Treatment","Year","Month","Day","Rep","verbatimTraitName"),
            sep = "_")
-
-
 missing2 %>% pull(Site) %>% unique()
 missing2 %>% pull(verbatimTraitName) %>% unique()
 missing2 %>% pull(Code_Sp) %>% unique()
 
-# isoler Species, Site, verbatimTraitName
-
-setdiff(TIDY4_differingtraits_ext$verbatimOccurrenceID, TIDY4_differingtraits$verbatimOccurrenceID) # 0
+setdiff(TIDY4_differingtraits_ext_check$verbatimOccurrenceID, TIDY4_differingtraits$verbatimOccurrenceID) # 0
 
 
 
@@ -266,7 +291,15 @@ setdiff(TIDY4_differingtraits_ext$verbatimOccurrenceID, TIDY4_differingtraits$ve
 TIDY5 <- rbind(TIDY4_commontraits_ext,TIDY4_differingtraits_ext)
 dim(TIDY4)
 dim(TIDY5)
-# on a perdu des lignes!
+# on a perdu des lignes! ... ou rajouté, au choix.
+
+dim(TIDY5)
+
+TIDY5 %>% 
+  group_by(nameOfProject) %>% 
+  summarize(n = n())
+
+
 
 
 # generate core and extension ####
@@ -276,7 +309,10 @@ core <- TIDY5 %>%
          Entity,	Rep,	feuillet ,verbatimTraitName,	verbatimTraitValue	, nameOfProject,	measurementDeterminedBy,
          verbatimOccurrenceID, verbatimOccurrenceID_echantillon,	verbatimOccurrenceID_population	
 )
-write.csv2(core,"output/Core_vavr2023.csv",fileEncoding = "Latin1")
+
+
+write.table(core,"output/Core_vavr2023.csv",fileEncoding = "UTF-8",
+            row.names=F,sep="\t")
 
 
 MeasurementOrFact <- TIDY5 %>% 
@@ -284,7 +320,13 @@ MeasurementOrFact <- TIDY5 %>%
          LocalIdentifier,	traitID	,samplingProtocol,	measurementMethod
 )
 
-write.csv2(MeasurementOrFact,"output/MeasurementOrFact(traits).csv",fileEncoding = "Latin1")
+write.csv2(MeasurementOrFact,"output/MeasurementOrFact(traits).csv",fileEncoding = "Latin1",row.names=F)
+
+
+core_subsample <- core[sample(10000, ), ]
+MeasurementOrFact_subsample <- MeasurementOrFact[sample(10000, ), ]
+write.csv2(core_subsample,"output/core_subsample.csv",fileEncoding = "Latin1",row.names=F)
+write.csv2(MeasurementOrFact_subsample,"output/MeasurementOrFact_subsample(traits).csv",fileEncoding = "Latin1",row.names=F)
 
 
 
