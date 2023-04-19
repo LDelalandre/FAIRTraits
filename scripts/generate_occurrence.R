@@ -130,7 +130,7 @@ TIDY2 <- TIDY %>%
 
 
 
-# Corrections ####
+# Corrections (typos) ####
 TIDY3 <- TIDY2 %>% 
   filter(!(is.na(verbatimTraitValue))) %>% 
   filter(!(Species %in% c("Geranium dissectum - p\xe9tiole","Geranium dissectum - pétiole"))) %>% 
@@ -167,14 +167,10 @@ TIDY3 <- TIDY2 %>%
   mutate(Treatment = paste("Treatment",Treatment,sep="_"))
 
 
-
-
-
-
 #_______________________________________________________________________________
-# Info on traits traits ####
+#  Modifs ####
 
-## Update trait names ####
+## Update values of verbatimTraitName ####
 TIDY4 <- TIDY3 %>% 
   merge(correspondence_traits_old_new) %>% 
   select(-verbatimTraitName) %>% 
@@ -184,8 +180,8 @@ TIDY4 <- TIDY3 %>%
 # TIDY4 <- read.csv2("output/Core_vavr2023.csv") %>% 
 #   select(-X)
 
-#_____________________________
-## Add samplingProtocol and measurementMethod f(site) ####
+#_______________________________________________________________________________
+## MoF(traits): add samplingProtocol and measurementMethod f(site) ####
 info_traits <- MeasurementOrFact_traits %>% 
   select(-verbatimTraitName_old) %>% 
   rename(verbatimTraitName = verbatimTraitName_new)
@@ -304,11 +300,7 @@ TIDY5 %>%
   group_by(nameOfProject) %>% 
   summarize(n = n())
 
-
-
-
-# generate core and extension MoF traits ####
-
+#_______________________________________________________________________________
 ## Envt info  #### 
 # (plot latitude, longitude, altitude)
 
@@ -322,13 +314,20 @@ Infos_Plots <- openxlsx::read.xlsx("data/Versions_Avril2023/Supp_Extensions_FAIR
 
 # TRES PEU DE CONGRUENCE ENTRE LES PLOTS DES METADONNEES ET DES DONNEES
 # --> A compléter
-plots_core <- TIDY5 %>% pull(Plot) %>% unique()
+plots_core <- TIDY5 %>% 
+  filter(!(Site %in% c("O2LA","PDM"))) %>% 
+  pull(Plot) %>% unique()
 plots_info <- Infos_Plots %>% pull(Plot) %>% unique()
 setdiff(plots_core,plots_info)
 setdiff(plots_info,plots_core)
+intersect(plots_info,plots_core)
 
 TIDY6 <- merge(TIDY5,Infos_Plots) # je perds de l'info en mergeant
 
+
+
+TIDY5 %>% filter(Plot == "Q3") %>% View
+#________________________________________________
 ## New columns ####
 TIDY7 <- TIDY6 %>% 
   mutate(countryCode = if_else(Site == "Garraf", "ES","FR"),
@@ -338,19 +337,30 @@ TIDY7 <- TIDY6 %>%
          plotAltitude_max = plotAltitude) 
 
 
-# Core (with mapping file) ####
+#_______________________________________________
+# generate core and extensions MoF traits ####
 mapping <- read.csv2("data/mapping_Leo.csv",header=T)
-mapping_core <- mapping %>% filter(Module == "Core")
 
-TIDY8 <- TIDY7 %>% 
+##  Core (with mapping file) ####
+mapping_core <- mapping %>% filter(Module == "Occurrences")
+
+Occurrences <- TIDY7 %>% 
   select(all_of(mapping_core$Variable))
-colnames(TIDY8) <- mapping_core$Term
+colnames(Occurrences) <- mapping_core$Term
 
-write.table(TIDY8 ,"output/Core_vavr2023.csv",fileEncoding = "UTF-8",
+write.table(Occurrences ,"output/Core_vavr2023.csv",fileEncoding = "UTF-8",
             row.names=F,sep="\t",dec = ".")
 
 
-# Subsample ####
+# TraitValues ####
+mapping_traits <- mapping %>% filter(Module == "TraitValues")
+
+TraitValues <- TIDY7 %>% 
+  select(all_of(mapping_traits$Variable))
+colnames(TraitValues) <- mapping_traits$Term
+
+
+## Subsample ####
 core_subsample <- core[sample(10000, ), ]
 MeasurementOrFact_subsample <- MeasurementOrFact[sample(10000, ), ]
 write.csv2(core_subsample,"output/core_subsample.csv",fileEncoding = "Latin1",row.names=F)
@@ -364,6 +374,23 @@ write.csv2(MeasurementOrFact_subsample,"output/MeasurementOrFact_subsample(trait
 #   )
 # 
 # write.csv2(MeasurementOrFact,"output/MeasurementOrFact(traits).csv",fileEncoding = "Latin1",row.names=F)
+
+
+# Taxon Core ####
+taxon <- read.csv2("output/taxon_extension.csv") %>% 
+  mutate(event = "Flowering range")
+mapping_taxon <- mapping %>% filter(Module == "Taxon")
+
+# ATTENTION, ONE PERD LifeCycle2, LifeForm2
+setdiff(colnames(taxon),mapping_taxon$Variable)
+
+taxon2 <- taxon %>% 
+  select(all_of(mapping_taxon$Variable))
+colnames(taxon2) <- mapping_taxon$Term
+
+write.table(taxon2 ,"output/Taxon_vavr2023.csv",fileEncoding = "UTF-8",
+            row.names=F,sep="\t",dec = ".")
+
 
 
 #_______________________________________________________________________________

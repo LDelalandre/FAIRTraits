@@ -13,13 +13,13 @@ sp_info_scientificName <- sp_info %>%
   mutate(scientificName = map_chr(Species,get_scientificName,taxref)) 
 
 sp_info_name_URL <- sp_info_scientificName %>% 
-  mutate(acceptedNameUsageID = map_chr(Species,get_CD_NOM,taxref))
+  mutate(nameAccordingTo = map_chr(Species,get_CD_NOM,taxref))  %>% 
+  mutate(nameAccordingTo = paste0("taxRefv16: ",nameAccordingTo))
 
 sp_info_name_URL_id <- sp_info_name_URL %>% 
-  mutate(nameAccordingToID = map_chr(Species,get_URL,taxref))
+  mutate(scientificNameID = map_chr(Species,get_URL,taxref))
 
-taxon_extension <- sp_info_name_URL_id%>% 
-  mutate(nameAccordingTo = "TAXREF_v16") %>% 
+taxon_extension <- sp_info_name_URL_id %>% 
   select(-Remarques)
 
 # checké avec TAXREF: les familles botaniques sont bien renseignées.
