@@ -118,6 +118,7 @@ for (focalsite in sites){
 
 write.csv2(COL_REMOVED,"output/columns_removed.csv",row.names = F)
 
+TIDY_backup <- TIDY
 
 TIDY2 <- TIDY %>%
   # generate occurrenceID
@@ -168,8 +169,12 @@ TIDY3 <- TIDY2 %>%
 
 
 
-#_____________________________
-# Change trait names ####
+
+
+#_______________________________________________________________________________
+# Info on traits traits ####
+
+## Update trait names ####
 TIDY4 <- TIDY3 %>% 
   merge(correspondence_traits_old_new) %>% 
   select(-verbatimTraitName) %>% 
@@ -180,7 +185,7 @@ TIDY4 <- TIDY3 %>%
 #   select(-X)
 
 #_____________________________
-# Add samplingProtocol and measurementMethod ####
+## Add samplingProtocol and measurementMethod f(site) ####
 info_traits <- MeasurementOrFact_traits %>% 
   select(-verbatimTraitName_old) %>% 
   rename(verbatimTraitName = verbatimTraitName_new)
@@ -205,7 +210,7 @@ intersect(traits_f_site,traits_identical_all_sites)
 # 2) ça s'appelle TotRpDM, alors que dans certains cas, mesuré juste sur l'organe
 
 #__
-## traits whose samplingProtocol and measurementMethod are identical whatever the site ####
+### traits whose samplingProtocol and measurementMethod are identical whatever the site ####
 
 
 # subset of core with these traits
@@ -229,7 +234,7 @@ TIDY4_commontraits_ext %>% dim()
 # ok, mêmes dimensions
 
 #--
-## traits whose samplingProtocol and measurementMethod differ depending on the site ####
+### traits whose samplingProtocol and measurementMethod differ depending on the site ####
 # PB1: dans le CORE, l'info PDM et O2LA est dégradée en CAmp Redon. Changer à la lecture de ces sites le nom du site, puis le rechanger à la toute fin.
 # PB2: il manque des sites dans le fichier de mapping des traits!!
 
@@ -302,32 +307,63 @@ TIDY5 %>%
 
 
 
-# generate core and extension ####
+# generate core and extension MoF traits ####
 
-core <- TIDY5 %>% 
-  select(Site,	Block	,Plot,	Treatment,	Year,	Month,	Day,	Species,
-         Entity,	Rep,	feuillet ,verbatimTraitName,	verbatimTraitValue	, nameOfProject,	measurementDeterminedBy,
-         verbatimOccurrenceID, verbatimOccurrenceID_echantillon,	verbatimOccurrenceID_population	
-)
+## Envt info  #### 
+# (plot latitude, longitude, altitude)
+
+Infos_Plots <- openxlsx::read.xlsx("data/Versions_Avril2023/Supp_Extensions_FAIRTraits_vavril2023.xlsx", 
+                                   sheet = "Infos_Plots", startRow = 1, colNames = TRUE) %>% 
+  rename(Site = Site.name,
+         Plot = plot) %>% 
+  select(Site,Plot,plotLatitude,	plotLongitude,	plotAltitude)
+# NB: A COMPLETER POUR LES PLOTS qu'on n'a pas (pas de mesure de sol)
+# Mettre des bons noms de colonnes
+
+# TRES PEU DE CONGRUENCE ENTRE LES PLOTS DES METADONNEES ET DES DONNEES
+# --> A compléter
+plots_core <- TIDY5 %>% pull(Plot) %>% unique()
+plots_info <- Infos_Plots %>% pull(Plot) %>% unique()
+setdiff(plots_core,plots_info)
+setdiff(plots_info,plots_core)
+
+TIDY6 <- merge(TIDY5,Infos_Plots) # je perds de l'info en mergeant
+
+## New columns ####
+TIDY7 <- TIDY6 %>% 
+  mutate(countryCode = if_else(Site == "Garraf", "ES","FR"),
+         basisOfRecord = "Human Observation",
+         dynamicProperties = paste(verbatimTraitName,verbatimTraitValue,verbatimTraitUnit,sep="_"),
+         plotAltitude_min = plotAltitude,
+         plotAltitude_max = plotAltitude) 
 
 
-write.table(core,"output/Core_vavr2023.csv",fileEncoding = "UTF-8",
-            row.names=F,sep="\t")
+# Core (with mapping file) ####
+mapping <- read.csv2("data/mapping_Leo.csv",header=T)
+mapping_core <- mapping %>% filter(Module == "Core")
+
+TIDY8 <- TIDY7 %>% 
+  select(all_of(mapping_core$Variable))
+colnames(TIDY8) <- mapping_core$Term
+
+write.table(TIDY8 ,"output/Core_vavr2023.csv",fileEncoding = "UTF-8",
+            row.names=F,sep="\t",dec = ".")
 
 
-MeasurementOrFact <- TIDY5 %>% 
-  select(verbatimOccurrenceID,Site,	verbatimTraitName,	traitName,	traitEntity,	Quality,	verbatimTraitUnit,
-         LocalIdentifier,	traitID	,samplingProtocol,	measurementMethod
-)
-
-write.csv2(MeasurementOrFact,"output/MeasurementOrFact(traits).csv",fileEncoding = "Latin1",row.names=F)
-
-
+# Subsample ####
 core_subsample <- core[sample(10000, ), ]
 MeasurementOrFact_subsample <- MeasurementOrFact[sample(10000, ), ]
 write.csv2(core_subsample,"output/core_subsample.csv",fileEncoding = "Latin1",row.names=F)
 write.csv2(MeasurementOrFact_subsample,"output/MeasurementOrFact_subsample(traits).csv",fileEncoding = "Latin1",row.names=F)
 
+
+
+# MeasurementOrFact <- TIDY5 %>% 
+#   select(verbatimOccurrenceID,Site,	verbatimTraitName,	traitName,	traitEntity,	Quality,	verbatimTraitUnit,
+#          LocalIdentifier,	traitID	,samplingProtocol,	measurementMethod
+#   )
+# 
+# write.csv2(MeasurementOrFact,"output/MeasurementOrFact(traits).csv",fileEncoding = "Latin1",row.names=F)
 
 
 #_______________________________________________________________________________
