@@ -14,7 +14,7 @@ sp_info_scientificName <- sp_info %>%
 
 sp_info_name_URL <- sp_info_scientificName %>% 
   mutate(nameAccordingTo = map_chr(Species,get_CD_NOM,taxref))  %>% 
-  mutate(nameAccordingTo = paste0("taxRefv16: ",nameAccordingTo))
+  mutate(nameAccordingTo = paste0("taxRefv16_CD_NOM: ",nameAccordingTo))
 
 sp_info_name_URL_id <- sp_info_name_URL %>% 
   mutate(scientificNameID = map_chr(Species,get_URL,taxref))

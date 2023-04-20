@@ -1,15 +1,11 @@
 library(tidyverse)
 library("openxlsx")
 
-# Names of traits that we keep
-MeasurementOrFact_traits <- openxlsx::read.xlsx("data/Versions_Avril2023/Supp_Extensions_FAIRTraits_vavril2023.xlsx", sheet = "MeasurementOrFact(traits)", startRow = 1, colNames = TRUE)
-trait_names <- MeasurementOrFact_traits$verbatimTraitName_old
-correspondence_traits_old_new <- MeasurementOrFact_traits %>% 
-  select(verbatimTraitName_old,verbatimTraitName_new) %>% 
-  rename(verbatimTraitName = verbatimTraitName_old)
-
-
 sites <- c("LaFage","Cazarils","PDM","O2LA","Garraf","HGM","LesAgros")
+
+
+
+
 
 # colmuns other than traits used for building the "tidy" csv (i.e. data in row)
 columns_other_than_traits <- 
@@ -58,9 +54,9 @@ read_file <- function(fsite){
 
 # Centralize data in one "tidy" data frame with info in row ####
 
-feuillets_to_remove <- c("LeafDimensions (àsupprimer)","Climate data")
+feuillets_to_remove <- c("LeafDimensions (àsupprimer)","Climate data","Leaf_Thickness")
 
-COL_REMOVED <- NULL # columns discarded from the database
+# COL_REMOVED <- NULL # columns discarded from the database
 TIDY <- NULL
 
 for (focalsite in sites){
@@ -81,7 +77,6 @@ for (focalsite in sites){
         select(!any_of(columns_other_than_traits)) %>%
         colnames()  # extract the name of the traits available on that sheet
       
-      
       # which are the columns that are missing in that sheet?
       Missing <- setdiff(columns_other_than_traits, names(focus))  # Find names of missing columns
       focus[Missing] <- NA  # Add them, filled with NAs
@@ -100,39 +95,48 @@ for (focalsite in sites){
       TIDY_now <- TIDY_site %>% 
         filter(!(feuillet %in% feuillets_to_remove))
       
-      # columns removed 
-      col_removed <- TIDY_now %>% 
-        filter(!(verbatimTraitName %in% trait_names)) %>% 
-        select(verbatimTraitName) %>% 
-        unique() %>% 
-        rename(column_removed = verbatimTraitName)
-      col_removed$feuillet <- unique(focus$feuillet)
-      col_removed$site <- unique(focus$Site)
+      # # columns removed 
+      # col_removed <- TIDY_now %>% 
+      #   filter(!(verbatimTraitName %in% trait_names)) %>% 
+      #   select(verbatimTraitName) %>% 
+      #   unique() %>% 
+      #   rename(column_removed = verbatimTraitName)
+      # col_removed$feuillet <- unique(focus$feuillet)
+      # col_removed$site <- unique(focus$Site)
     }
     
     
   }
   TIDY <- rbind(TIDY,TIDY_site)
-  COL_REMOVED <- rbind(COL_REMOVED,col_removed)
+  # COL_REMOVED <- rbind(COL_REMOVED,col_removed)
 }
 
-write.csv2(COL_REMOVED,"output/columns_removed.csv",row.names = F)
+# write.csv2(COL_REMOVED,"output/columns_removed.csv",row.names = F)
 
 TIDY_backup <- TIDY
 
 TIDY2 <- TIDY %>%
-  # generate occurrenceID
+## generate occurrenceID ####
   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,sep = "_")) %>% 
   mutate(verbatimOccurrenceID_echantillon = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
   mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,sep = "_")) %>% 
-  select(-c(Code_Sp,Family,LifeForm1,LifeForm2)) %>% # remove columns that we do not want to keep
-  filter(verbatimTraitName %in% trait_names) # remove traits that are not listed in MeasurementOrFact(traits)
+## # remove columns already present in MoF_traits ####
+  select(-c(Code_Sp,Family,LifeForm1,LifeForm2)) %>%  
+## remove NAs in trait values ####
+  filter(!(is.na(verbatimTraitValue))) %>% 
+## change values of, e.g., Plots ####
+  mutate(Plot = case_when(Site == "La Fage" ~ paste("FAG",Plot,sep = "_"),
+                          Site == "Cazarils" ~ paste("CAZ",Plot,sep = "_"),
+                          Site == "PDM" ~ paste("CRE",Plot,sep = "_"),
+                          Site == "O2LA" ~ paste("CRE",Plot,sep = "_"),
+                          Site == "Garraf" ~ paste("GAR",Plot,sep = "_"),
+                          Site == "Hautes Garrigues" ~ paste("HGM",Plot,sep = "_"),
+                          Site == "La Fage" ~ paste("Fag",Plot,sep = "_")))
 
 
 
 # Corrections (typos) ####
 TIDY3 <- TIDY2 %>% 
-  filter(!(is.na(verbatimTraitValue))) %>% 
   filter(!(Species %in% c("Geranium dissectum - p\xe9tiole","Geranium dissectum - pétiole"))) %>% 
   mutate(Species = case_when(Species == "Thymus serpyllum" ~ "Thymus sp.",
                              Species == "Taraxacum officinale" ~ "Taraxacum sp.",
@@ -170,52 +174,70 @@ TIDY3 <- TIDY2 %>%
 #_______________________________________________________________________________
 #  Modifs ####
 
+# Names of traits that we keep
+MoFTraits <- read.csv2("data/Versions_Avril2023/MoFTraits.csv",fileEncoding = "latin1")
+
+correspondence_traits_old_new <- MoFTraits %>% 
+  select(verbatimTraitName_old,verbatimTraitName_new) %>% 
+  rename(verbatimTraitName = verbatimTraitName_old)
+trait_names <- MoFTraits$verbatimTraitName_new
+
+TIDY4.0 <- TIDY3 %>%
 ## Update values of verbatimTraitName ####
-TIDY4 <- TIDY3 %>% 
   merge(correspondence_traits_old_new) %>% 
   select(-verbatimTraitName) %>% 
-  rename(verbatimTraitName = verbatimTraitName_new)
+  rename(verbatimTraitName = verbatimTraitName_new) 
 
-# write.csv2(TIDY4,"output/Core_vavr2023.csv",row.names=F,fileEncoding = 'Latin1')
-# TIDY4 <- read.csv2("output/Core_vavr2023.csv") %>% 
-#   select(-X)
+TIDY4.0 %>% 
+  filter(verbatimTraitName == "LCC")
+
+## Select traits to keep ####
+TIDY4 <- TIDY4.0 %>% 
+  filter(verbatimTraitName %in% trait_names) %>% # remove traits that are not listed in MeasurementOrFact(traits)
+## change some column names ####
+  rename(traitEntity = Entity)
+
+#_____________________________________
+# TEMPORAIRE
+# old trait names 
+Told <- correspondence_traits_old_new$verbatimTraitName
+
+# trait included
+Tincl <- TIDY4 %>% pull(verbatimTraitName) %>% unique() %>% sort()
+
+# traits excluded
+Texcl <- TIDY3 %>% 
+  filter(!(verbatimTraitName %in% Told)) %>% 
+  filter(!(verbatimTraitName %in% Tincl)) %>% 
+  pull(verbatimTraitName) %>% 
+  unique()
+EXCL <- data.frame(verbatimTraitName = Texcl,
+                   removed = 1)
+
+Tto_add <- read.csv2("data/Versions_Avril2023/Traits_à_ajouter_MoFTraits.csv") %>% 
+  rename(verbatimTraitName = column_removed)
+
+# Voir si on a bien inclus tous les traits qu'on voulait
+full_join(EXCL,Tto_add) %>% View
+#_____________________________________
+
+
 
 #_______________________________________________________________________________
-## MoF(traits): add samplingProtocol and measurementMethod f(site) ####
-info_traits <- MeasurementOrFact_traits %>% 
+## Join occurrence and MoFTraits ####
+info_traits <- MoFTraits %>% 
   select(-verbatimTraitName_old) %>% 
   rename(verbatimTraitName = verbatimTraitName_new)
 
-# CHANGE MERGE for FULL_JOIN ?
-# (Il y a des lignes qui disparaissent dans la procédure, alors que normalement j'ai séléectionné uniquement els traits listés dans MeasurementOrFact. Lesquels ?)
-
+### traits whose samplingProtocol and measurementMethod are identical whatever the site ####
+# subset of core with these traits
 traits_identical_all_sites <-  info_traits %>% 
   filter(Site == "All") %>% 
   pull(verbatimTraitName)
-
-traits_f_site <- info_traits %>% 
-  filter(!(Site == "All")) %>% 
-  pull(verbatimTraitName)
-
-# quels traits sont mesurés à la fois dans les sites où il y a des différences, et dans "All"
-intersect(traits_f_site,traits_identical_all_sites)
-# Il y a juste LCC et TotStDMC pour lesquels il y a des méthodes de mesure différentes entre "All" et les sites particuliers
-# Voir à quels sites ça correspond et dupliquer les lignes en conséquence
-
-# TotRpDM: il y a des problèmes: 1)même chose appelée différemment dans traitName
-# 2) ça s'appelle TotRpDM, alors que dans certains cas, mesuré juste sur l'organe
-
-#__
-### traits whose samplingProtocol and measurementMethod are identical whatever the site ####
-
-
-# subset of core with these traits
+  
 TIDY4_commontraits <- TIDY4 %>% 
-  filter(verbatimTraitName %in% traits_identical_all_sites) %>% 
-  filter(!verbatimTraitName %in% c("LCC","TotStDM"))
+  filter(verbatimTraitName %in% traits_identical_all_sites)
 
-intersect(TIDY4_commontraits %>% colnames(),
-          info_traits %>% colnames())
 
 # add columns of the MeasurementOrFact(traits) extension (to be splitted into extension later)
 info_commontraits_tomerge <- info_traits %>% 
@@ -223,7 +245,7 @@ info_commontraits_tomerge <- info_traits %>%
   select(-Site)
 
 TIDY4_commontraits_ext <- TIDY4_commontraits %>% 
-  merge(info_commontraits_tomerge,by = c("verbatimTraitName"))
+  merge(info_commontraits_tomerge,by = c("verbatimTraitName","traitEntity"))
 
 TIDY4_commontraits %>% dim()
 TIDY4_commontraits_ext %>% dim()
@@ -237,28 +259,32 @@ TIDY4_commontraits_ext %>% dim()
 
 
 # subset of core with these traits
+traits_f_site <- info_traits %>% 
+  filter(!(Site == "All")) %>% 
+  pull(verbatimTraitName)
+         
 TIDY4_differingtraits <- TIDY4 %>% 
   filter(verbatimTraitName %in% traits_f_site)
 
-intersect(TIDY4_differingtraits %>% colnames(),
-          info_traits %>% colnames())
 
 # add columns of the MeasurementOrFact(traits) extension (to be splitted into extension later)
-info_traits_tomerge <- info_traits %>% filter(!(Site == "All"))
+info_traits_tomerge <- info_traits %>% 
+  filter(!(Site == "All"))
 
 info_traits_tomerge %>% pull(Site) %>% unique()
 TIDY4_differingtraits %>% pull(Site) %>% unique()
 
 # left join (pour database sans perte de données)
 TIDY4_differingtraits_ext <- TIDY4_differingtraits %>% 
-  left_join(info_traits_tomerge, by = c("Site","verbatimTraitName"))
+  left_join(info_traits_tomerge, by = c("Site","verbatimTraitName","traitEntity"))
 
 # merge (pour voir ce qui manque)
 TIDY4_differingtraits_ext_check <- TIDY4_differingtraits %>% 
-  merge(info_traits_tomerge, by = c("Site","verbatimTraitName"))
+  merge(info_traits_tomerge, by = c("Site","verbatimTraitName","traitEntity"))
 
 TIDY4_differingtraits %>% dim()
 TIDY4_differingtraits_ext_check %>% dim()
+# on a plein de trucs qui disparaissent ?
 
 missing_MoF <- TIDY4_differingtraits_ext %>% 
   filter(is.na(samplingProtocol))
@@ -289,23 +315,19 @@ setdiff(TIDY4_differingtraits_ext_check$verbatimOccurrenceID, TIDY4_differingtra
 
 
 
-TIDY5 <- rbind(TIDY4_commontraits_ext,TIDY4_differingtraits_ext)
+TIDY5 <- rbind(TIDY4_commontraits_ext,TIDY4_differingtraits_ext_check)
 dim(TIDY4)
 dim(TIDY5)
-# on a perdu des lignes! ... ou rajouté, au choix.
+# on a perdu des lignes! Pourquoi ? Lesquelles ?
 
-dim(TIDY5)
-
-TIDY5 %>% 
-  group_by(nameOfProject) %>% 
-  summarize(n = n())
 
 #_______________________________________________________________________________
 ## Envt info  #### 
 # (plot latitude, longitude, altitude)
 
-Infos_Plots <- openxlsx::read.xlsx("data/Versions_Avril2023/Supp_Extensions_FAIRTraits_vavril2023.xlsx", 
-                                   sheet = "Infos_Plots", startRow = 1, colNames = TRUE) %>% 
+Plots <- read.csv2("data/Versions_Avril2023/Plots.csv",fileEncoding = "latin1",sep=";")
+
+Infos_Plots <- Plots %>% 
   rename(Site = Site.name,
          Plot = plot) %>% 
   select(Site,Plot,plotLatitude,	plotLongitude,	plotAltitude)
@@ -339,10 +361,11 @@ TIDY7 <- TIDY6 %>%
 
 #_______________________________________________
 # generate core and extensions MoF traits ####
-mapping <- read.csv2("data/mapping_Leo.csv",header=T)
+mapping <- read.csv2("data/Versions_Avril2023/Mapping.csv",header=T)
+
 
 ##  Core (with mapping file) ####
-mapping_core <- mapping %>% filter(Module == "Occurrences")
+mapping_core <- mapping %>% filter(GBIFFile == "Occurrences")
 
 Occurrences <- TIDY7 %>% 
   select(all_of(mapping_core$Variable))
@@ -352,12 +375,17 @@ write.table(Occurrences ,"output/Core_vavr2023.csv",fileEncoding = "UTF-8",
             row.names=F,sep="\t",dec = ".")
 
 
-# TraitValues ####
+## TraitValues ####
 mapping_traits <- mapping %>% filter(Module == "TraitValues")
 
 TraitValues <- TIDY7 %>% 
   select(all_of(mapping_traits$Variable))
 colnames(TraitValues) <- mapping_traits$Term
+
+head(TraitValues) %>% View
+
+write.table(TraitValues ,"output/TraitValues_vavr2023.csv",fileEncoding = "UTF-8",
+            row.names=F,sep="\t",dec = ".")
 
 
 ## Subsample ####
@@ -378,8 +406,11 @@ write.csv2(MeasurementOrFact_subsample,"output/MeasurementOrFact_subsample(trait
 
 # Taxon Core ####
 taxon <- read.csv2("output/taxon_extension.csv") %>% 
-  mutate(event = "Flowering range")
-mapping_taxon <- mapping %>% filter(Module == "Taxon")
+  mutate(event = "Flowering range") %>% 
+  mutate(Height1 = 10*Height1,
+         Height2=10*Height2) %>% 
+  mutate(sizeInMillimeters  = paste(Height1,Height2,sep ="-")) 
+mapping_taxon <- mapping %>% filter(GBIFFile == "Taxon")
 
 # ATTENTION, ONE PERD LifeCycle2, LifeForm2
 setdiff(colnames(taxon),mapping_taxon$Variable)
@@ -419,3 +450,37 @@ setdiff(taxon$Species,sp_core$Species)
 # espèces dans le core, mais pas dans l'extension taxon
 setdiff(sp_core$Species,taxon$Species)
 # "Festuca ovina (sp.)?"
+
+
+
+
+
+
+# 
+# write.table(MoF_traits ,"data/MoFTraits_test.csv",fileEncoding = "UTF-8",
+#             row.names=F,sep="\t",dec = ".")
+
+traits_dupl <- MoF_traits %>% 
+  group_by(verbatimTraitName_new) %>% 
+  summarize(n = n()) %>% 
+  filter(n>1) %>% 
+  pull(verbatimTraitName_new)
+
+MoF_traits %>% 
+  filter(verbatimTraitName_new %in% traits_dupl) %>% 
+  View
+
+
+TIDY5 %>% 
+  # filter(Site == "Hautes Garrigues") %>%
+  filter(verbatimTraitName=="SLA") %>% 
+  select(Site,verbatimTraitName,Entity) %>% 
+  unique()
+
+
+# Pourquoi pas LNC sur whole plant??
+TIDY5 %>% 
+  filter(Site == "Hautes Garrigues") %>% 
+  filter(verbatimTraitName=="LNC") %>% 
+  select(Site,verbatimTraitName,Entity) %>% 
+  unique()
