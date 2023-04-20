@@ -131,7 +131,7 @@ TIDY2 <- TIDY %>%
                           Site == "O2LA" ~ paste("CRE",Plot,sep = "_"),
                           Site == "Garraf" ~ paste("GAR",Plot,sep = "_"),
                           Site == "Hautes Garrigues" ~ paste("HGM",Plot,sep = "_"),
-                          Site == "La Fage" ~ paste("Fag",Plot,sep = "_")))
+                          Site == "Les Agros" ~ paste("AGR",Plot,sep = "_")))
 
 
 
@@ -238,7 +238,6 @@ traits_identical_all_sites <-  info_traits %>%
 TIDY4_commontraits <- TIDY4 %>% 
   filter(verbatimTraitName %in% traits_identical_all_sites)
 
-
 # add columns of the MeasurementOrFact(traits) extension (to be splitted into extension later)
 info_commontraits_tomerge <- info_traits %>% 
   filter(Site == "All") %>% 
@@ -247,17 +246,9 @@ info_commontraits_tomerge <- info_traits %>%
 TIDY4_commontraits_ext <- TIDY4_commontraits %>% 
   merge(info_commontraits_tomerge,by = c("verbatimTraitName","traitEntity"))
 
-TIDY4_commontraits %>% dim()
-TIDY4_commontraits_ext %>% dim()
-# ok, mêmes dimensions
 
-#--
+
 ### traits whose samplingProtocol and measurementMethod differ depending on the site ####
-# PB1: dans le CORE, l'info PDM et O2LA est dégradée en CAmp Redon. Changer à la lecture de ces sites le nom du site, puis le rechanger à la toute fin.
-# PB2: il manque des sites dans le fichier de mapping des traits!!
-
-
-
 # subset of core with these traits
 traits_f_site <- info_traits %>% 
   filter(!(Site == "All")) %>% 
@@ -266,7 +257,6 @@ traits_f_site <- info_traits %>%
 TIDY4_differingtraits <- TIDY4 %>% 
   filter(verbatimTraitName %in% traits_f_site)
 
-
 # add columns of the MeasurementOrFact(traits) extension (to be splitted into extension later)
 info_traits_tomerge <- info_traits %>% 
   filter(!(Site == "All"))
@@ -274,52 +264,27 @@ info_traits_tomerge <- info_traits %>%
 info_traits_tomerge %>% pull(Site) %>% unique()
 TIDY4_differingtraits %>% pull(Site) %>% unique()
 
-# left join (pour database sans perte de données)
 TIDY4_differingtraits_ext <- TIDY4_differingtraits %>% 
-  left_join(info_traits_tomerge, by = c("Site","verbatimTraitName","traitEntity"))
-
-# merge (pour voir ce qui manque)
-TIDY4_differingtraits_ext_check <- TIDY4_differingtraits %>% 
   merge(info_traits_tomerge, by = c("Site","verbatimTraitName","traitEntity"))
 
-TIDY4_differingtraits %>% dim()
-TIDY4_differingtraits_ext_check %>% dim()
-# on a plein de trucs qui disparaissent ?
-
-missing_MoF <- TIDY4_differingtraits_ext %>% 
-  filter(is.na(samplingProtocol))
-write.csv2(missing_MoF,"output/missing_MoF_avr2023.CSV",row.names=F)
-
-# IL MANQUE ENVIRON 667 lignes... (= on n'a pas les métadonnées de mesures de trait pour ces données)
-
-# Concerne les sites Cazarils et Les Agros
-# concerne uniquement le trait LCC
-# Hautes Garrigues et PDM : whole plant
-# Autres sites : mature leaf
-
-
-missing <- setdiff(TIDY4_differingtraits$verbatimOccurrenceID, TIDY4_differingtraits_ext_check$verbatimOccurrenceID) %>% # plein de lignes manquantes dans info_traits_tomerge
-  as.data.frame()
-colnames(missing) <- "verbatimOccurrenceID"
-
-# isoler Species, Site, verbatimTraitName
-missing2 <- missing %>% 
-  separate(verbatimOccurrenceID, into = c("Code_Sp","Site","Block","Plot","Treatment","Year","Month","Day","Rep","verbatimTraitName"),
-           sep = "_")
-missing2 %>% pull(Site) %>% unique()
-missing2 %>% pull(verbatimTraitName) %>% unique()
-missing2 %>% pull(Code_Sp) %>% unique()
-
-setdiff(TIDY4_differingtraits_ext_check$verbatimOccurrenceID, TIDY4_differingtraits$verbatimOccurrenceID) # 0
-
-
-
-
-TIDY5 <- rbind(TIDY4_commontraits_ext,TIDY4_differingtraits_ext_check)
+TIDY5 <- rbind(TIDY4_commontraits_ext,TIDY4_differingtraits_ext)
 dim(TIDY4)
 dim(TIDY5)
 # on a perdu des lignes! Pourquoi ? Lesquelles ?
+V1 <- TIDY4$verbatimOccurrenceID
+V2 <- TIDY5$verbatimOccurrenceID
+lost_occ <- setdiff(V1,V2)
+  # separate(occ, into = c("Code_Sp","Site","Block","Plot","Treatment","Year","Month","Day","Rep","verbatimTraitName"), sep = "_", remove = F)
 
+LOST <- TIDY4 %>% 
+  filter(verbatimOccurrenceID %in% lost_occ )
+
+LOST %>% pull(verbatimTraitName) %>% unique()
+
+no_corresp <- LOST %>% 
+  select(verbatimTraitName,traitEntity) %>% unique()
+
+write.csv2(no_corresp , "output/trait_entity_absent_in_MoFTraits.csv",row.names=F)
 
 #_______________________________________________________________________________
 ## Envt info  #### 
@@ -328,8 +293,6 @@ dim(TIDY5)
 Plots <- read.csv2("data/Versions_Avril2023/Plots.csv",fileEncoding = "latin1",sep=";")
 
 Infos_Plots <- Plots %>% 
-  rename(Site = Site.name,
-         Plot = plot) %>% 
   select(Site,Plot,plotLatitude,	plotLongitude,	plotAltitude)
 # NB: A COMPLETER POUR LES PLOTS qu'on n'a pas (pas de mesure de sol)
 # Mettre des bons noms de colonnes
@@ -338,19 +301,20 @@ Infos_Plots <- Plots %>%
 # --> A compléter
 plots_core <- TIDY5 %>% 
   filter(!(Site %in% c("O2LA","PDM"))) %>% 
-  pull(Plot) %>% unique()
-plots_info <- Infos_Plots %>% pull(Plot) %>% unique()
-setdiff(plots_core,plots_info)
-setdiff(plots_info,plots_core)
-intersect(plots_info,plots_core)
+  select(Site,Plot) %>% 
+  unique() %>% 
+  arrange(Site)
 
-TIDY6 <- merge(TIDY5,Infos_Plots) # je perds de l'info en mergeant
+write.csv2(plots_core,"output/plots_per_site.csv",row.names=F,fileEncoding = "Latin1")
+
+# TIDY6 <- merge(TIDY5,Infos_Plots) # je perds de l'info en mergeant
 
 
+TIDY %>% filter(Site == "Les Agros") %>% pull(Plot)
 
-TIDY5 %>% filter(Plot == "Q3") %>% View
 #________________________________________________
-## New columns ####
+# GBIF ####
+## New columns for GBIF ####
 TIDY7 <- TIDY6 %>% 
   mutate(countryCode = if_else(Site == "Garraf", "ES","FR"),
          basisOfRecord = "Human Observation",
