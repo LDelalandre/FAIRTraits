@@ -2,16 +2,6 @@ library(tidyverse)
 
 TIDY2bis <- read.csv2("output/TIDY2.csv",fileEncoding = "latin1",sep="\t",dec = ".")
 
-TIDY2bis %>% 
-  filter(is.na(verbatimTraitValue)) %>% 
-  View
-
-dim(TIDY2)
-dim(TIDY2bis)
-
-TIDY2 %>% head() %>% View
-TIDY2bis %>% head() %>% View
-
 # Operations on columns ####
 TIDY3 <- TIDY2 %>% 
   # rename Entity

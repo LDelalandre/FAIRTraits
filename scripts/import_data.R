@@ -88,6 +88,9 @@ for (focalsite in sites){
   TIDY <- rbind(TIDY,TIDY_site)
 }
 
+# Change verbatimTraitValue to numeric
+TIDY$verbatimTraitValue <- as.numeric(TIDY$verbatimTraitValue)
+
 # Corrections (typos) ####
 TIDY2 <- TIDY %>% 
   filter(!(Species %in% c("Geranium dissectum - p\xe9tiole","Geranium dissectum - pétiole"))) %>% 
@@ -122,14 +125,6 @@ TIDY2 <- TIDY %>%
                               TRUE ~ Species)) %>% 
 # remove NAs ####
   filter(!is.na(verbatimTraitValue))
-
-
-TIDY2 %>% 
-  filter(is.na(verbatimTraitValue))
-
-TIDY2 %>% 
-  str()
-# PROBLEME: Verbatimtraitval est considéré comme sting !!! 
 
 # Export ####
 write.table(TIDY2 ,"output/TIDY2.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
