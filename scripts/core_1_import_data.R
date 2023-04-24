@@ -1,6 +1,8 @@
 library(tidyverse)
 library("openxlsx")
 
+# This script imports raw data from excel files and writes a single csv file with data in row
+
 # functions ####
 read_file <- function(fsite){
   # function to import all excel sheets of a site in a list
@@ -90,6 +92,9 @@ for (focalsite in sites){
 
 # Change verbatimTraitValue to numeric
 TIDY$verbatimTraitValue <- as.numeric(TIDY$verbatimTraitValue)
+TIDY$Year <- as.numeric(TIDY$Year)
+TIDY$Month <- as.numeric(TIDY$Month)
+TIDY$Day <- as.numeric(TIDY$Day)
 
 # Corrections (typos) ####
 TIDY2 <- TIDY %>% 
@@ -127,4 +132,4 @@ TIDY2 <- TIDY %>%
   filter(!is.na(verbatimTraitValue))
 
 # Export ####
-write.table(TIDY2 ,"output/TIDY2.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+write.table(TIDY2 ,"output/TIDY.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
