@@ -1,70 +1,63 @@
 library(tidyverse)
 
-TIDY4_occurrenceID <-  read.csv2("output/TIDY_occurrenceID.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+GBIF <-  read.csv2("output/TIDY_plot.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+mapping <- read.csv2("data/MappingDwC.csv",header=T)
 
-#________________________________________________
-# GBIF ####
-## New columns for GBIF ####
-TIDY7 <- TIDY6 %>% 
+# New columns for GBIF ####
+GBIF2 <- GBIF %>% 
   mutate(countryCode = if_else(Site == "Garraf", "ES","FR"),
          basisOfRecord = "Human Observation",
          dynamicProperties = paste(verbatimTraitName,verbatimTraitValue,verbatimTraitUnit,sep="_"),
          plotAltitude_min = plotAltitude,
          plotAltitude_max = plotAltitude) 
 
+#_____________________________________
+#  Core Occurrences and extension ####
+## Occurrences ###
+mapping_core <- mapping %>% 
+  filter(GBIFFile == "Occurrences")
 
-#_______________________________________________
-# generate core and extensions MoF traits ####
-mapping <- read.csv2("data/Mapping.csv",header=T)
+setdiff(mapping_core$Variable, GBIF2 %>% colnames())
 
-
-##  Core (with mapping file) ####
-mapping_core <- mapping %>% filter(GBIFFile == "Occurrences")
-
-Occurrences <- TIDY7 %>% 
+Occurrences <- GBIF2 %>% 
   select(all_of(mapping_core$Variable))
 colnames(Occurrences) <- mapping_core$Term
 
-write.table(Occurrences ,"output/Core_vavr2023.csv",fileEncoding = "UTF-8",
+write.table(Occurrences ,"output/GBIF/Occurrences.csv",fileEncoding = "UTF-8",
             row.names=F,sep="\t",dec = ".")
 
 
 ## TraitValues ####
-mapping_traits <- mapping %>% filter(Module == "TraitValues")
+mapping_traits <- mapping %>% 
+  filter(GBIFFile == "TraitValues")
 
-TraitValues <- TIDY7 %>% 
+TraitValues <- GBIF2 %>% 
   select(all_of(mapping_traits$Variable))
 colnames(TraitValues) <- mapping_traits$Term
 
-head(TraitValues) %>% View
 
-write.table(TraitValues ,"output/TraitValues_vavr2023.csv",fileEncoding = "UTF-8",
+write.table(TraitValues ,"output/GBIF/TraitValues.csv",fileEncoding = "UTF-8",
             row.names=F,sep="\t",dec = ".")
 
 
 ## Subsample ####
-core_subsample <- core[sample(10000, ), ]
-MeasurementOrFact_subsample <- MeasurementOrFact[sample(10000, ), ]
-write.csv2(core_subsample,"output/core_subsample.csv",fileEncoding = "Latin1",row.names=F)
-write.csv2(MeasurementOrFact_subsample,"output/MeasurementOrFact_subsample(traits).csv",fileEncoding = "Latin1",row.names=F)
-
-
-
-# MeasurementOrFact <- TIDY5 %>% 
-#   select(verbatimOccurrenceID,Site,	verbatimTraitName,	traitName,	traitEntity,	Quality,	verbatimTraitUnit,
-#          LocalIdentifier,	traitID	,samplingProtocol,	measurementMethod
-#   )
+# core_subsample <- core[sample(10000, ), ]
+# MeasurementOrFact_subsample <- MeasurementOrFact[sample(10000, ), ]
+# write.csv2(core_subsample,"output/core_subsample.csv",fileEncoding = "Latin1",row.names=F)
+# write.csv2(MeasurementOrFact_subsample,"output/MeasurementOrFact_subsample(traits).csv",fileEncoding = "Latin1",row.names=F)
 # 
-# write.csv2(MeasurementOrFact,"output/MeasurementOrFact(traits).csv",fileEncoding = "Latin1",row.names=F)
 
 
-# Taxon Core ####
-taxon <- read.csv2("output/taxon_extension.csv") %>% 
+#______________________________________________________
+# Taxon Core and extensions ####
+taxon <- read.csv2("output/taxon.csv") %>% 
   mutate(event = "Flowering range") %>% 
   mutate(Height1 = 10*Height1,
          Height2=10*Height2) %>% 
   mutate(sizeInMillimeters  = paste(Height1,Height2,sep ="-")) 
-mapping_taxon <- mapping %>% filter(GBIFFile == "Taxon")
+
+mapping_taxon <- mapping %>% 
+  filter(GBIFFile == "Taxon")
 
 # ATTENTION, ONE PERD LifeCycle2, LifeForm2
 setdiff(colnames(taxon),mapping_taxon$Variable)
