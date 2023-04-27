@@ -46,11 +46,11 @@ TIDY4.0 %>%
   pull(verbatimTraitName_old) %>%  # names of these traits
   unique() %>%
   sort()
-Toccur <- TIDY3_occurrenceID %>% 
-  pull(verbatimTraitName) %>% 
-  unique() %>% 
-  sort()
-setdiff(Toccur, MoFTraits$verbatimTraitName_old) %>% sort()
+# Toccur <- TIDY3_occurrenceID %>% 
+#   pull(verbatimTraitName) %>% 
+#   unique() %>% 
+#   sort()
+# setdiff(Toccur, MoFTraits$verbatimTraitName_old) %>% sort()
 
 # Traits dans MoFTraits mais pas dans nos données!
 setdiff(MoFTraits$verbatimTraitName_old, Toccur) %>% sort() # REGARDER LES ESPACES DANS MoFTraits$verbatimTraitName!!!!
@@ -130,3 +130,10 @@ TIDY4_occurrenceID_nodupl <- TIDY4_occurrenceID %>%
   filter(!verbatimOccurrenceID %in% DUPL$verbatimOccurrenceID)
 
 write.table(TIDY4_occurrenceID_nodupl ,"output/TIDY_occurrenceID.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+
+# Info on treatments
+TIDY4_occurrenceID_nodupl <- read.csv2("output/TIDY_occurrenceID.csv",sep="\t")
+treatment <- TIDY4_occurrenceID_nodupl %>% 
+  select(Site, Treatment) %>% 
+  unique() 
+write.csv2(treatment,"output/treatments_per_site.csv",row.names=F)

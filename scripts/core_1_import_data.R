@@ -31,7 +31,7 @@ read_file <- function(fsite){
   
   # Import the sheets of that file in a list
   sheets <- readxl::excel_sheets(path_filename)
-  sheets2 <- sheets[-c(1,2)] # remove Metadata and Climate data, to keep only trait data
+  sheets2 <- sheets[!sheets %in% c("Metadata","Climate data")] # remove Metadata and Climate data, to keep only trait data
   
   x <- lapply(sheets2, function(X) readxl::read_excel(path_filename, sheet = X))
   names(x) <- sheets2
@@ -133,3 +133,4 @@ TIDY2 <- TIDY %>%
 
 # Export ####
 write.table(TIDY2 ,"output/TIDY.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+
