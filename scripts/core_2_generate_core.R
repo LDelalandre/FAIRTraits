@@ -19,8 +19,8 @@ TIDY3 <- TIDY2 %>%
   # Change values of Plot and Treatment
   mutate(Plot = case_when(Site == "La Fage" ~ paste("FAG",Plot,sep = "_"),
                           Site == "Cazarils" ~ paste("CAZ",Plot,sep = "_"),
-                          Site == "PDM" ~ paste("CRE",Plot,sep = "_"),
-                          Site == "O2LA" ~ paste("CRE",Plot,sep = "_"),
+                          Site == "PDM" ~ paste("CRP",Plot,sep = "_"),
+                          Site == "O2LA" ~ paste("CRO",Plot,sep = "_"),
                           Site == "Garraf" ~ paste("GAR",Plot,sep = "_"),
                           Site == "Hautes Garrigues" ~ paste("HGM",Plot,sep = "_"),
                           Site == "Les Agros" ~ paste("AGR",Plot,sep = "_"))) %>% 
