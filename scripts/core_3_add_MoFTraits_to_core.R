@@ -1,6 +1,6 @@
 library(tidyverse)
 
-# This script adds info on trait measurement method and sampling to the core of the database
+# This script adds info on trait measurement and sampling method to the core of the database
 
 # Join occurrence and MoFTraits
 
@@ -52,13 +52,19 @@ lost_occ <- setdiff(V1,V2)
 LOST <- TIDY4_occurrenceID %>% 
   filter(verbatimOccurrenceID %in% lost_occ )
 
-LOST %>% pull(verbatimTraitName) %>% unique()
+LOST %>% 
+  pull(verbatimTraitName) %>% 
+  unique()
 
 no_corresp <- LOST %>% 
   select(verbatimTraitName,traitEntity) %>% unique()
 
 write.csv2(no_corresp , "data/AFaire_Avril2023/MoFTraits/trait_entity_absent_in_MoFTraits.csv",row.names=F)
 
+no_corresp_site_feuillet <- LOST %>% 
+  select(verbatimTraitName,traitEntity,Site,feuillet) %>% unique()
+
+write.csv2(no_corresp_site_feuillet , "data/AFaire_Avril2023/MoFTraits/trait_entity_absent_in_MoFTraits_site_feuillet.csv",row.names=F)
 
 
 # Export ####

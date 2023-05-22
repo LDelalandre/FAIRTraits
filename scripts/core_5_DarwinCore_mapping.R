@@ -1,7 +1,8 @@
 library(tidyverse)
 
-GBIF <-  read.csv2("output/TIDY_plot.csv",fileEncoding = "latin1",sep="\t",dec = ".")
-mapping <- read.csv2("data/MappingDwC.csv",header=T)
+# importer TIDY_plot, mais pour l'instant pas au point
+GBIF <-  read.csv2("output/TIDY_MoFTraits.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+mapping <- read.csv("data/MappingDwC_SP.csv",header=T,sep = ";",fileEncoding = "latin1")
 
 # New columns for GBIF ####
 GBIF2 <- GBIF %>% 
@@ -9,7 +10,8 @@ GBIF2 <- GBIF %>%
          basisOfRecord = "Human Observation",
          dynamicProperties = paste(verbatimTraitName,verbatimTraitValue,verbatimTraitUnit,sep="_"),
          plotAltitude_min = plotAltitude,
-         plotAltitude_max = plotAltitude) 
+         plotAltitude_max = plotAltitude
+         ) 
 
 #_____________________________________
 #  Core Occurrences and extension ####

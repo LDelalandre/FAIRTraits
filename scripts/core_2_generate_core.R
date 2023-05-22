@@ -1,13 +1,9 @@
 library(tidyverse)
 
-# This script imports data in row, and generates the core of the database, with verbatimOccurrenceIDs
-# It also updates trait names and values in some other columns
-
-# PBs :
-# - Enormément de décimales dans les valeurs de traits ! 
-# NB: c'est déjà le cas dans les fichiers bruts. Pourquoi ?
-# --> Remonter l'historique, et voir à quel moment ça apparaît. Fausse manip pdt ouverture des fichiers excel ?
-# Observé dès les versions de novembre ! (2021_11_02_LaFage_PlantTraitsDP_vp.xlsx, présents sur le MyCore)
+# This script:
+# - imports a csv file with data in row (output of `core_1_import_data.R`), 
+# - generates the core of the database, with verbatimOccurrenceIDs
+# - updates trait names and the values in some other columns (Plot, Treatment)
 
 TIDY2 <- read.csv2("output/TIDY.csv",fileEncoding = "latin1",sep="\t",dec = ".")
 
@@ -40,15 +36,15 @@ TIDY4.0 <- TIDY3 %>%
 
 #____________________________________________________________________
 # TEMPORARY missing traits names ####
-# TRAITS OF THE CORE ABSENT FROM MOF_traits (checker une dernière fois)
+# TRAITS OF THE CORE ABSENT FROM correspondence_traits_old_new (checker une dernière fois)
 TIDY4.0 %>% 
   filter(is.na(verbatimTraitName_new)) %>% # traits that did not match MoFTraits
   pull(verbatimTraitName_old) %>%  # names of these traits
   unique() %>%
   sort()
-# Toccur <- TIDY3_occurrenceID %>% 
-#   pull(verbatimTraitName) %>% 
-#   unique() %>% 
+# Toccur <- TIDY4.0 %>%
+#   pull(verbatimTraitName) %>%
+#   unique() %>%
 #   sort()
 # setdiff(Toccur, MoFTraits$verbatimTraitName_old) %>% sort()
 
@@ -56,6 +52,8 @@ TIDY4.0 %>%
 setdiff(MoFTraits$verbatimTraitName_old, Toccur) %>% sort() # REGARDER LES ESPACES DANS MoFTraits$verbatimTraitName!!!!
   
 # Je ne trouve pas : "LRF" "LTS"   "S_Var"
+
+
 #____________________________________________________________________
 
 ## Select traits to keep ####
@@ -129,10 +127,12 @@ purrr::imap(
 TIDY4_occurrenceID_nodupl <- TIDY4_occurrenceID %>% 
   filter(!verbatimOccurrenceID %in% DUPL$verbatimOccurrenceID)
 
-write.table(TIDY4_occurrenceID_nodupl ,"output/TIDY_occurrenceID.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+write.table(TIDY4_occurrenceID_nodupl ,"output/TIDY_occurrenceID_nodupl.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+write.table(TIDY4_occurrenceID ,"output/TIDY_occurrenceID.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+
 
 # Info on treatments
-TIDY4_occurrenceID_nodupl <- read.csv2("output/TIDY_occurrenceID.csv",sep="\t")
+TIDY4_occurrenceID <- read.csv2("output/TIDY_occurrenceID.csv",sep="\t")
 treatment <- TIDY4_occurrenceID_nodupl %>% 
   select(Site, Treatment) %>% 
   unique() 
