@@ -5,7 +5,9 @@ library(tidyverse)
 # Join occurrence and MoFTraits
 
 TIDY4_occurrenceID <-  read.csv2("output/TIDY_occurrenceID.csv",fileEncoding = "latin1",sep="\t",dec = ".")
-MoFTraits <- read.csv2("data/MoFTraits.csv",fileEncoding = "latin1")
+MoFTraits <- read.csv2("data/MoFTraits_vmai2023.csv",fileEncoding = "latin1")
+colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
+
 info_traits <- MoFTraits %>% 
   select(-verbatimTraitName_old) %>% 
   rename(verbatimTraitName = verbatimTraitName_new)

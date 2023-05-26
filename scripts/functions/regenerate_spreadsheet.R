@@ -20,7 +20,7 @@ regenerate_spreadsheet <- function(tidy){
   spreadsheet <- tidy  %>% 
     select(any_of(columns_other_than_traits),verbatimTraitName,verbatimTraitValue) %>% 
     group_by(verbatimTraitName) %>% 
-    # mutate(ind = row_number()) %>% # if duplicated rows
+    mutate(ind = row_number()) %>% # if duplicated rows
     spread(key = "verbatimTraitName", value = "verbatimTraitValue") %>% 
     select(any_of(columns_other_than_traits),everything())
 }
