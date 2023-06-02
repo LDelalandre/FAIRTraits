@@ -22,7 +22,8 @@ TIDY5 <-  read.csv2("output/TIDY_MoFTraits.csv",fileEncoding = "latin1",sep="\t"
   
 
 # Measurements made at the level of plots
-Plots <- read.csv2("data/Plots_vmai2023_av.csv",fileEncoding = "latin1",sep=";")
+Plots <- read.csv2("data/Plots_vmai2023_av.csv",fileEncoding = "latin1",sep=";") %>% 
+  mutate(treatmentNew = paste("Treatment",treatmentNew,sep="_"))
 
 
 # Info to change plot and treatment names
@@ -71,17 +72,43 @@ TIDY5_plots %>%
 # add plot latitude, longitude, and altitude
 Infos_Plots <- Plots %>% 
   select(envPlot,plotLatitude,plotLongitude,plotAltitude)
+
 TIDY5_long <- TIDY5_plots %>% 
-  left_join(Infos_Plots,by = c("envPlot"))  %>% 
-  select(-c(traitPlotOriginal,treatmentOriginal)) %>% 
-  rename(traitplot = traitPlotNew) %>% 
+  left_join(Infos_Plots,by = c("envPlot")) %>% 
+  select(-c(traitPlotOriginal,treatmentOriginal)) %>%
+  rename(traitPlot = traitPlotNew) %>%
   rename(Treatment = treatmentNew)
+
+TIDY5_long%>% 
+  filter(envPlot == "FAG_AvP4P9P10Dm") %>% 
+  select(Treatment,feuillet) %>% 
+  unique()
+
+#___________________________
+# temporaire
+# normalement, je dois pouvoir merger sur plot et traitement
+Infos_Plots2 <- Plots %>% 
+  select(envPlot,treatmentNew,plotLatitude,plotLongitude,plotAltitude)
+TIDY5_long2 <- TIDY5_plots %>% 
+  left_join(Infos_Plots2,by = c("envPlot"))
+trts_occ_plot <- TIDY5_long2 %>% select(Site,envPlot,treatmentOriginal,treatmentNew.x,treatmentNew.y) %>% unique() 
+
+trts_occ_plot %>% 
+  filter(!(treatmentNew.x == treatmentNew.y)) %>% 
+  View
+
+# Pourquoi Site vaut NA des fois
+TIDY5_long2 %>% 
+  filter(is.na(Site))
+
+TIDY5_long2 %>% filter(envPlot == "FAG_AvP4P9P10Cc") %>% 
+  filter(treatmentNew.x=="Treatment_GU_Dlm" & treatmentNew.y=="Treatment_GU_Clc") %>% View
 
 #______________
 # temporaire
 TIDY5_long %>%
   filter(is.na(plotLatitude )) %>% 
-  select(Site,envPlot,traitPlotOriginal,treatmentNew,feuillet) %>% 
+  select(Site,envPlot,traitPlot,Treatment,feuillet) %>% 
   unique() %>% 
   View
 # temporaire

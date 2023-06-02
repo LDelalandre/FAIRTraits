@@ -14,20 +14,20 @@ TIDY_occurrenceID <- TIDY_plot %>%
 # TEMPORARY duplicated occurrence ####
 source("scripts/functions/regenerate_spreadsheet.R")
 
-DUPL <- TIDY4_occurrenceID[which(duplicated(TIDY4_occurrenceID$verbatimOccurrenceID)),]
+DUPL <- TIDY_occurrenceID[which(duplicated(TIDY_occurrenceID$verbatimOccurrenceID)),]
 DUPL %>% 
   pull(Site) %>% 
   unique()
 
-DUPLcplet <- TIDY4_occurrenceID %>% 
+DUPLcplet <- TIDY_occurrenceID %>% 
   filter(verbatimOccurrenceID %in% DUPL$verbatimOccurrenceID) %>% 
   arrange(Site,feuillet)
-write.csv2(DUPLcplet,"data/AFaire_Avril2023/occurrences/duplicated_occurrenceID_format_core.csv",row.names=F,fileEncoding = "latin1")
+write.csv2(DUPLcplet,"output/WorkingFiles/duplicated_occurrenceID_format_core.csv",row.names=F,fileEncoding = "latin1")
 
 sum_DUPL <- DUPL %>% 
   group_by(Site, feuillet) %>% 
   summarize(n = n())
-write.csv2(sum_DUPL,"data/AFaire_Avril2023/occurrences/sites_feuillets_with_duplicated_occurrenceID.csv",row.names=F,fileEncoding = "latin1")
+write.csv2(sum_DUPL,"output/WorkingFiles/sites_feuillets_with_duplicated_occurrenceID.csv",row.names=F,fileEncoding = "latin1")
 
 names_feuillets <- DUPLcplet %>%
   select(Site,feuillet) %>% 
@@ -59,18 +59,19 @@ purrr::imap(
     openxlsx::writeData(wb = wb, sheet = object_name, x = df)
   }
 )
-saveWorkbook(wb = wb, file = "data/AFaire_Avril2023/occurrences/duplicated_occurrenceID_format_excel.xlsx")
+saveWorkbook(wb = wb, file = "output/WorkingFiles/duplicated_occurrenceID_format_excel.xlsx")
 
 
 # Export ####
-TIDY4_occurrenceID_nodupl <- TIDY4_occurrenceID %>% 
+TIDY_occurrenceID_nodupl <- TIDY_occurrenceID %>% 
   filter(!verbatimOccurrenceID %in% DUPL$verbatimOccurrenceID)
 
-write.table(TIDY4_occurrenceID_nodupl ,"output/TIDY_occurrenceID_nodupl.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+write.table(TIDY_occurrenceID_nodupl ,"output/TIDY_occurrenceID_nodupl.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+write.table(TIDY_occurrenceID ,"output/TIDY_occurrenceID.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 
 # Info on treatments
-# TIDY4_occurrenceID <- read.csv2("output/TIDY_occurrenceID.csv",sep="\t")
-# treatment <- TIDY4_occurrenceID_nodupl %>% 
+# TIDY_occurrenceID <- read.csv2("output/TIDY_occurrenceID.csv",sep="\t")
+# treatment <- TIDY_occurrenceID_nodupl %>% 
 #   select(Site, Treatment) %>% 
 #   unique() 
 # write.csv2(treatment,"output/treatments_per_site.csv",row.names=F)

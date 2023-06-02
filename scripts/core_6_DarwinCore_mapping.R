@@ -1,7 +1,7 @@
 library(tidyverse)
 
 # importer TIDY_plot, mais pour l'instant pas au point
-GBIF <-  read.csv2("output/TIDY_MoFTraits.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+GBIF <-  read.csv2("output/TIDY_occurrenceID.csv",fileEncoding = "latin1",sep="\t",dec = ".")
 mapping <- read.csv("data/MappingDwC_SP.csv",header=T,sep = ";",fileEncoding = "latin1")
 
 # New columns for GBIF ####
