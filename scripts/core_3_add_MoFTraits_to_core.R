@@ -17,19 +17,6 @@ info_traits <- MoFTraits %>%
          traitEntity = traitEntityValid) %>% 
   unique()
 
-#_________________________
-# temporaire
-tdupl <- info_traits %>% 
-  mutate(T_E = paste(verbatimTraitName,traitEntity,sep="_")) %>% 
-  filter(duplicated(T_E)) %>% 
-  pull(T_E)
-
-info_traits %>% 
-  mutate(T_E = paste(verbatimTraitName,traitEntity,sep="_")) %>%
-  filter(T_E %in% tdupl) %>% 
-  arrange(verbatimTraitName) 
-#_____________________________
-
 ### traits whose samplingProtocol and measurementMethod differ depending on the site ####
 info_differingtraits_tomerge <- info_traits %>% 
   filter(!(Site == "All"))
@@ -37,10 +24,11 @@ info_differingtraits_tomerge <- info_traits %>%
 TIDY4_differingtraits_completed <- TIDY4 %>% 
   left_join(info_differingtraits_tomerge, by = c("Site","verbatimTraitName","traitEntity"))
 
+# Only the completed lines
 DF_differingtraits_completed <- TIDY4_differingtraits_completed %>% 
   filter(!is.na(traitName)) # les lignes qui ont été bien complétées
 
-# les lignes à compléter : traitName vaut NA
+# Only lines to be completed = where traitName equals NA
 DF_commontraits <- TIDY4_differingtraits_completed %>% 
   filter(is.na(traitName)) %>% 
   select(-c(traitName, Quality, verbatimTraitUnit, LocalIdentifier, traitID, samplingProtocol, measurementMethod))
@@ -74,64 +62,17 @@ list_trait_entity_to_add <- DF_commontraits_pb %>%
   select(Site, verbatimTraitName_old,verbatimTraitName , traitEntityDataFile,traitEntity) %>% 
   unique()
 
-write.csv2(list_trait_entity_to_add, "output/list_trait_entity_to_add.csv",row.names=F)
-
-# Pourquoi pas complété avant ?
-TEST <- TIDY4_differingtraits_completed %>% 
-  filter(Site == "La Fage" & verbatimTraitName == "RDMC") %>%
-  select(Site,verbatimTraitName,traitEntity) %>% 
-  unique()
-
-
-TOMERGE <- info_differingtraits_tomerge %>% 
-  select("Site","verbatimTraitName","traitEntity","traitName")
-TEST %>% 
-  left_join(TOMERGE, by = c("Site","verbatimTraitName","traitEntity"))
-TOMERGE %>% 
-  filter(traitName == "Root dry matter content")
-  filter(Site=="La Fage" & verbatimTraitName == "RDMC")
-
+write.csv2(list_trait_entity_to_add, "output/WorkingFiles/list_trait_entity_to_add.csv",row.names=F)
 # --
-#____________________________________________________________
-TIDY4_commontraits <- TIDY4 %>% 
-  filter(verbatimTraitName %in% info_commontraits_tomerge$verbatimTraitName)
-
-# add columns of the MeasurementOrFact(traits) extension (to be splitted into extension later)
-TIDY4_commontraits_ext <- TIDY4_commontraits %>% 
-  right_join(info_commontraits_tomerge,by = c("verbatimTraitName","traitEntity"))
-#
-# TEMPORAIRE
-TIDY4_commontraits_ext %>% 
-  filter(is.na(traitEntity))
-#
 
 
-
-TIDY5 <- rbind(TIDY4_commontraits_ext,TIDY4_differingtraits_ext)
-dim(TIDY4_occurrenceID)
+# bind the two
+TIDY5 <- rbind(DF_differingtraits_completed,DF_commontraits_completed)
+dim(TIDY4)
 dim(TIDY5)
-# on a perdu des lignes! Pourquoi ? Lesquelles ?
-V1 <- TIDY4_occurrenceID$verbatimOccurrenceID
-V2 <- TIDY5$verbatimOccurrenceID
-lost_occ <- setdiff(V1,V2)
-# separate(occ, into = c("Code_Sp","Site","Block","Plot","Treatment","Year","Month","Day","Rep","verbatimTraitName"), sep = "_", remove = F)
 
-LOST <- TIDY4_occurrenceID %>% 
-  filter(verbatimOccurrenceID %in% lost_occ )
-
-LOST %>% 
-  pull(verbatimTraitName) %>% 
-  unique()
-
-no_corresp <- LOST %>% 
-  select(verbatimTraitName,traitEntity) %>% unique()
-
-write.csv2(no_corresp , "data/AFaire_Avril2023/MoFTraits/trait_entity_absent_in_MoFTraits.csv",row.names=F)
-
-no_corresp_site_feuillet <- LOST %>% 
-  select(verbatimTraitName,traitEntity,Site,feuillet) %>% unique()
-
-write.csv2(no_corresp_site_feuillet , "data/AFaire_Avril2023/MoFTraits/trait_entity_absent_in_MoFTraits_site_feuillet.csv",row.names=F)
+TIDY5 %>% 
+  filter(is.na(traitName)) %>% dim() # compléter MoFTraits (Eric)
 
 
 # Export ####

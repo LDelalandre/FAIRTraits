@@ -2,7 +2,6 @@ library(tidyverse)
 
 # This script:
 # - imports a csv file with data in row (output of `core_1_import_data.R`), 
-# - generates the core of the database, with verbatimOccurrenceIDs
 # - updates trait names and the values in some other columns (Plot, Treatment)
 
 TIDY2 <- read.csv2("output/TIDY.csv",fileEncoding = "latin1",sep="\t",dec = ".")

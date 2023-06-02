@@ -1,10 +1,12 @@
 library(tidyverse)
 
+TIDY_plot <- read.csv2("output/TIDY_plot.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+
 # OccurrenceIDs ####
-TIDY4_occurrenceID <- TIDY4 %>%
-  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_")) %>% 
-  mutate(verbatimOccurrenceID_echantillon = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
-  mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,sep = "_")) %>% 
+TIDY_occurrenceID <- TIDY_plot %>%
+  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_")) %>% 
+  mutate(verbatimOccurrenceID_echantillon = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
+  mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,sep = "_")) %>% 
   # remove columns already present in taxon
   select(-c(Code_Sp,Family,LifeForm1,LifeForm2))
 
