@@ -59,7 +59,7 @@ write.csv2(missing_traitPlotOriginal_treatmentOriginal_combi,"output/WorkingFile
 TIDY5_plots %>%
   filter(is.na(envPlot)) %>% 
   select(Site,traitPlotOriginal,traitPlotNew,treatmentOriginal,treatmentNew,envPlot) %>% 
-  unique() %>% View
+  unique()
 #________________
 
 # add plot latitude, longitude, and altitude
@@ -77,8 +77,7 @@ TIDY5_long <- TIDY5_plots %>%
 TIDY5_long %>%
   filter(is.na(plotLatitude )) %>% 
   select(Site,envPlot,traitPlot,Treatment,feuillet) %>% 
-  unique() %>% 
-  View
+  unique()
 # temporaire
 
 

@@ -6,7 +6,7 @@ library(tidyverse)
 
 TIDY2 <- read.csv2("output/TIDY.csv",fileEncoding = "latin1",sep="\t",dec = ".")
 
-MoFTraits <- read.csv2("data/MoFTraits_vmai2023_EG.csv",fileEncoding = "latin1") %>% 
+MoFTraits <- read.csv2("data/MoFTraits_vjuin2023.csv",fileEncoding = "latin1") %>% 
   mutate_all(trimws)
 # colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
 # Enlever les espaces qui se sont glissés un peu partout dans les noms de traits
@@ -50,6 +50,7 @@ TIDY4.0 <- TIDY3 %>%
                                            TRUE ~ verbatimTraitName_old)) %>%  
   # update pbs organ Graminoid (sheath) and others (stem)...
   left_join(correspondence_traits_old_new)
+  
 
 #____________________________________________________________________
 # TEMPORARY missing traits names ####
@@ -75,7 +76,7 @@ TIDY4 <- TIDY4.0 %>%
   # select(-verbatimTraitName_old) %>%
   rename(verbatimTraitName = verbatimTraitName_new) %>%
   rename(traitEntity = traitEntityValid) %>% 
-  filter(!is.na(verbatimTraitName)) # idem que ligne en-dessous
+  filter(!is.na(verbatimTraitName))  # idem que ligne en-dessous
   # filter(verbatimTraitName %in% trait_names)  # remove traits that are not listed in MeasurementOrFact(traits)
 write.table(TIDY4 ,"output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 

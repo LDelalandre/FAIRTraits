@@ -5,7 +5,7 @@ library(tidyverse)
 # Join occurrence and MoFTraits
 
 TIDY4 <-  read.csv2("output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",sep="\t",dec = ".")
-MoFTraits <- read.csv2("data/MoFTraits_vmai2023_EG.csv",fileEncoding = "latin1") %>% 
+MoFTraits <- read.csv2("data/MoFTraits_vjuin2023.csv",fileEncoding = "latin1") %>% 
   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
   mutate_all(trimws)
 # colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
