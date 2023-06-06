@@ -6,7 +6,7 @@ library(tidyverse)
 
 TIDY2 <- read.csv2("output/TIDY.csv",fileEncoding = "latin1",sep="\t",dec = ".")
 
-MoFTraits <- read.csv2("data/MoFTraits_vmai2023.csv",fileEncoding = "latin1") %>% 
+MoFTraits <- read.csv2("data/MoFTraits_vmai2023_EG.csv",fileEncoding = "latin1") %>% 
   mutate_all(trimws)
 # colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
 # Enlever les espaces qui se sont glissés un peu partout dans les noms de traits
@@ -54,10 +54,18 @@ TIDY4.0 <- TIDY3 %>%
 #____________________________________________________________________
 # TEMPORARY missing traits names ####
 # Problème résolu
-TIDY4.0 %>% 
+missing_in_moftraits <- TIDY4.0 %>% 
   filter(is.na(verbatimTraitName_new)) %>% # traits that did not match MoFTraits
-  select(verbatimTraitName_old,traitEntityDataFile,traitEntityValid) %>%  # names of these traits
-  unique()
+  select(verbatimTraitName_old,traitEntityDataFile,traitEntityValid,Site,feuillet) %>%  # names of these traits
+  unique() %>% 
+  arrange(verbatimTraitName_old)
+missing_in_moftraits %>% View
+
+write.csv2(missing_in_moftraits,"output/WorkingFiles/2023_06_06_missing_in_MoFTraits.csv",fileEncoding = "latin1",row.names=F)
+
+vbtn <- missing_in_moftraits %>% pull(verbatimTraitName_old) %>% unique()
+submof <- MoFTraits %>% 
+  filter(verbatimTraitName_old %in%  vbtn) 
 
 #____________________________________________________________________
 

@@ -17,25 +17,16 @@ TIDY5 <-  read.csv2("output/TIDY_MoFTraits.csv",fileEncoding = "latin1",sep="\t"
                                TRUE ~ Treatment)) %>% 
   mutate(Site = case_when(Site == "PDM" ~ "CRE_PDM",
                           Site == "O2LA" ~ "CRE_O2LA",
-                          TRUE ~ Site)) %>% 
-  filter(!Plot == "CRP_Glasshouse_CEFE") # VIRER ?
+                          TRUE ~ Site)) 
   
 
 # Measurements made at the level of plots
-Plots <- read.csv2("data/Plots_vmai2023_av.csv",fileEncoding = "latin1",sep=";") %>% 
-  mutate(treatmentNew = paste("Treatment",treatmentNew,sep="_"))
+Plots <- read.csv2("data/Plots_vjuin2023.csv",fileEncoding = "latin1",sep=";")
+  # mutate(treatmentNew = paste("Treatment",treatmentNew,sep="_"))
 
 
 # Info to change plot and treatment names
-Plots_corresp_envt_ok <- read.csv2("data/plots-per_site_CorrespEnv.csv",fileEncoding = "latin1") %>% 
-  mutate(treatmentOriginal = paste("Treatment",treatmentOriginal,sep="_")) %>% 
-  mutate(treatmentNew = paste("Treatment",treatmentNew,sep="_"))
-
-Plots_corresp_envt_rest <- read.csv2("data/missing_traitPlotOriginal_treatmentOriginal_combi.csv") %>% 
-  select(-Remarques)
-
-Plots_corresp_envt <- rbind(Plots_corresp_envt_ok,Plots_corresp_envt_rest)
-
+Plots_corresp_envt <- read.csv2("data/plots_corresp_envt.csv",fileEncoding = "latin1")
 
 # Modify the Core dataframe ####
 
@@ -45,9 +36,10 @@ TIDY5_plots <- TIDY5 %>%
   rename(traitPlotOriginal = Plot) %>% 
   rename(treatmentOriginal = Treatment) %>% 
   # change plot and treatment names
-  left_join(Plots_corresp_envt) %>%   # joining by Site, traitPlotOriginal, treatmentOriginal
+  left_join(Plots_corresp_envt) %>%  # joining by Site, traitPlotOriginal, treatmentOriginal
   mutate(envPlot = case_when(Site == "CRE_PDM" ~ str_sub(traitPlotOriginal,start = 1L, end = 7L),
                              Site == "CRE_O2LA" ~ "CRO_Average",
+                             traitPlotOriginal == "CRP_Glasshouse_CEFE" ~"NA",
                              TRUE ~ envPlot)) %>% 
   mutate(traitPlotNew = case_when(Site == "CRE_PDM" ~ traitPlotOriginal,
                              Site == "CRE_O2LA" ~ traitPlotOriginal,
@@ -55,6 +47,7 @@ TIDY5_plots <- TIDY5 %>%
   mutate(treatmentNew = case_when(Site == "CRE_PDM" ~ treatmentOriginal,
                                   Site == "CRE_O2LA" ~ treatmentOriginal,
                                   TRUE ~ treatmentNew))
+
 #______________
 # temporaire
 missing_traitPlotOriginal_treatmentOriginal_combi <- TIDY5_plots %>%
@@ -64,7 +57,7 @@ missing_traitPlotOriginal_treatmentOriginal_combi <- TIDY5_plots %>%
 write.csv2(missing_traitPlotOriginal_treatmentOriginal_combi,"output/WorkingFiles/missing_traitPlotOriginal_treatmentOriginal_combi.csv",row.names=F,fileEncoding = "latin1")
 
 TIDY5_plots %>%
-  filter(is.na(treatmentNew)) %>% 
+  filter(is.na(envPlot)) %>% 
   select(Site,traitPlotOriginal,traitPlotNew,treatmentOriginal,treatmentNew,envPlot) %>% 
   unique() %>% View
 #________________
@@ -78,31 +71,6 @@ TIDY5_long <- TIDY5_plots %>%
   select(-c(traitPlotOriginal,treatmentOriginal)) %>%
   rename(traitPlot = traitPlotNew) %>%
   rename(Treatment = treatmentNew)
-
-TIDY5_long%>% 
-  filter(envPlot == "FAG_AvP4P9P10Dm") %>% 
-  select(Treatment,feuillet) %>% 
-  unique()
-
-#___________________________
-# temporaire
-# normalement, je dois pouvoir merger sur plot et traitement
-Infos_Plots2 <- Plots %>% 
-  select(envPlot,treatmentNew,plotLatitude,plotLongitude,plotAltitude)
-TIDY5_long2 <- TIDY5_plots %>% 
-  left_join(Infos_Plots2,by = c("envPlot"))
-trts_occ_plot <- TIDY5_long2 %>% select(Site,envPlot,treatmentOriginal,treatmentNew.x,treatmentNew.y) %>% unique() 
-
-trts_occ_plot %>% 
-  filter(!(treatmentNew.x == treatmentNew.y)) %>% 
-  View
-
-# Pourquoi Site vaut NA des fois
-TIDY5_long2 %>% 
-  filter(is.na(Site))
-
-TIDY5_long2 %>% filter(envPlot == "FAG_AvP4P9P10Cc") %>% 
-  filter(treatmentNew.x=="Treatment_GU_Dlm" & treatmentNew.y=="Treatment_GU_Clc") %>% View
 
 #______________
 # temporaire

@@ -5,7 +5,7 @@ library(tidyverse)
 # Join occurrence and MoFTraits
 
 TIDY4 <-  read.csv2("output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",sep="\t",dec = ".")
-MoFTraits <- read.csv2("data/MoFTraits_vmai2023.csv",fileEncoding = "latin1") %>% 
+MoFTraits <- read.csv2("data/MoFTraits_vmai2023_EG.csv",fileEncoding = "latin1") %>% 
   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
   mutate_all(trimws)
 # colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
@@ -28,7 +28,7 @@ TIDY4_differingtraits_completed <- TIDY4 %>%
 DF_differingtraits_completed <- TIDY4_differingtraits_completed %>% 
   filter(!is.na(traitName)) # les lignes qui ont été bien complétées
 
-# Only lines to be completed = where traitName equals NA
+# Only lines to be completed = where traitName is NA so far
 DF_commontraits <- TIDY4_differingtraits_completed %>% 
   filter(is.na(traitName)) %>% 
   select(-c(traitName, Quality, verbatimTraitUnit, LocalIdentifier, traitID, samplingProtocol, measurementMethod))
@@ -50,7 +50,7 @@ DF_commontraits_completed <- DF_commontraits %>%
   left_join(info_commontraits_tomerge, by = c("verbatimTraitName", "traitEntity"))
 
 # -- temporaire
-# pb: encore des lignes non ocmplétées
+# pb: encore des lignes non complétées
 DF_commontraits_pb <- DF_commontraits_completed %>% 
   filter(is.na(traitName))
 
@@ -62,7 +62,7 @@ list_trait_entity_to_add <- DF_commontraits_pb %>%
   select(Site, verbatimTraitName_old,verbatimTraitName , traitEntityDataFile,traitEntity) %>% 
   unique()
 
-write.csv2(list_trait_entity_to_add, "output/WorkingFiles/list_trait_entity_to_add.csv",row.names=F)
+write.csv2(list_trait_entity_to_add, "output/WorkingFiles/2023_06_06_list_site_trait_entity_to_add.csv",row.names=F)
 # --
 
 
