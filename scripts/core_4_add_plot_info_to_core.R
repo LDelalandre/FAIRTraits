@@ -81,6 +81,21 @@ TIDY5_long %>%
 # temporaire
 
 
+#_________________
+# TEMPORAIRE plots et géoréférencement
+traitPlots <- TIDY5_long %>% 
+  select(traitPlot,envPlot,plotLatitude,plotLongitude,plotAltitude) %>% 
+  unique() %>%
+  arrange(traitPlot)
+
+traitPlots_to_complete <- traitPlots %>% 
+  filter(!(traitPlot == envPlot))
+
+traitPlots_ok <- traitPlots %>% 
+  filter(traitPlot == envPlot)
+
+write.csv2(traitPlots,"output/WorkingFiles/traitPlots_to_complete.csv",row.names=F,fileEncoding = "latin1")
+
 write.table(TIDY5_long ,"output/TIDY_plot.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 
 

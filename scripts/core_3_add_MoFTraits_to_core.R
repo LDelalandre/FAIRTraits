@@ -10,6 +10,10 @@ MoFTraits <- read.csv2("data/MoFTraits_vjuin2023.csv",fileEncoding = "latin1") %
   mutate_all(trimws)
 # colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
 
+MoFTraitsLight <- read.csv2("data/MoFTraitsLight_vjuin2023.csv",fileEncoding = "latin1") %>% 
+  mutate_all(trimws) %>% 
+  rename(verbatimTraitName = verbatimTraitName_new) %>% 
+  select(verbatimTraitName,variableType)
 
 info_traits <- MoFTraits %>% 
   select(-c(verbatimTraitName_old,traitEntityDataFile)) %>% 
@@ -75,6 +79,19 @@ TIDY5 %>%
   filter(is.na(traitName)) %>% dim() # compléter MoFTraits (Eric)
 
 
+# Add column variableType
+# TIDY5 <- TIDY5 %>% 
+#   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
+#   
+TIDY6 <- TIDY5 %>% 
+  merge(MoFTraitsLight)
+
+# setdiff(TIDY5$verbatimOccurrenceID,TIDY6$verbatimOccurrenceID)
+# setdiff(TIDY6$verbatimOccurrenceID,TIDY5$verbatimOccurrenceID)
+# 
+# dim(TIDY5)
+# dim(TIDY6)
+
 # Export ####
-write.table(TIDY5 ,"output/TIDY_MoFTraits.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+write.table(TIDY6 ,"output/TIDY_MoFTraits.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 
