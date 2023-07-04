@@ -17,22 +17,25 @@ TIDY5 <-  read.csv2("output/TIDY_MoFTraits.csv",fileEncoding = "latin1",sep="\t"
                                TRUE ~ Treatment)) %>% 
   mutate(Site = case_when(Site == "PDM" ~ "CRE_PDM",
                           Site == "O2LA" ~ "CRE_O2LA",
-                          TRUE ~ Site)) 
+                          TRUE ~ Site))
   
 
 # Measurements made at the level of plots
-Plots <- read.csv2("data/Plots_vjuin2023.csv",fileEncoding = "latin1",sep=";")
-  # mutate(treatmentNew = paste("Treatment",treatmentNew,sep="_"))
+envPlots <- read.csv2("data/Plots_vjuil2023.csv",fileEncoding = "latin1",sep=";") %>% 
+  unique()
 
+traitPlots <- read.csv2("data/traitPlots_georeferences.csv",fileEncoding = "latin1") %>% 
+  # select(-envPlot) %>% 
+  unique()
 
 # Info to change plot and treatment names
-Plots_corresp_envt <- read.csv2("data/plots_corresp_envt.csv",fileEncoding = "latin1")
+Plots_corresp_envt <- read.csv2("data/plots_corresp_envt.csv",fileEncoding = "latin1") %>% 
+  unique()
 
 # Modify the Core dataframe ####
 
 ## Modify plot and treatment names ####
 TIDY5_plots <- TIDY5 %>% 
-  # filter(!(Site %in% c("O2LA","PDM"))) %>% 
   rename(traitPlotOriginal = Plot) %>% 
   rename(treatmentOriginal = Treatment) %>% 
   # change plot and treatment names
@@ -46,39 +49,72 @@ TIDY5_plots <- TIDY5 %>%
                              TRUE ~ traitPlotNew)) %>% 
   mutate(treatmentNew = case_when(Site == "CRE_PDM" ~ treatmentOriginal,
                                   Site == "CRE_O2LA" ~ treatmentOriginal,
-                                  TRUE ~ treatmentNew))
+                                  TRUE ~ treatmentNew)) %>%
+  rename(traitPlot = traitPlotNew) %>%
+  rename(Treatment = treatmentNew) %>% 
+  select(-c(traitPlotOriginal,treatmentOriginal))
 
-#______________
-# temporaire
-missing_traitPlotOriginal_treatmentOriginal_combi <- TIDY5_plots %>%
-  filter(is.na(envPlot)) %>% 
-  select(Site,traitPlotOriginal,treatmentOriginal) %>% 
-  unique()
-write.csv2(missing_traitPlotOriginal_treatmentOriginal_combi,"output/WorkingFiles/missing_traitPlotOriginal_treatmentOriginal_combi.csv",row.names=F,fileEncoding = "latin1")
-
-TIDY5_plots %>%
-  filter(is.na(envPlot)) %>% 
-  select(Site,traitPlotOriginal,traitPlotNew,treatmentOriginal,treatmentNew,envPlot) %>% 
-  unique()
-#________________
 
 # add plot latitude, longitude, and altitude
-Infos_Plots <- Plots %>% 
-  select(envPlot,plotLatitude,plotLongitude,plotAltitude)
+Infos_Plots <- traitPlots %>% 
+  select(traitPlot,plotLatitude,plotLongitude,plotAltitude) %>% 
+  unique()
 
-TIDY5_long <- TIDY5_plots %>% 
-  left_join(Infos_Plots,by = c("envPlot")) %>% 
-  select(-c(traitPlotOriginal,treatmentOriginal)) %>%
-  rename(traitPlot = traitPlotNew) %>%
-  rename(Treatment = treatmentNew)
+TIDY5_long <- TIDY5_plots %>%
+  left_join(Infos_Plots,by = c("traitPlot"))  
+
 
 #______________
+before <- TIDY5_plots
+after <- TIDY5_long
+
+dim(before)
+dim(after)
+
+dupl <- Infos_Plots[which(duplicated(Infos_Plots$traitPlot)),]$traitPlot
+Infos_Plots %>% filter(traitPlot %in% dupl)
+traitPlots %>% filter(traitPlot %in% dupl)
+
 # temporaire
+dim(TIDY5)
+dim(TIDY5_plots)
+dim(TIDY5_long)
+# pourquoi on rajoute des lignes ??? Pourtant, c'est les mêmes noms de plots dans les deux...
+# il y en a des dupliquées, mais pas toutes
+
+
+setdiff(TIDY5_long$envPlot,traitPlots$envPlot)
+setdiff(traitPlots$envPlot,TIDY5_long$envPlot)
+
 TIDY5_long %>%
   filter(is.na(plotLatitude )) %>% 
   select(Site,envPlot,traitPlot,Treatment,feuillet) %>% 
   unique()
 # temporaire
+
+TIDY5_long %>%
+  filter(is.na(Species ))
+
+TIDY5_long %>% names()
+
+
+A <- TIDY5_plots %>% 
+  mutate(long = 1)
+
+B <- TIDY5_long %>% 
+  mutate(plot = 1)
+
+joined <- full_join(A,B)
+joined %>% 
+  filter(plot==1 & long == 0)
+joined %>% 
+  filter(plot==0 & long == 1)
+joined %>% 
+  filter(plot==0 & long == 0)
+joined %>% 
+  filter(plot==1 & long == 1) %>% 
+  dim()
+# Les lignes sont toutes à la fois dans TIDY5_long et TIDY5_plots
 
 
 #_________________
