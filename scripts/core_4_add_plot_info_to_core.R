@@ -64,57 +64,7 @@ TIDY5_long <- TIDY5_plots %>%
   left_join(Infos_Plots,by = c("traitPlot"))  
 
 
-#______________
-before <- TIDY5_plots
-after <- TIDY5_long
-
-dim(before)
-dim(after)
-
-dupl <- Infos_Plots[which(duplicated(Infos_Plots$traitPlot)),]$traitPlot
-Infos_Plots %>% filter(traitPlot %in% dupl)
-traitPlots %>% filter(traitPlot %in% dupl)
-
-# temporaire
-dim(TIDY5)
-dim(TIDY5_plots)
-dim(TIDY5_long)
-# pourquoi on rajoute des lignes ??? Pourtant, c'est les mêmes noms de plots dans les deux...
-# il y en a des dupliquées, mais pas toutes
-
-
-setdiff(TIDY5_long$envPlot,traitPlots$envPlot)
-setdiff(traitPlots$envPlot,TIDY5_long$envPlot)
-
-TIDY5_long %>%
-  filter(is.na(plotLatitude )) %>% 
-  select(Site,envPlot,traitPlot,Treatment,feuillet) %>% 
-  unique()
-# temporaire
-
-TIDY5_long %>%
-  filter(is.na(Species ))
-
-TIDY5_long %>% names()
-
-
-A <- TIDY5_plots %>% 
-  mutate(long = 1)
-
-B <- TIDY5_long %>% 
-  mutate(plot = 1)
-
-joined <- full_join(A,B)
-joined %>% 
-  filter(plot==1 & long == 0)
-joined %>% 
-  filter(plot==0 & long == 1)
-joined %>% 
-  filter(plot==0 & long == 0)
-joined %>% 
-  filter(plot==1 & long == 1) %>% 
-  dim()
-# Les lignes sont toutes à la fois dans TIDY5_long et TIDY5_plots
+write.table(TIDY5_long ,"output/TIDY_plot.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 
 
 #_________________
@@ -132,6 +82,6 @@ traitPlots_ok <- traitPlots %>%
 
 write.csv2(traitPlots,"output/WorkingFiles/traitPlots_to_complete.csv",row.names=F,fileEncoding = "latin1")
 
-write.table(TIDY5_long ,"output/TIDY_plot.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+
 
 
