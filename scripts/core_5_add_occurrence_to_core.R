@@ -55,8 +55,8 @@ list_feuillet <- lapply(list_site_feuillet,regenerate_spreadsheet)
 
 # list_site_feuillet[[1]] %>% 
 #   View()
-# list_feuillet[[1]] %>% 
-#   View()
+list_feuillet[[1]] %>%
+  View()
 
 # Export it into an excel file
 lst_data <- list_feuillet

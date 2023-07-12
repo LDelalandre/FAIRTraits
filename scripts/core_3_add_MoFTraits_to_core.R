@@ -5,21 +5,33 @@ library(tidyverse)
 # Join occurrence and MoFTraits
 
 TIDY4 <-  read.csv2("output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",sep="\t",dec = ".")
-MoFTraits <- read.csv2("data/MoFTraits_vjuin2023.csv",fileEncoding = "latin1") %>% 
+MoFTraits <- read.csv2("data/MoFTraits.csv",fileEncoding = "latin1") %>% 
   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
-  mutate_all(trimws)
+  mutate_all(trimws) %>% 
+  mutate(verbatimTraitName_new = case_when(verbatimTraitName_new == "RDM _ab_0" ~ "RDM_ab_0",
+                                         verbatimTraitName_new == "RDM _ab_84" ~ "RDM_ab_84",
+                                         TRUE ~ verbatimTraitName_new))
 # colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
 
-MoFTraitsLight <- read.csv2("data/MoFTraitsLight_vjuin2023.csv",fileEncoding = "latin1") %>% 
+MoFTraitsLight <- read.csv2("data/MoFTraitsLight.csv",fileEncoding = "latin1") %>% 
   mutate_all(trimws) %>% 
-  rename(verbatimTraitName = verbatimTraitName_new) %>% 
-  select(verbatimTraitName,variableType)
+  rename(verbatimTraitName = verbatimTraitName_new) 
 
 info_traits <- MoFTraits %>% 
   select(-c(verbatimTraitName_old,traitEntityDataFile)) %>% 
   rename(verbatimTraitName = verbatimTraitName_new,
          traitEntity = traitEntityValid) %>% 
   unique()
+
+#________________________
+# TEMPORAIRE : check MoFTraitsLight
+A <- MoFTraits %>% pull(verbatimTraitName_new) %>% unique()
+
+B <- MoFTraitsLight %>% pull(verbatimTraitName) %>% unique()
+
+setdiff(A,B)
+
+#______________________
 
 ### traits whose samplingProtocol and measurementMethod differ depending on the site ####
 info_differingtraits_tomerge <- info_traits %>% 
@@ -84,7 +96,8 @@ TIDY5 %>%
 #   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
 #   
 TIDY6 <- TIDY5 %>% 
-  merge(MoFTraitsLight)
+  merge(MoFTraitsLight %>%  select(verbatimTraitName,variableType)
+  )
 
 # setdiff(TIDY5$verbatimOccurrenceID,TIDY6$verbatimOccurrenceID)
 # setdiff(TIDY6$verbatimOccurrenceID,TIDY5$verbatimOccurrenceID)
@@ -94,4 +107,9 @@ TIDY6 <- TIDY5 %>%
 
 # Export ####
 write.table(TIDY6 ,"output/TIDY_MoFTraits.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+
+# vérifs
+dim(TIDY4)
+dim(TIDY5)
+dim(TIDY6)
 

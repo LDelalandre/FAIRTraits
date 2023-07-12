@@ -21,7 +21,7 @@ TIDY5 <-  read.csv2("output/TIDY_MoFTraits.csv",fileEncoding = "latin1",sep="\t"
   
 
 # Measurements made at the level of plots
-envPlots <- read.csv2("data/Plots_vjuil2023.csv",fileEncoding = "latin1",sep=";") %>% 
+envPlots <- read.csv2("data/Plots.csv",fileEncoding = "latin1",sep=";") %>% 
   unique()
 
 traitPlots <- read.csv2("data/traitPlots_georeferences.csv",fileEncoding = "latin1") %>% 
@@ -65,6 +65,11 @@ TIDY5_long <- TIDY5_plots %>%
 
 
 write.table(TIDY5_long ,"output/TIDY_plot.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+
+
+dim(TIDY5)
+dim(TIDY5_plots)
+dim(TIDY5_long)
 
 
 #_________________

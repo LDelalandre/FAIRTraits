@@ -10,13 +10,13 @@ read_file <- function(fsite){
   # Define files to read in a data frame whose columns are:
   # - site, the name of the site
   # - file, the name of the excel file to import
-  DATA_FILES <- c("Data_LaFage_FAIRTraits_vjuin2023.xlsx",
-                  "Data_Cazarils_FAIRTraits_vjuin2023.xlsx",
-                  "Data_CRE_PDM_FAIRTraits_vjuin2023.xlsx",
-                  "Data_CRE_O2LA_FAIRTraits_vjuin2023.xlsx",
-                  "Data_Garraf_FAIRTraits_vjuin2023.xlsx",
-                  "Data_HGM_FAIRTraits_vjuin2023.xlsx",
-                  "Data_LesAgros_FAIRTraits_vjuin2023.xlsx"
+  DATA_FILES <- c("Data_LaFage_FAIRTraits.xlsx",
+                  "Data_Cazarils_FAIRTraits.xlsx",
+                  "Data_CRE_PDM_FAIRTraits.xlsx",
+                  "Data_CRE_O2LA_FAIRTraits.xlsx",
+                  "Data_Garraf_FAIRTraits.xlsx",
+                  "Data_HGM_FAIRTraits.xlsx",
+                  "Data_LesAgros_FAIRTraits.xlsx"
   )
   sites <- c("LaFage","Cazarils","PDM","O2LA","Garraf","HGM","LesAgros")
   SITES <- data.frame(cbind(sites,DATA_FILES))
