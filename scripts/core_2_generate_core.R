@@ -6,7 +6,7 @@ library(tidyverse)
 
 TIDY2 <- read.csv2("output/TIDY.csv",fileEncoding = "latin1",sep="\t",dec = ".")
 
-MoFTraits <- read.csv2("data/MoFTraits.csv",fileEncoding = "latin1") %>% 
+MoFTraits <- read.csv2("data/MoFTraitsFull.csv",fileEncoding = "latin1") %>% 
   mutate_all(trimws) %>% 
   mutate(verbatimTraitName_new = case_when(verbatimTraitName_new == "RDM _ab_0" ~ "RDM_ab_0",
                                            verbatimTraitName_new == "RDM _ab_84" ~ "RDM_ab_84",
@@ -79,8 +79,8 @@ TIDY4 <- TIDY4.0 %>%
   # select(-verbatimTraitName_old) %>%
   rename(verbatimTraitName = verbatimTraitName_new) %>%
   rename(traitEntity = traitEntityValid) %>% 
-  filter(!is.na(verbatimTraitName))  # idem que ligne en-dessous
-  # filter(verbatimTraitName %in% trait_names)  # remove traits that are not listed in MeasurementOrFact(traits)
+  # filter(!is.na(verbatimTraitName))  # idem que ligne en-dessous
+  filter(verbatimTraitName %in% trait_names)  # remove traits that are not listed in MeasurementOrFact(traits)
 write.table(TIDY4 ,"output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 
 
