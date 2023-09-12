@@ -64,12 +64,29 @@ TIDY5_long <- TIDY5_plots %>%
   left_join(Infos_Plots,by = c("traitPlot"))  
 
 
-write.table(TIDY5_long ,"output/TIDY_plot.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+# write.table(TIDY5_long ,"output/TIDY_plot.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+data.table::fwrite(TIDY5_long,"output/TIDY_plot.csv")
+
 
 
 dim(TIDY5)
 dim(TIDY5_plots)
 dim(TIDY5_long)
+
+
+# problems of encoding
+TIDY5_long_subset <- TIDY5_long %>%
+  filter(Site == "Hautes Garrigues" & verbatimTraitName == "Ldelta13C") 
+
+TIDY5_long_subset %>% 
+  write.table("output/WorkingFiles/TIDY_plot_subset.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+
+data.table::fwrite(TIDY5_long,"output/WorkingFiles/TIDY_plot_subset_data.table.csv")
+test <- data.table::fread("output/WorkingFiles/TIDY_plot_subset_data.table.csv",encoding="UTF-8")
+
+
+TIDY_plot_subset <- read.csv2("output/WorkingFiles/TIDY_plot_subset.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+
 
 
 #_________________

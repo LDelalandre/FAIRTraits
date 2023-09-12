@@ -1,6 +1,13 @@
 library(tidyverse)
 
-TIDY_plot <- read.csv2("output/TIDY_plot.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+# TIDY_plot <- read.csv2("output/TIDY_plot.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+TIDY_plot <- data.table::fread("output/TIDY_plot.csv",encoding="UTF-8")
+
+
+                       
+dim(TIDY_plot)
+dim(TIDY5_long)
+
 
 
 
@@ -12,6 +19,7 @@ TIDY_occurrenceID <- TIDY_plot %>%
   # remove columns already present in taxon
   select(-c(Code_Sp,Family,LifeForm1,LifeForm2)) %>% 
   unique()
+
 
 #____________________________________
 # TEMPORARY duplicated occurrence ####
@@ -25,11 +33,11 @@ DUPL %>%
 DUPLcplet <- TIDY_occurrenceID %>% 
   filter(verbatimOccurrenceID %in% DUPL$verbatimOccurrenceID) %>% 
   arrange(Site,feuillet)
-write.csv2(DUPLcplet,"output/WorkingFiles/duplicated_occurrenceID_format_core.csv",row.names=F,fileEncoding = "latin1")
+write.csv2(DUPLcplet,"output/WorkingFiles/2023_09_12_duplicated_occurrenceID_format_core.csv",row.names=F,fileEncoding = "latin1")
 
 DUPLcplet %>% 
   unique() %>% 
-  group_by(envPlot) %>% 
+  group_by(Site) %>%
   summarize(n = n()) %>% 
   arrange(n)
 
@@ -68,7 +76,7 @@ purrr::imap(
     openxlsx::writeData(wb = wb, sheet = object_name, x = df)
   }
 )
-openxlsx::saveWorkbook(wb = wb, file = "output/WorkingFiles/2023_07_05_duplicated_occurrenceID_format_excel.xlsx")
+openxlsx::saveWorkbook(wb = wb, file = "output/WorkingFiles/2023_09_12_duplicated_occurrenceID_format_excel.xlsx")
 
 
 # Export ####

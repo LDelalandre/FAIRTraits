@@ -64,7 +64,6 @@ info_differingtraits_tomerge %>%
 info_differingtraits_tomerge %>% 
   select(Site,verbatimTraitName,traitEntity) %>% 
   filter(verbatimTraitName == "RtRM84" & Site == "O2LA")
-  duplicated()
 
 dim(DF_differingtraits_completed) + dim(DF_commontraits)
 
@@ -147,4 +146,6 @@ write.table(TIDY6 ,"output/TIDY_MoFTraits.csv",fileEncoding = "latin1",row.names
 dim(TIDY4)
 dim(TIDY5)
 dim(TIDY6)
+
+
 
