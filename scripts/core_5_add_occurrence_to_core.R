@@ -80,11 +80,14 @@ openxlsx::saveWorkbook(wb = wb, file = "output/WorkingFiles/2023_09_12_duplicate
 
 
 # Export ####
-TIDY_occurrenceID_nodupl <- TIDY_occurrenceID %>% 
-  filter(!verbatimOccurrenceID %in% DUPL$verbatimOccurrenceID)
 
-write.table(TIDY_occurrenceID_nodupl ,"output/TIDY_occurrenceID_nodupl.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
-write.table(TIDY_occurrenceID ,"output/TIDY_occurrenceID.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+data.table::fwrite(TIDY_occurrenceID,"output/TIDY_occurrenceID.csv")
+
+# TIDY_occurrenceID_nodupl <- TIDY_occurrenceID %>% 
+#   filter(!verbatimOccurrenceID %in% DUPL$verbatimOccurrenceID)
+# 
+# write.table(TIDY_occurrenceID_nodupl ,"output/TIDY_occurrenceID_nodupl.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+# write.table(TIDY_occurrenceID ,"output/TIDY_occurrenceID.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 
 # Info on treatments
 # TIDY_occurrenceID <- read.csv2("output/TIDY_occurrenceID.csv",sep="\t")
