@@ -16,7 +16,7 @@ str(core) # everything is a character, except verbatimTraitName, info on plot al
 # remove numeric columns, and occurrence
 col_names <- core %>% 
   select(!(is.numeric)) %>% 
-  select(- c("verbatimOccurrenceID"       ,"verbatimOccurrenceID_echantillon" ,"verbatimOccurrenceID_population" )) %>% 
+  select(- c("verbatimOccurrenceID" ,"verbatimOccurrenceID_echantillon" ,"verbatimOccurrenceID_population" )) %>% 
   colnames()
 
 get_column_values <- function(col_name){
@@ -29,39 +29,46 @@ list_values_per_column <- lapply(X = col_names,FUN = get_column_values)
 names(list_values_per_column) <- col_names
 
 ## check one by one ####
-# trait
+### trait ####
 list_values_per_column$verbatimTraitName %>% sort()
 list_values_per_column$verbatimTraitName_old %>% sort()
 list_values_per_column$traitName %>% sort()
+
+list_values_per_column$verbatimTraitUnit %>% sort()
+
 list_values_per_column$traitEntityDataFile  %>% sort()
 list_values_per_column$traitEntity  %>% sort()
-list_values_per_column$Quality %>% sort()
-list_values_per_column$samplingProtocol %>% sort()
-list_values_per_column$measurementMethod %>% sort()
-list_values_per_column$verbatimTraitUnit %>% sort() # PROBLEME
-list_values_per_column$traitID %>% sort()
-list_values_per_column$variableType
 
-# species
+list_values_per_column$variableType
+list_values_per_column$traitID %>% sort()
+
+list_values_per_column$Quality %>% sort()
+
+# pourquoi des fois : "All stems or sheaths collected on the \"\"\"\"\"\"\"\"cored\"\"\"\"\"\"\"\" individual"
+# a changer dans les MoFTraits sur les deux ci-dessous (samplingProtocol et measurementMethod)
+list_values_per_column$samplingProtocol %>% sort()
+list_values_per_column$measurementMethod %>% sort() 
+
+### species ####
 list_values_per_column$Species %>% sort()
 
-# environment
+### environment ####
 list_values_per_column$traitPlot %>% sort()
 list_values_per_column$Treatment %>% sort()
 list_values_per_column$envPlot %>% sort()
 
-# data structure
+### data structure ####
 list_values_per_column$Rep %>% sort()
 list_values_per_column$feuillet %>% sort()
 
-# metadata
+### metadata ####
 list_values_per_column$measurementDeterminedBy
 list_values_per_column$nameOfProject
 list_values_per_column$Site
 list_values_per_column$Block
 
 
-## Fields empty ####
+## Problem : fields empty ####
 core %>% filter(Block == "") %>% pull(verbatimOccurrenceID) # Block empty
 core %>% filter(nameOfProject == "") %>% pull(verbatimOccurrenceID) # nameOfProject empty
 core %>% filter(Quality == "") %>% pull(verbatimOccurrenceID) # Quality empty : many (110460) entries !

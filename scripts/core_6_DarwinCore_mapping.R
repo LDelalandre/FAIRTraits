@@ -1,11 +1,11 @@
 library(tidyverse)
 
 # importer TIDY_plot, mais pour l'instant pas au point
-GBIF <-  read.csv2("output/TIDY_occurrenceID.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8")
 mapping <- read.csv("data/MappingDwC_SP.csv",header=T,sep = ";",fileEncoding = "latin1")
 
 # New columns for GBIF ####
-GBIF2 <- GBIF %>% 
+GBIF <- core %>% 
   mutate(countryCode = if_else(Site == "Garraf", "ES","FR"),
          basisOfRecord = "Human Observation",
          dynamicProperties = paste(verbatimTraitName,verbatimTraitValue,verbatimTraitUnit,sep="_"),

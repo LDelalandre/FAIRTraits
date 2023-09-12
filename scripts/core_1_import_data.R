@@ -132,5 +132,5 @@ TIDY2 <- TIDY %>%
   filter(!is.na(verbatimTraitValue))
 
 # Export ####
-write.table(TIDY2 ,"output/TIDY.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
-
+# write.table(TIDY2 ,"output/TIDY.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+data.table::fwrite(TIDY2,"output/TIDY.csv")

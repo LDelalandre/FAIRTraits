@@ -4,7 +4,8 @@ library(tidyverse)
 
 # Join occurrence and MoFTraits
 
-TIDY4 <-  read.csv2("output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+# TIDY4 <-  read.csv2("output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+TIDY4 <- data.table::fread("output/TIDY_trait_entity_updated.csv",encoding="UTF-8")
 
 MoFTraits <- read.csv2("data/MoFTraitsFull.csv",fileEncoding = "latin1") %>% 
   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
@@ -117,7 +118,7 @@ intersect(D1$verbatimOccurrenceID, D2$verbatimOccurrenceID)
 
 
 info_differingtraits_tomerge %>% select(Site,verbatimTraitName,traitEntity)
-info_commontraits_tomerge %>% select(Site,verbatimTraitName,traitEntity)
+# info_commontraits_tomerge %>% select(Site,verbatimTraitName,traitEntity)
 #______________
 
 
@@ -140,12 +141,14 @@ TIDY6 %>% filter(is.na(traitName))
 
 
 # Export ####
-write.table(TIDY6 ,"output/TIDY_MoFTraits.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+data.table::fwrite(TIDY6,"output/TIDY_MoFTraits.csv")
+# write.table(TIDY6 ,"output/TIDY_MoFTraits.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+
 
 # vérifs
 dim(TIDY4)
 dim(TIDY5)
 dim(TIDY6)
 
-
+TIDY6 %>% select(verbatimTraitUnit) %>% unique() %>% View()
 

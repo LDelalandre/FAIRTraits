@@ -2,7 +2,8 @@ library(tidyverse)
 
 # This script adds info on altitude, longitude, and latitude, to the core of the database
 
-TIDY5 <-  read.csv2("output/TIDY_MoFTraits.csv",fileEncoding = "latin1",sep="\t",dec = ".") %>% 
+TIDY5 <-  data.table::fread("output/TIDY_MoFTraits.csv",encoding = "UTF-8") %>% 
+  # read.csv2("output/TIDY_MoFTraits.csv",fileEncoding = "latin1",sep="\t",dec = ".") %>% 
 # Correct typos on plots
   mutate(Plot = if_else(Plot == "HGM_P7,  P9, P10", "HGM_P7, P9, P10",Plot)) %>% 
 # Correct typos on Treatment
@@ -73,7 +74,9 @@ dim(TIDY5)
 dim(TIDY5_plots)
 dim(TIDY5_long)
 
+TIDY5_long %>% select(verbatimTraitUnit) %>% unique() %>% View()
 
+#_____________________________
 # problems of encoding
 TIDY5_long_subset <- TIDY5_long %>%
   filter(Site == "Hautes Garrigues" & verbatimTraitName == "Ldelta13C") 

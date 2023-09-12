@@ -4,13 +4,6 @@ library(tidyverse)
 TIDY_plot <- data.table::fread("output/TIDY_plot.csv",encoding="UTF-8")
 
 
-                       
-dim(TIDY_plot)
-dim(TIDY5_long)
-
-
-
-
 # OccurrenceIDs ####
 TIDY_occurrenceID <- TIDY_plot %>%
   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_")) %>% 

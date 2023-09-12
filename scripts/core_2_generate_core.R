@@ -4,7 +4,8 @@ library(tidyverse)
 # - imports a csv file with data in row (output of `core_1_import_data.R`), 
 # - updates trait names and the values in some other columns (Plot, Treatment)
 
-TIDY2 <- read.csv2("output/TIDY.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+# TIDY2 <- read.csv2("output/TIDY.csv",fileEncoding = "latin1",sep="\t",dec = ".")
+TIDY2 <- data.table::fread("output/TIDY.csv",encoding="UTF-8")
 
 MoFTraits <- read.csv2("data/MoFTraitsFull.csv",fileEncoding = "latin1") %>% 
   mutate_all(trimws) %>% 
@@ -81,7 +82,9 @@ TIDY4 <- TIDY4.0 %>%
   rename(traitEntity = traitEntityValid) %>% 
   # filter(!is.na(verbatimTraitName))  # idem que ligne en-dessous
   filter(verbatimTraitName %in% trait_names)  # remove traits that are not listed in MeasurementOrFact(traits)
-write.table(TIDY4 ,"output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+
+data.table::fwrite(TIDY4,"output/TIDY_trait_entity_updated.csv")
+# write.table(TIDY4 ,"output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 
 
 
