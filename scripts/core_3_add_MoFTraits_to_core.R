@@ -1,5 +1,7 @@
 library(tidyverse)
 
+#NB: QUALITY COLUMN TO ADD FROM MOFTRAITSLIGHT
+
 # This script adds info on trait measurement and sampling method to the core of the database
 
 # Join occurrence and MoFTraits
@@ -15,6 +17,7 @@ MoFTraits <- read.csv2("data/MoFTraitsFull.csv",fileEncoding = "latin1") %>%
                                          TRUE ~ verbatimTraitName_new))
 # colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
 
+# for the column variabletype
 MoFTraitsLight <- readxl::read_excel("data/MoFTraitsLight.xlsx", sheet = "MoFTraitsLight") %>% 
   mutate_all(trimws) %>% 
   rename(verbatimTraitName = verbatimTraitName_new)
@@ -52,7 +55,8 @@ DF_differingtraits_completed <- TIDY4_differingtraits_completed %>%
 # Only lines to be completed = where traitName is NA so far
 DF_commontraits <- TIDY4_differingtraits_completed %>% 
   filter(is.na(traitName)) %>% 
-  select(-c( traitName,Quality,   samplingProtocol, measurementMethod)) #
+  select(-c( traitName,   samplingProtocol, measurementMethod,verbatimTraitName_new_old,
+             inFinalFile,traitEntityAbbreviation)) # remove th columns added by left-joining with info_traits !!
 
 # problème : les deux data frame suivants devraient avoir le même nombre de lignes !
 dim(TIDY4)
@@ -75,16 +79,23 @@ info_commontraits_tomerge <- info_traits %>%
   select(-Site) %>% 
   unique()
 
-# -- temporaire
+
+# -- temporaire _____________________________________
 # pas de duplication de ligne dans ce MoFTraits
 info_commontraits_tomerge %>% 
   filter(duplicated(paste0(verbatimTraitName,traitEntity)))
-# --
+# --_____________________________________________________
+
+
 
 DF_commontraits_completed <- DF_commontraits %>% 
-  left_join(info_commontraits_tomerge, by = c("verbatimTraitName", "traitEntity"))
+  left_join(info_commontraits_tomerge)
 
-# -- temporaire
+
+intersect(colnames(TIDY4),colnames(info_differingtraits_tomerge))
+intersect(colnames(DF_commontraits),colnames(info_commontraits_tomerge))
+
+# -- temporaire____________________________________________
 # pb: encore des lignes non complétées
 DF_commontraits_pb <- DF_commontraits_completed %>% 
   filter(is.na(traitName))
@@ -98,7 +109,9 @@ list_trait_entity_to_add <- DF_commontraits_pb %>%
   unique()
 
 write.csv2(list_trait_entity_to_add, "output/WorkingFiles/2023_08_21_list_site_trait_name_to_add.csv",row.names=F)
-# --
+# --_______________________________________________________
+
+
 
 
 # bind the two
@@ -122,9 +135,14 @@ info_differingtraits_tomerge %>% select(Site,verbatimTraitName,traitEntity)
 #______________
 
 
-TIDY5 %>% 
+# pb: les traitName ne se sont pas mis à jour !!
+TIDY5 %>%
   filter(is.na(traitName)) %>% dim() # compléter MoFTraits (Eric)
 
+TIDY5 %>% 
+  filter(is.na(traitName)) %>% 
+  pull(verbatimTraitName) %>% 
+  unique()
 
 # Add column variableType
 # TIDY5 <- TIDY5 %>% 

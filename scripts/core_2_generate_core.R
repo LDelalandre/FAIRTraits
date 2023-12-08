@@ -11,7 +11,8 @@ MoFTraits <- read.csv2("data/MoFTraitsFull.csv",fileEncoding = "latin1") %>%
   mutate_all(trimws) %>% 
   mutate(verbatimTraitName_new = case_when(verbatimTraitName_new == "RDM _ab_0" ~ "RDM_ab_0",
                                            verbatimTraitName_new == "RDM _ab_84" ~ "RDM_ab_84",
-                                           TRUE ~ verbatimTraitName_new))
+                                           TRUE ~ verbatimTraitName_new)) %>% 
+  filter(!verbatimTraitName_new == "check in data file")
 # colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
 # Enlever les espaces qui se sont glissés un peu partout dans les noms de traits
 # MoFTraits <- MoFTraits %>% 
@@ -57,6 +58,28 @@ TIDY4.0 <- TIDY3 %>%
   
 
 #____________________________________________________________________
+# check 
+dim(TIDY3)
+dim(TIDY4.0)
+correspondence_traits_old_new <- correspondence_traits_old_new %>% 
+  mutate(test = paste(traitEntityDataFile , verbatimTraitName_old, sep = "_"))
+
+correspondence_traits_old_new[which(duplicated(correspondence_traits_old_new$test)),] %>% 
+  arrange(test)
+
+correspondence_traits_old_new[which(duplicated(correspondence_traits_old_new$verbatimTraitName_new)),] %>% 
+  arrange(verbatimTraitName_new)
+
+correspondence_traits_old_new %>% 
+  select(traitEntityDataFile , verbatimTraitName_old) %>%
+  # unique() %>%
+  dim()
+
+TIDY4.0 %>% 
+  filter(is.na(verbatimTraitName_new)) %>% View() # c'est normal, c'était déjà vide avant MoFTraitsFull
+# (et les champs d'espèce et autres sont vides = pb d'Excel, ou bien le trait n'est pas retenu)
+
+
 # TEMPORARY missing traits names ####
 # Problème résolu
 missing_in_moftraits <- TIDY4.0 %>% 
@@ -75,7 +98,12 @@ submof <- MoFTraits %>%
 #____________________________________________________________________
 
 ## Select traits to keep ####
-trait_names <- MoFTraits$verbatimTraitName_new # Names of traits that we keep
+
+# Names of traits that we keep
+trait_names <- MoFTraits %>% 
+  filter(inFinalFile == "yes") %>% 
+  pull(verbatimTraitName_new)
+
 TIDY4 <- TIDY4.0 %>% 
   # select(-verbatimTraitName_old) %>%
   rename(verbatimTraitName = verbatimTraitName_new) %>%
