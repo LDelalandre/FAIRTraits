@@ -2,7 +2,7 @@ library(tidyverse)
 
 # This script:
 # - imports a csv file with data in row (output of `core_1_import_data.R`), 
-# - updates trait names and the values in some other columns (Plot, Treatment)
+# - updates the values in some columns (Plot, Treatment), and corrects typos
 
 # TIDY2 <- read.csv2("output/TIDY.csv",fileEncoding = "latin1",sep="\t",dec = ".")
 TIDY2 <- data.table::fread("output/TIDY.csv",encoding="UTF-8")
@@ -33,29 +33,17 @@ TIDY3 <- TIDY2 %>%
                           Site == "Garraf" ~ paste("GAR",Plot,sep = "_"),
                           Site == "Hautes Garrigues" ~ paste("HGM",Plot,sep = "_"),
                           Site == "Les Agros" ~ paste("AGR",Plot,sep = "_"))) %>% 
-  mutate(Treatment = paste("Treatment",Treatment,sep="_"))
-
-
-# Traits ####
-## Update names of traits and entity ####
-correspondence_traits_old_new <- MoFTraits %>% 
-  select(verbatimTraitName_old,traitEntityDataFile,verbatimTraitName_new,traitEntityValid) %>% 
-  unique() # some trait names are duplicated because of different measurement methods in MoFTraits
-
-TIDY4.0 <- TIDY3 %>%
-  rename(verbatimTraitName_old = verbatimTraitName) %>% 
-  rename(traitEntityDataFile = traitEntity) %>% 
-  # correct typos
-  mutate(verbatimTraitName_old = str_replace_all(verbatimTraitName_old, " ", "")) %>% 
-  mutate(verbatimTraitName_old = str_replace_all(verbatimTraitName_old, " ", "")) %>% 
-  mutate(verbatimTraitName_old = case_when(verbatimTraitName_old == "R_Cellulose" ~"R_cellulose",
-                                           verbatimTraitName_old == "R_prod" ~ "Rprod",
-                                           verbatimTraitName_old == "R_DM_84" ~ "R_DM_ab_84",
-                                           verbatimTraitName_old == "R_DM_0" ~ "R_DM_ab_0",
-                                           TRUE ~ verbatimTraitName_old)) %>%  
-  # update pbs organ Graminoid (sheath) and others (stem)...
-  left_join(correspondence_traits_old_new)
+  mutate(Treatment = paste("Treatment",Treatment,sep="_")) %>% 
   
+  # correct typos
+  mutate(verbatimTraitName = str_replace_all(verbatimTraitName, " ", "")) %>% 
+  mutate(verbatimTraitName = str_replace_all(verbatimTraitName, " ", "")) %>% 
+  mutate(verbatimTraitName = case_when(verbatimTraitName == "R_prod" ~ "Rprod",
+                                           verbatimTraitName == "R_DM_84" ~ "R_DM_ab_84",
+                                           verbatimTraitName == "R_DM_0" ~ "R_DM_ab_0",
+                                           TRUE ~ verbatimTraitName)) #verbatimTraitName == "R_Cellulose" ~"R_cellulose",
+
+data.table::fwrite(TIDY3,"output/TIDY_corrected_typos.csv")
 
 #____________________________________________________________________
 # check 
@@ -97,28 +85,8 @@ submof <- MoFTraits %>%
 
 #____________________________________________________________________
 
-## Select traits to keep ####
-
-# Names of traits that we keep
-trait_names <- MoFTraits %>% 
-  filter(inFinalFile == "yes") %>% 
-  pull(verbatimTraitName_new)
-
-TIDY4 <- TIDY4.0 %>% 
-  # select(-verbatimTraitName_old) %>%
-  rename(verbatimTraitName = verbatimTraitName_new) %>%
-  rename(traitEntity = traitEntityValid) %>% 
-  # filter(!is.na(verbatimTraitName))  # idem que ligne en-dessous
-  filter(verbatimTraitName %in% trait_names)  # remove traits that are not listed in MeasurementOrFact(traits)
-
-data.table::fwrite(TIDY4,"output/TIDY_trait_entity_updated.csv")
-# write.table(TIDY4 ,"output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 
 
 
 dim(TIDY2)
 dim(TIDY3)
-dim(TIDY4.0)
-dim(TIDY4)
-
-
