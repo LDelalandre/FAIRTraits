@@ -10,8 +10,8 @@ TIDY_occurrenceID <- TIDY_plot %>%
   mutate(verbatimOccurrenceID_echantillon = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
   mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,sep = "_")) %>% 
   # remove columns already present in taxon
-  select(-c(Code_Sp,Family,LifeForm1,LifeForm2)) %>% 
-  unique() # Pourquoi y avait-il des lignes (5) dupliquées ?!
+  select(-c(Code_Sp,Family,LifeForm1,LifeForm2)) %>%
+  unique() # Pourquoi y avait-il des lignes (5) dupliquées ?! (apparait au moment de faire TIDY5, dans script core_3, à la fin)
 
 dim(TIDY_plot)
 dim(TIDY_occurrenceID)

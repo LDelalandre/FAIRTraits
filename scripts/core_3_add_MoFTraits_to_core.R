@@ -108,7 +108,7 @@ DF_commontraits <- TIDY4_differingtraits_completed %>%
              inFinalFile,traitEntityAbbreviation,
              verbatimTraitName_new, traitEntityValid,
              variableType,      entityCategory,    traitQuality,     
-             verbatimTraitUnit, termSource,        localIdentifier,   traitID )) # remove th columns added by left-joining with MoFTraits !!
+             verbatimTraitUnit, termSource,        localIdentifier,   traitID )) # remove the columns added by left-joining with MoFTraits !!
 
 # # problème : les deux data frame suivants devraient avoir le même nombre de lignes !
 # dim(TIDY4)
@@ -222,7 +222,8 @@ data.table::fwrite(TIDY6,"output/TIDY_MoFTraits.csv")
 # vérifs
 dim(TIDY4)
 dim(TIDY5)
+dim(TIDY5 %>% unique()) # il y a 5 lignes dupliquées. Pourquoi ?!?:?!
 dim(TIDY6)
 
-TIDY6 %>% select(verbatimTraitUnit) %>% unique() %>% View()
-
+TIDY6 %>% select(verbatimTraitUnit) %>% unique()
+colnames(TIDY5)

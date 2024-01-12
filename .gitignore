@@ -9,7 +9,9 @@
 *.png
 *.jpg
 *.html
+*.svg
 data
 info
 notebook
 output
+draft
