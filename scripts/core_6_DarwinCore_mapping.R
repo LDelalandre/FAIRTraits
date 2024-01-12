@@ -1,7 +1,12 @@
 library(tidyverse)
 
 # importer TIDY_plot, mais pour l'instant pas au point
-core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8")
+core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8") %>% 
+  select(-c(verbatimTraitName_old,verbatimTraitName_new_old,inFinalFile,
+            traitEntityDataFile)) %>% 
+  rename(traitEntity = traitEntityValid,
+         verbatimTraitName = verbatimTraitName_new)
+  
 mapping <- read.csv("data/MappingDwC_SP.csv",header=T,sep = ";",fileEncoding = "latin1")
 
 # New columns for GBIF ####
@@ -19,27 +24,27 @@ GBIF <- core %>%
 mapping_core <- mapping %>% 
   filter(GBIFFile == "Occurrences")
 
-setdiff(mapping_core$Variable, GBIF2 %>% colnames())
+setdiff(mapping_core$Variable, GBIF %>% colnames())
 
-Occurrences <- GBIF2 %>% 
-  select(all_of(mapping_core$Variable))
-colnames(Occurrences) <- mapping_core$Term
+Occurrences <- GBIF %>% 
+  select(any_of(mapping_core$Variable)) # changer pour all_of
+colnames(Occurrences) <- mapping_core$Term # vérifier qu'on conserve bien le même ordre
 
-write.table(Occurrences ,"output/GBIF/Occurrences.csv",fileEncoding = "UTF-8",
-            row.names=F,sep="\t",dec = ".")
+data.table::fwrite(Occurrences,"output/GBIF/Occurrences.csv")
 
 
 ## TraitValues ####
 mapping_traits <- mapping %>% 
   filter(GBIFFile == "TraitValues")
 
-TraitValues <- GBIF2 %>% 
-  select(all_of(mapping_traits$Variable))
+setdiff(mapping_traits$Variable, GBIF %>% colnames())
+
+TraitValues <- GBIF %>% 
+  select(any_of(mapping_traits$Variable)) # changer pour all_of
 colnames(TraitValues) <- mapping_traits$Term
 
+data.table::fwrite(TraitValues,"output/GBIF/TraitValues.csv")
 
-write.table(TraitValues ,"output/GBIF/TraitValues.csv",fileEncoding = "UTF-8",
-            row.names=F,sep="\t",dec = ".")
 
 
 ## Subsample ####
@@ -62,15 +67,13 @@ mapping_taxon <- mapping %>%
   filter(GBIFFile == "Taxon")
 
 # ATTENTION, ONE PERD LifeCycle2, LifeForm2
-setdiff(colnames(taxon),mapping_taxon$Variable)
+setdiff(mapping_taxon$Variable,colnames(taxon))
 
 taxon2 <- taxon %>% 
   select(all_of(mapping_taxon$Variable))
 colnames(taxon2) <- mapping_taxon$Term
 
-write.table(taxon2 ,"output/Taxon_vavr2023.csv",fileEncoding = "UTF-8",
-            row.names=F,sep="\t",dec = ".")
-
+data.table::fwrite(taxon2,"output/GBIF/Taxon_vavr2023.csv")
 
 
 #_______________________________________________________________________________

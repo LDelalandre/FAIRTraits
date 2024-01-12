@@ -11,21 +11,27 @@ TIDY4 <- data.table::fread("output/TIDY_corrected_typos.csv",encoding="UTF-8") %
   rename(verbatimTraitName_old = verbatimTraitName) %>% 
   rename(traitEntityDataFile = traitEntity)
 
-MoFTraits <- read.csv2("data/MoFTraitsFull.csv",fileEncoding = "latin1") %>% 
+MoFTraits <- readxl::read_excel("data/MoFTraitsFull_jan2024.xlsx", sheet = "MoFTraitsFull") %>% 
   rename(verbatimTraitName_new = verbatimTraitName_new_new) %>% 
   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
-  mutate_all(trimws) %>% 
-  mutate(verbatimTraitName_new = case_when(verbatimTraitName_new == "RDM _ab_0" ~ "RDM_ab_0",
-                                         verbatimTraitName_new == "RDM _ab_84" ~ "RDM_ab_84",
-                                         TRUE ~ verbatimTraitName_new))
+  mutate_all(trimws)
+
+# MoFTraits <- read.csv2("data/MoFTraitsFull_jan2024.csv",fileEncoding = "latin1") %>% 
+#   rename(verbatimTraitName_new = verbatimTraitName_new_new) %>% 
+#   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
+#   mutate_all(trimws) %>% 
+#   mutate(verbatimTraitName_new = case_when(verbatimTraitName_new == "RDM _ab_0" ~ "RDM_ab_0",
+#                                          verbatimTraitName_new == "RDM _ab_84" ~ "RDM_ab_84",
+#                                          TRUE ~ verbatimTraitName_new)) %>% 
+#   filter(!verbatimTraitName_new == "check in data file")
 
 
 
 # # colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
 # 
 # # for the column variabletype
-# MoFTraitsLight <- readxl::read_excel("data/MoFTraitsLight.xlsx", sheet = "MoFTraitsLight") %>% 
-#   mutate_all(trimws) %>% 
+# MoFTraitsLight <- readxl::read_excel("data/MoFTraitsLight.xlsx", sheet = "MoFTraitsLight") %>%
+#   mutate_all(trimws) %>%
 #   rename(verbatimTraitName = verbatimTraitName_new)
 # 
 # info_traits <- MoFTraits %>% 
@@ -68,14 +74,14 @@ MoFTraits <- read.csv2("data/MoFTraitsFull.csv",fileEncoding = "latin1") %>%
 
 
 # TEMPORAIRE : check MoFTraitsLight
-A <- MoFTraits %>% pull(verbatimTraitName_new) %>% unique()
-
-B <- MoFTraitsLight %>% pull(verbatimTraitName) %>% unique()
-
-setdiff(A,B)
-setdiff(B,A)
-
-is.element("RDM_ab_84",B)
+# A <- MoFTraits %>% pull(verbatimTraitName_new) %>% unique()
+# 
+# B <- MoFTraitsLight %>% pull(verbatimTraitName) %>% unique()
+# 
+# setdiff(A,B)
+# setdiff(B,A)
+# 
+# is.element("RDM_ab_84",B)
 
 #______________________
 # TEMPORAIRE: Voir la liste des traits
@@ -98,9 +104,11 @@ DF_differingtraits_completed <- TIDY4_differingtraits_completed %>%
 # Only lines to be completed = where traitName is NA so far
 DF_commontraits <- TIDY4_differingtraits_completed %>% 
   filter(is.na(traitName)) %>% 
-  select(-c( traitName,   samplingProtocol, measurementMethod,verbatimTraitName_new_old,
+  select(-c( traitName,   samplingProtocol, measurementMethod,
              inFinalFile,traitEntityAbbreviation,
-             verbatimTraitName_new, traitEntityValid)) # remove th columns added by left-joining with MoFTraits !!
+             verbatimTraitName_new, traitEntityValid,
+             variableType,      entityCategory,    traitQuality,     
+             verbatimTraitUnit, termSource,        localIdentifier,   traitID )) # remove th columns added by left-joining with MoFTraits !!
 
 # # problème : les deux data frame suivants devraient avoir le même nombre de lignes !
 # dim(TIDY4)
@@ -135,9 +143,16 @@ intersect(colnames(DF_commontraits),colnames(info_commontraits_tomerge))
 DF_commontraits_pb <- DF_commontraits_completed %>% 
   filter(is.na(traitName))
 
+DF_commontraits_pb %>% select(Site,verbatimTraitName_old,verbatimTraitName_new) %>% unique 
+DF_commontraits_pb %>% pull(verbatimTraitName_old) %>% unique()
+
 DF_commontraits_pb%>% 
   group_by(Site) %>% 
   summarize(n = n())
+
+# TIDY4 %>% filter(verbatimTraitName_old == "LTS") %>% select(Site,traitEntityDataFile,verbatimTraitName_old) %>%
+#   unique()
+# MoFTraits %>% filter(verbatimTraitName_old == "LWS")
 
 list_trait_entity_to_add <- DF_commontraits_pb %>% 
   select(Site,feuillet, verbatimTraitName_old,verbatimTraitName_new , traitEntityDataFile,traitEntityValid,traitName) %>% 
@@ -151,21 +166,25 @@ write.csv2(list_trait_entity_to_add, "output/WorkingFiles/2023_08_21_list_site_t
 
 # bind the two
 TIDY5 <- rbind(DF_differingtraits_completed,DF_commontraits_completed) 
+
+setdiff(colnames(DF_differingtraits_completed),colnames(DF_commontraits_completed))
+setdiff(colnames(DF_commontraits_completed),colnames(DF_differingtraits_completed))
+
 dim(TIDY4)
 dim(TIDY5)
 
 #_______________
 # Pourquoi augmentation du nombre de lignes ?
-D1 <- DF_differingtraits_completed %>% 
-  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
-
-D2 <- DF_commontraits_completed %>% 
-  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
-
-intersect(D1$verbatimOccurrenceID, D2$verbatimOccurrenceID)
-
-
-info_differingtraits_tomerge %>% select(Site,verbatimTraitName,traitEntity)
+# D1 <- DF_differingtraits_completed %>% 
+#   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
+# 
+# D2 <- DF_commontraits_completed %>% 
+#   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
+# 
+# intersect(D1$verbatimOccurrenceID, D2$verbatimOccurrenceID)
+# 
+# 
+# info_differingtraits_tomerge %>% select(Site,verbatimTraitName,traitEntity)
 # info_commontraits_tomerge %>% select(Site,verbatimTraitName,traitEntity)
 #______________
 
@@ -190,15 +209,10 @@ write.csv2(missing_MoFTraitsFull,"output/2023_12_missing_MoFTraitsFull.csv",row.
 #   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
 #   
 TIDY6 <- TIDY5 %>% 
-  filter(inFinalFile == "yes") %>% 
-  merge(MoFTraitsLight %>%  select(verbatimTraitName, verbatimTraitUnit, traitID, variableType)
-  )
-
-MoFTraitsLight[which(duplicated(MoFTraitsLight$verbatimTraitName)),]
-
+  filter(inFinalFile == "yes")
 
 TIDY6 %>% filter(is.na(traitName))
-
+TIDY6 %>% colnames()
 
 # Export ####
 data.table::fwrite(TIDY6,"output/TIDY_MoFTraits.csv")

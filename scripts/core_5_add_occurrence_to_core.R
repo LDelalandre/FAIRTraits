@@ -6,13 +6,15 @@ TIDY_plot <- data.table::fread("output/TIDY_plot.csv",encoding="UTF-8")
 
 # OccurrenceIDs ####
 TIDY_occurrenceID <- TIDY_plot %>%
-  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_")) %>% 
+  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,verbatimTraitName_new,traitEntityValid,sep = "_")) %>% 
   mutate(verbatimOccurrenceID_echantillon = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
   mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,sep = "_")) %>% 
   # remove columns already present in taxon
   select(-c(Code_Sp,Family,LifeForm1,LifeForm2)) %>% 
-  unique()
+  unique() # Pourquoi y avait-il des lignes (5) dupliquées ?!
 
+dim(TIDY_plot)
+dim(TIDY_occurrenceID)
 
 #____________________________________
 # TEMPORARY duplicated occurrence ####
