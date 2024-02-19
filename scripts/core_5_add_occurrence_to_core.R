@@ -1,70 +1,27 @@
 library(tidyverse)
 
-# TIDY_plot <- read.csv2("output/TIDY_plot.csv",fileEncoding = "latin1",sep="\t",dec = ".")
 TIDY_plot <- data.table::fread("output/TIDY_plot.csv",encoding="UTF-8")
 
 
-# OccurrenceIDs ####
+# Generate OccurrenceIDs ####
 TIDY_occurrenceID <- TIDY_plot %>%
-  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,verbatimTraitName_new,traitEntityValid,sep = "_")) %>% 
-  mutate(verbatimOccurrenceID_echantillon = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
-  mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,sep = "_")) %>% 
-  # remove columns already present in taxon
-  select(-c(Code_Sp,Family,LifeForm1,LifeForm2)) %>%
-  unique() # Pourquoi y avait-il des lignes (5) dupliquées ?! (apparait au moment de faire TIDY5, dans script core_3, à la fin)
+  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntityValid,sep = "_")) %>% 
+  mutate(verbatimOccurrenceID_sample = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
+  mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,sep = "_"))
 
-dim(TIDY_plot)
-dim(TIDY_occurrenceID)
+# Quality check ####
 
-which(duplicated(TIDY_occurrenceID$verbatimOccurrenceID))
+# Is occurrenceID unique ?
+dupl_occ <- TIDY_occurrenceID[which(duplicated(TIDY_occurrenceID$verbatimOccurrenceID)),]
+
+
 
 # Export ####
-
 data.table::fwrite(TIDY_occurrenceID,"output/TIDY_occurrenceID.csv",sep="\t")
 data.table::fwrite(TIDY_occurrenceID %>% 
                      select(-c(measurementMethod)),
                    "output/TIDY_occurrenceID_no_sampling_measurement.csv",sep="\t")
 
-
-# TEMPORAIRE
-TIDY_occurrenceID %>% 
-  pull(traitPlot) %>% 
-  unique()
-
-
-
-
-TIDY6 # MOFTraits
-TIDY5_long # + plots
-TIDY_occurrenceID # + occurrence
-core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8")
-
-focus <- core
-focus %>% 
-  filter(Site == "CRE_O2LA") %>% 
-  select(Site,samplingProtocol,traitPlot) %>% 
-  View()
-
-focus %>% 
-  filter(Site == "CRE_O2LA" & Block == "J" & Species == "Bromus erectus") %>% 
-  View()
- 
-O2LA <- TIDY_occurrenceID %>% 
-  filter(Site == "CRE_O2LA") 
-data.table::fwrite(O2LA ,"output/WorkingFiles/TIDY_occurrenceID_O2LA.csv") 
-
-no_sampling_measurement <- TIDY_occurrenceID %>% 
-  select(-c(samplingProtocol,measurementMethod))
-data.table::fwrite(no_sampling_measurement ,"output/WorkingFiles/TIDY_occurrenceID_no_sampling_measurement.csv") 
-
-# PB à 02LA ? ####
-
-O2LA %>% 
-  filter(verbatimOccurrenceID == "BROMEREC_CRE_O2LA_L_CRO_L1_Treatment_Ambient_2012_5_1_Rrm2_RDMC_abr_absorptive roots") %>% 
-  pull(samplingProtocol)
-
-O2LAbis <- data.table::fread("output/WorkingFiles/TIDY_occurrenceID_O2LA.csv", encoding = "UTF-8")
-O2LAbis %>% pull(samplingProtocol) %>% unique()
 
 #____________________________________
 # TEMPORARY duplicated occurrence ####
@@ -99,7 +56,7 @@ names_feuillets <- DUPLcplet %>%
   pull(site_feuillet)
 
 list_site_feuillet <- DUPLcplet %>% 
-  select(-c(verbatimOccurrenceID,verbatimOccurrenceID_echantillon,verbatimOccurrenceID_population)) %>% 
+  select(-c(verbatimOccurrenceID,verbatimOccurrenceID_sample,verbatimOccurrenceID_population)) %>% 
   group_split(Site,feuillet) %>% 
   setNames(names_feuillets) %>% 
   unique()
@@ -121,7 +78,7 @@ purrr::imap(
     openxlsx::writeData(wb = wb, sheet = object_name, x = df)
   }
 )
-# openxlsx::saveWorkbook(wb = wb, file = "output/WorkingFiles/2023_09_12_duplicated_occurrenceID_format_excel.xlsx")
+openxlsx::saveWorkbook(wb = wb, file = "output/WorkingFiles/2024_02_16_duplicated_occurrenceID_format_excel.xlsx")
 
 
 
@@ -137,3 +94,12 @@ purrr::imap(
 #   select(Site, Treatment) %>% 
 #   unique() 
 # write.csv2(treatment,"output/treatments_per_site.csv",row.names=F)
+
+
+# JE REGARDE QUAND LE DUPLICAT ARRIVE
+TIDY5_plots %>% 
+  filter(Site=="La Fage" & Code_Sp == "VICISATI-SATI"&Rep == "Rlm1" & verbatimTraitName_old  == "LDMC")
+
+# Problème à partir de l'ajout des infos de longitude
+TIDY5_long %>% 
+  filter(Site=="La Fage" & Code_Sp == "VICISATI-SATI"&Rep == "Rlm1" & verbatimTraitName_old  == "LDMC") %>% View

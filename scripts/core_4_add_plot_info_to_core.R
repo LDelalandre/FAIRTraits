@@ -1,9 +1,12 @@
 library(tidyverse)
 
 # This script adds info on altitude, longitude, and latitude, to the core of the database
+# It also updates names of plots, treatments, and sites
 
+# Import data ####
+
+## Traits ####
 TIDY5 <-  data.table::fread("output/TIDY_MoFTraits.csv",encoding = "UTF-8") %>% 
-  # read.csv2("output/TIDY_MoFTraits.csv",fileEncoding = "latin1",sep="\t",dec = ".") %>% 
 # Correct typos on plots
   mutate(Plot = if_else(Plot == "HGM_P7,  P9, P10", "HGM_P7, P9, P10",Plot)) %>% 
 # Correct typos on Treatment
@@ -21,17 +24,24 @@ TIDY5 <-  data.table::fread("output/TIDY_MoFTraits.csv",encoding = "UTF-8") %>%
                           TRUE ~ Site))
   
 
-# Measurements made at the level of plots
+## Environmental data ####
+
+# Names of plots and values of environmental parameters
 envPlots <- read.csv2("data/Plots.csv",fileEncoding = "latin1",sep=";") %>% 
   unique()
 
-traitPlots <- read.csv2("data/traitPlots_georeferences.csv",fileEncoding = "latin1") %>% 
-  # select(-envPlot) %>% 
+# Georeference of plots where traits were measured
+traitPlots <- read.csv2("data/traitPlots_georeferences.csv",fileEncoding = "latin1")
+Infos_Plots <- traitPlots %>% 
+  select(traitPlot,plotLatitude,plotLongitude,plotAltitude) %>% 
   unique()
 
-# Info to change plot and treatment names
+# Info to update plot and treatment names 
+# + correspondence between plots where traits were measured, and plots where 
+# environmental parameters were measured
 Plots_corresp_envt <- read.csv2("data/plots_corresp_envt.csv",fileEncoding = "latin1") %>% 
   unique()
+
 
 # Modify the Core dataframe ####
 
@@ -53,61 +63,47 @@ TIDY5_plots <- TIDY5 %>%
                                   TRUE ~ treatmentNew)) %>%
   rename(traitPlot = traitPlotNew) %>%
   rename(Treatment = treatmentNew) 
-  # select(-c(traitPlotOriginal,treatmentOriginal))
 
 
-# add plot latitude, longitude, and altitude
-Infos_Plots <- traitPlots %>% 
-  select(traitPlot,plotLatitude,plotLongitude,plotAltitude) %>% 
-  unique()
 
+## add plot latitude, longitude, and altitude ####
 TIDY5_long <- TIDY5_plots %>%
   left_join(Infos_Plots,by = c("traitPlot"))
 
 
-# write.table(TIDY5_long ,"output/TIDY_plot.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
-data.table::fwrite(TIDY5_long,"output/TIDY_plot.csv",sep="\t")
+# Quality check ####
 
+## Was plot name  updated for every plot?
+TIDY5_long %>%
+  filter(is.na(traitPlot))
 
+## Is latitude documented for every plot?
+TIDY5_long %>%
+  filter(is.na(plotLatitude))
 
+# Was the correspondence between plots where traits and environment were measured
+# made for every record ?
+TIDY5_long %>%
+  filter(is.na(envPlot))
+
+# Does row number remain identical?
 dim(TIDY5)
 dim(TIDY5_plots)
+dim(TIDY5_long)
 dim(TIDY5_long %>% unique())
 
-TIDY5_long %>% select(verbatimTraitUnit) %>% unique() %>% View()
-TIDY5_long %>% select(traitPlot,envPlot) %>% unique() %>% View()
 
-#_____________________________
-# problems of encoding
-TIDY5_long_subset <- TIDY5_long %>%
-  filter(Site == "Hautes Garrigues" & verbatimTraitName_new == "Ldelta13C_mlf") 
+# PROBLEME dans l'ajout des infos de géolocalisation des traitPlot
+Coreplots <- TIDY5_plots %>% 
+  pull(traitPlot) %>% 
+  unique()
 
-TIDY5_long_subset %>% 
-  write.table("output/WorkingFiles/TIDY_plot_subset.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+GPSplots <- Infos_Plots %>% 
+  pull(traitPlot) %>% 
+  unique()
 
-data.table::fwrite(TIDY5_long,"output/WorkingFiles/TIDY_plot_subset_data.table.csv")
-test <- data.table::fread("output/WorkingFiles/TIDY_plot_subset_data.table.csv",encoding="UTF-8")
+setdiff(Coreplots, GPSplots)
+setdiff(GPSplots,Coreplots)
 
-
-TIDY_plot_subset <- read.csv2("output/WorkingFiles/TIDY_plot_subset.csv",fileEncoding = "latin1",sep="\t",dec = ".")
-
-
-
-#_________________
-# TEMPORAIRE plots et géoréférencement
-traitPlots <- TIDY5_long %>% 
-  select(traitPlot,envPlot,plotLatitude,plotLongitude,plotAltitude) %>% 
-  unique() %>%
-  arrange(traitPlot)
-
-traitPlots_to_complete <- traitPlots %>% 
-  filter(!(traitPlot == envPlot))
-
-traitPlots_ok <- traitPlots %>% 
-  filter(traitPlot == envPlot)
-
-write.csv2(traitPlots,"output/WorkingFiles/traitPlots_to_complete.csv",row.names=F,fileEncoding = "latin1")
-
-
-
-
+# Export ####
+data.table::fwrite(TIDY5_long,"output/TIDY_plot.csv",sep="\t")

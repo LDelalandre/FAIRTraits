@@ -23,7 +23,5 @@ sp_info_name_URL_id <- sp_info_name_URL %>%
 taxon_extension <- sp_info_name_URL_id %>% 
   select(-Remarques)
 
-# checké avec TAXREF: les familles botaniques sont bien renseignées.
-
 write.csv2(taxon_extension,"output/FAIRTraits_Taxon.csv",row.names=F,fileEncoding = "Latin1")
 

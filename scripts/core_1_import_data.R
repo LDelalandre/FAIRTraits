@@ -130,7 +130,8 @@ TIDY2 <- TIDY %>%
                               # "Linum tenuifolium subsp. tenuifolium" n'existe pas dans TAXREF
                               TRUE ~ Species)) %>% 
 # remove NAs ####
-  filter(!is.na(verbatimTraitValue))
+  filter(!is.na(verbatimTraitValue)) %>% 
+  unique()
 
 # Export ####
 # write.table(TIDY2 ,"output/TIDY.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")

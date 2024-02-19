@@ -30,12 +30,10 @@ TIDY3 <- TIDY2 %>%
                                            verbatimTraitName == "R_DM_0" ~ "R_DM_ab_0",
                                            TRUE ~ verbatimTraitName)) #verbatimTraitName == "R_Cellulose" ~"R_cellulose",
 
+# Export ####
 data.table::fwrite(TIDY3,"output/TIDY_corrected_typos.csv",sep="\t")
 
-#____________________________________________________________________
-# check
-dim(TIDY2)
-dim(TIDY3)
+
 
 
 

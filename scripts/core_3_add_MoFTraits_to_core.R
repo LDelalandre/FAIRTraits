@@ -1,104 +1,31 @@
 library(tidyverse)
 
-#NB: QUALITY COLUMN TO ADD FROM MOFTRAITSLIGHT
+# This script :
+# - updates trait names
+# - adds information on trait measurement and sampling method to the core of the database
 
-# This script adds info on trait measurement and sampling method to the core of the database
-
-# Join occurrence and MoFTraits
-
+# Import data ####
 # TIDY4 <-  read.csv2("output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",sep="\t",dec = ".")
 TIDY4 <- data.table::fread("output/TIDY_corrected_typos.csv",encoding="UTF-8") %>% 
   rename(verbatimTraitName_old = verbatimTraitName) %>% 
   rename(traitEntityDataFile = traitEntity)
 
-MoFTraits <- readxl::read_excel("data/MoFTraitsFull_jan2024.xlsx", sheet = "MoFTraitsFull") %>% 
+MoFTraits <- readxl::read_excel("data/MoFTraitsFull_jan2024_clean.xlsx", sheet = "MoFTraitsFull") %>% 
   rename(verbatimTraitName_new = verbatimTraitName_new_new) %>% 
   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
-  mutate_all(trimws) %>% 
+  mutate_all(trimws)
   # add double quotes to avoid problems with commas contained in two columns
-  mutate(samplingProtocol = paste0("\"", samplingProtocol,"\"" )) %>%
-  mutate(measurementMethod = paste0("\"", measurementMethod,"\"" ))
+  # mutate(samplingProtocol = paste0("\"", samplingProtocol,"\"" )) %>%
+  # mutate(measurementMethod = paste0("\"", measurementMethod,"\"" ))
 
 
-# change ; into ,
-# MoFTraits$measurementMethod <- MoFTraits$measurementMethod %>%
-#   gsub(";",",",.)
+# Combine core data with MoFTraits ####
+# (information on traits : names, measurement method, etc.)
 
-# MoFTraits <- read.csv2("data/MoFTraitsFull_jan2024.csv",fileEncoding = "latin1") %>% 
-#   rename(verbatimTraitName_new = verbatimTraitName_new_new) %>% 
-#   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
-#   mutate_all(trimws) %>% 
-#   mutate(verbatimTraitName_new = case_when(verbatimTraitName_new == "RDM _ab_0" ~ "RDM_ab_0",
-#                                          verbatimTraitName_new == "RDM _ab_84" ~ "RDM_ab_84",
-#                                          TRUE ~ verbatimTraitName_new)) %>% 
-#   filter(!verbatimTraitName_new == "check in data file")
+# This is performed separately for traits which were measured the same way whatever
+# the site, and the other traits
 
-
-
-# # colnames(MoFTraits)[1] <- gsub('^...','',colnames(MoFTraits)[1]) # remove ï.., qu'Eric a mis je sais pas comment.
-# 
-# # for the column variabletype
-# MoFTraitsLight <- readxl::read_excel("data/MoFTraitsLight.xlsx", sheet = "MoFTraitsLight") %>%
-#   mutate_all(trimws) %>%
-#   rename(verbatimTraitName = verbatimTraitName_new)
-# 
-# info_traits <- MoFTraits %>% 
-#   select(-c(verbatimTraitName_old,traitEntityDataFile)) %>% 
-#   # rename(verbatimTraitName = verbatimTraitName_new,
-#   #        traitEntity = traitEntityValid) %>% 
-#   unique()
-# 
-# 
-# 
-# ## Select traits to keep ####
-# 
-# # Names of traits that we keep
-# trait_names <- MoFTraits %>% 
-#   filter(inFinalFile == "yes") %>% 
-#   pull(verbatimTraitName_new)
-# 
-# TIDY4 <- TIDY3 %>% 
-#   # rename(verbatimTraitName = verbatimTraitName_new) %>%
-#   # rename(traitEntity = traitEntityValid) %>% 
-#   # filter(!is.na(verbatimTraitName))  # idem que ligne en-dessous
-#   filter(verbatimTraitName_new %in% trait_names)  # remove traits that are not listed in MeasurementOrFact(traits)
-# 
-# 
-# # write.table(TIDY4 ,"output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
-# 
-
-#________________________
-# # TEMPORAIRE (update trait name)
-# ## Update names of traits and entity ####
-# correspondence_traits_old_new <- MoFTraits %>%
-#   select(verbatimTraitName_old,traitEntityDataFile,verbatimTraitName_new,traitEntityValid) %>%
-#   unique() # some trait names are duplicated because of different measurement methods in MoFTraits
-# 
-# TIDY4.0 <- TIDY3 %>%
-#   rename(verbatimTraitName_old = verbatimTraitName) %>%
-#   rename(traitEntityDataFile = traitEntity) %>%
-#   # update pbs organ Graminoid (sheath) and others (stem)...
-#   left_join(correspondence_traits_old_new)
-
-
-# TEMPORAIRE : check MoFTraitsLight
-# A <- MoFTraits %>% pull(verbatimTraitName_new) %>% unique()
-# 
-# B <- MoFTraitsLight %>% pull(verbatimTraitName) %>% unique()
-# 
-# setdiff(A,B)
-# setdiff(B,A)
-# 
-# is.element("RDM_ab_84",B)
-
-#______________________
-# TEMPORAIRE: Voir la liste des traits
-
-
-
-#__________
-
-### traits whose samplingProtocol and measurementMethod differ depending on the site ####
+## traits whose samplingProtocol and measurementMethod differ depending on the site ####
 info_differingtraits_tomerge <- MoFTraits %>% 
   filter(!(Site == "All"))
 
@@ -116,24 +43,10 @@ DF_commontraits <- TIDY4_differingtraits_completed %>%
              inFinalFile,traitEntityAbbreviation,
              verbatimTraitName_new, traitEntityValid,
              variableType,      entityCategory,    traitQuality,     
-             verbatimTraitUnit, termSource,        localIdentifier,   traitID )) # remove the columns added by left-joining with MoFTraits !!
-
-# # problème : les deux data frame suivants devraient avoir le même nombre de lignes !
-# dim(TIDY4)
-# dim(TIDY4_differingtraits_completed)
-# # en complétant, on ajoute des lignes
-# # c'est qu'il doit y avoir des doublons dans info_traits
-# info_differingtraits_tomerge %>% 
-#   select(Site,verbatimTraitName,traitEntity) %>% unique() %>% 
-#   dim()
-# info_differingtraits_tomerge %>% 
-#   select(Site,verbatimTraitName,traitEntity) %>% 
-#   filter(verbatimTraitName == "RtRM84" & Site == "O2LA")
-# 
-# dim(DF_differingtraits_completed) + dim(DF_commontraits)
+             verbatimTraitUnit, termSource,        localIdentifier,   traitID,basisOfRecord )) # remove the columns added by left-joining with MoFTraits !!
 
 
-### traits whose samplingProtocol and measurementMethod are identical whatever the site ####
+## traits whose samplingProtocol and measurementMethod are identical whatever the site ####
 info_commontraits_tomerge <- MoFTraits %>% 
   filter(Site == "All") %>% 
   select(-Site) %>% 
@@ -142,98 +55,30 @@ info_commontraits_tomerge <- MoFTraits %>%
 DF_commontraits_completed <- DF_commontraits %>% 
   left_join(info_commontraits_tomerge, by = c("verbatimTraitName_old","traitEntityDataFile"))
 
+## Check before binding the two files ####
+# Do the two completed data frames have the same columns?
+setdiff(colnames(DF_commontraits_completed),colnames(DF_differingtraits_completed))
+setdiff(colnames(DF_differingtraits_completed),colnames(DF_commontraits_completed ))
 
-intersect(colnames(TIDY4),colnames(info_differingtraits_tomerge))
-intersect(colnames(DF_commontraits),colnames(info_commontraits_tomerge))
+## Bind the two files ####
+TIDY5 <- rbind(DF_differingtraits_completed,DF_commontraits_completed) %>% 
+  rename(verbatimTraitName = verbatimTraitName_new)
 
-# -- temporaire____________________________________________
-# pb: encore des lignes non complétées
-DF_commontraits_pb <- DF_commontraits_completed %>% 
+# Quality check ####
+
+## Was trait name  updated for every trait?
+DF_commontraits_completed %>% 
   filter(is.na(traitName))
 
-DF_commontraits_pb %>% select(Site,verbatimTraitName_old,verbatimTraitName_new) %>% unique 
-DF_commontraits_pb %>% pull(verbatimTraitName_old) %>% unique()
+## Were methods described for every trait?
+DF_commontraits_completed %>% 
+  filter(is.na(measurementMethod))
 
-DF_commontraits_pb%>% 
-  group_by(Site) %>% 
-  summarize(n = n())
-
-# TIDY4 %>% filter(verbatimTraitName_old == "LTS") %>% select(Site,traitEntityDataFile,verbatimTraitName_old) %>%
-#   unique()
-# MoFTraits %>% filter(verbatimTraitName_old == "LWS")
-
-list_trait_entity_to_add <- DF_commontraits_pb %>% 
-  select(Site,feuillet, verbatimTraitName_old,verbatimTraitName_new , traitEntityDataFile,traitEntityValid,traitName) %>% 
-  unique()
-
-write.csv2(list_trait_entity_to_add, "output/WorkingFiles/2023_08_21_list_site_trait_name_to_add.csv",row.names=F)
-# --_______________________________________________________
-
-
-
-
-# bind the two
-TIDY5 <- rbind(DF_differingtraits_completed,DF_commontraits_completed) 
-
-setdiff(colnames(DF_differingtraits_completed),colnames(DF_commontraits_completed))
-setdiff(colnames(DF_commontraits_completed),colnames(DF_differingtraits_completed))
-
+# Does row number remain identical?
 dim(TIDY4)
 dim(TIDY5)
-
-
-
-#_______________
-# Pourquoi augmentation du nombre de lignes ?
-# D1 <- DF_differingtraits_completed %>% 
-#   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
-# 
-# D2 <- DF_commontraits_completed %>% 
-#   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
-# 
-# intersect(D1$verbatimOccurrenceID, D2$verbatimOccurrenceID)
-# 
-# 
-# info_differingtraits_tomerge %>% select(Site,verbatimTraitName,traitEntity)
-# info_commontraits_tomerge %>% select(Site,verbatimTraitName,traitEntity)
-#______________
-
-
-# pb: les traitName ne se sont pas mis à jour !!
-TIDY5 %>%
-  filter(is.na(traitName)) %>% dim() # compléter MoFTraits (Eric)
-
-TIDY5 %>% 
-  filter(is.na(traitName)) %>% 
-  pull(verbatimTraitName_old) %>% 
-  unique()
-
-missing_MoFTraitsFull <- TIDY5 %>% 
-  filter(is.na(traitName)) %>%
-  select(Site,feuillet,verbatimTraitName_old,traitEntityDataFile,verbatimTraitName_new,traitEntityValid,traitName) %>% 
-  unique()
-write.csv2(missing_MoFTraitsFull,"output/2023_12_missing_MoFTraitsFull.csv",row.names=F)
-
-# Add column variableType
-# TIDY5 <- TIDY5 %>% 
-#   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
-#   
-TIDY6 <- TIDY5 %>% unique()
-  # filter(inFinalFile == "yes")
+dim(TIDY5 %>% unique())
 
 # Export ####
-data.table::fwrite(TIDY6,"output/TIDY_MoFTraits.csv",sep="\t")
-# write.table(TIDY6 ,"output/TIDY_MoFTraits.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
+data.table::fwrite(TIDY5,"output/TIDY_MoFTraits.csv",sep="\t")
 
-
-# vérifs
-dim(TIDY4)
-dim(TIDY5)
-dim(TIDY5 %>% unique()) # il y a quelques lignes dupliquées. Pourquoi ?!?:?!
-dim(TIDY6)
-
-TIDY6 %>% select(verbatimTraitUnit) %>% unique()
-colnames(TIDY6)
-
-# TEMPORAIRE
-TIDY6 %>% pull(Plot) %>% unique()
