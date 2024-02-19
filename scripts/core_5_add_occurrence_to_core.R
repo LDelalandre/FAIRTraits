@@ -16,6 +16,56 @@ TIDY_occurrenceID <- TIDY_plot %>%
 dim(TIDY_plot)
 dim(TIDY_occurrenceID)
 
+which(duplicated(TIDY_occurrenceID$verbatimOccurrenceID))
+
+# Export ####
+
+data.table::fwrite(TIDY_occurrenceID,"output/TIDY_occurrenceID.csv",sep="\t")
+data.table::fwrite(TIDY_occurrenceID %>% 
+                     select(-c(measurementMethod)),
+                   "output/TIDY_occurrenceID_no_sampling_measurement.csv",sep="\t")
+
+
+# TEMPORAIRE
+TIDY_occurrenceID %>% 
+  pull(traitPlot) %>% 
+  unique()
+
+
+
+
+TIDY6 # MOFTraits
+TIDY5_long # + plots
+TIDY_occurrenceID # + occurrence
+core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8")
+
+focus <- core
+focus %>% 
+  filter(Site == "CRE_O2LA") %>% 
+  select(Site,samplingProtocol,traitPlot) %>% 
+  View()
+
+focus %>% 
+  filter(Site == "CRE_O2LA" & Block == "J" & Species == "Bromus erectus") %>% 
+  View()
+ 
+O2LA <- TIDY_occurrenceID %>% 
+  filter(Site == "CRE_O2LA") 
+data.table::fwrite(O2LA ,"output/WorkingFiles/TIDY_occurrenceID_O2LA.csv") 
+
+no_sampling_measurement <- TIDY_occurrenceID %>% 
+  select(-c(samplingProtocol,measurementMethod))
+data.table::fwrite(no_sampling_measurement ,"output/WorkingFiles/TIDY_occurrenceID_no_sampling_measurement.csv") 
+
+# PB à 02LA ? ####
+
+O2LA %>% 
+  filter(verbatimOccurrenceID == "BROMEREC_CRE_O2LA_L_CRO_L1_Treatment_Ambient_2012_5_1_Rrm2_RDMC_abr_absorptive roots") %>% 
+  pull(samplingProtocol)
+
+O2LAbis <- data.table::fread("output/WorkingFiles/TIDY_occurrenceID_O2LA.csv", encoding = "UTF-8")
+O2LAbis %>% pull(samplingProtocol) %>% unique()
+
 #____________________________________
 # TEMPORARY duplicated occurrence ####
 source("scripts/functions/regenerate_spreadsheet.R")
@@ -74,9 +124,6 @@ purrr::imap(
 # openxlsx::saveWorkbook(wb = wb, file = "output/WorkingFiles/2023_09_12_duplicated_occurrenceID_format_excel.xlsx")
 
 
-# Export ####
-
-data.table::fwrite(TIDY_occurrenceID,"output/TIDY_occurrenceID.csv")
 
 # TIDY_occurrenceID_nodupl <- TIDY_occurrenceID %>% 
 #   filter(!verbatimOccurrenceID %in% DUPL$verbatimOccurrenceID)

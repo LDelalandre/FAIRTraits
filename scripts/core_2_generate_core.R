@@ -1,7 +1,7 @@
 library(tidyverse)
 
 # This script:
-# - imports a csv file with data in row (output of `core_1_import_data.R`), 
+# - imports a csv file with one record per row (output of `core_1_import_data.R`), 
 # - updates the values in some columns (Plot, Treatment), and corrects typos
 
 # TIDY2 <- read.csv2("output/TIDY.csv",fileEncoding = "latin1",sep="\t",dec = ".")
@@ -30,12 +30,14 @@ TIDY3 <- TIDY2 %>%
                                            verbatimTraitName == "R_DM_0" ~ "R_DM_ab_0",
                                            TRUE ~ verbatimTraitName)) #verbatimTraitName == "R_Cellulose" ~"R_cellulose",
 
-data.table::fwrite(TIDY3,"output/TIDY_corrected_typos.csv")
+data.table::fwrite(TIDY3,"output/TIDY_corrected_typos.csv",sep="\t")
 
 #____________________________________________________________________
-# check 
+# check
 dim(TIDY2)
 dim(TIDY3)
+
+
 
 
 

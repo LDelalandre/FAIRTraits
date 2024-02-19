@@ -52,8 +52,8 @@ TIDY5_plots <- TIDY5 %>%
                                   Site == "CRE_O2LA" ~ treatmentOriginal,
                                   TRUE ~ treatmentNew)) %>%
   rename(traitPlot = traitPlotNew) %>%
-  rename(Treatment = treatmentNew) %>% 
-  select(-c(traitPlotOriginal,treatmentOriginal))
+  rename(Treatment = treatmentNew) 
+  # select(-c(traitPlotOriginal,treatmentOriginal))
 
 
 # add plot latitude, longitude, and altitude
@@ -66,7 +66,7 @@ TIDY5_long <- TIDY5_plots %>%
 
 
 # write.table(TIDY5_long ,"output/TIDY_plot.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
-data.table::fwrite(TIDY5_long,"output/TIDY_plot.csv")
+data.table::fwrite(TIDY5_long,"output/TIDY_plot.csv",sep="\t")
 
 
 

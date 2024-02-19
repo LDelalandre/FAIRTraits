@@ -2,10 +2,20 @@ library(tidyverse)
 
 # importer TIDY_plot, mais pour l'instant pas au point
 core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8") %>% 
-  select(-c(verbatimTraitName_old,verbatimTraitName_new_old,inFinalFile,
+  select(-c(verbatimTraitName_old,inFinalFile,
             traitEntityDataFile)) %>% 
   rename(traitEntity = traitEntityValid,
          verbatimTraitName = verbatimTraitName_new)
+
+dim <- core %>% filter(measurementDeterminedBy == "Catherine Roumet") %>%  dim()
+dim[1]/length(core$verbatimOccurrenceID)
+core %>% pull(verbatimOccurrenceID) %>% unique() %>% length()
+
+core %>% group_by(measurementDeterminedBy) %>% 
+  summarize(n = n()) %>% 
+  arrange(n) %>% 
+  mutate(prop = n / length(core$verbatimOccurrenceID) ) %>% 
+  View()
   
 mapping <- read.csv("data/MappingDwC_SP.csv",header=T,sep = ";",fileEncoding = "latin1")
 

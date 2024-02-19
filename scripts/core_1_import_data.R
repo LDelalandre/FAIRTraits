@@ -39,11 +39,12 @@ read_file <- function(fsite){
 }
 
 
-# Centralize data in one "tidy" data frame with info in row ####
+# Centralize data in one "tidy" data frame with one record per row ####
 
 sites <- c("LaFage","Cazarils","PDM","O2LA","Garraf","HGM","LesAgros")
 
-feuillets_to_remove <- c("LeafDimensions (àsupprimer)","Climate data","Leaf_Thickness")
+feuillets_to_remove <- c("LeafDimensions (àsupprimer)","Climate data","Leaf_Thickness","Soil data",
+                         "PDM Climatic data 1975-2006")
 
 # colmuns other than traits used for building the "tidy" csv (i.e. data in row)
 columns_other_than_traits <- 
@@ -133,4 +134,4 @@ TIDY2 <- TIDY %>%
 
 # Export ####
 # write.table(TIDY2 ,"output/TIDY.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
-data.table::fwrite(TIDY2,"output/TIDY.csv")
+data.table::fwrite(TIDY2,"output/TIDY.csv",sep="\t")

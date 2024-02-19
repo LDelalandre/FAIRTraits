@@ -14,7 +14,15 @@ TIDY4 <- data.table::fread("output/TIDY_corrected_typos.csv",encoding="UTF-8") %
 MoFTraits <- readxl::read_excel("data/MoFTraitsFull_jan2024.xlsx", sheet = "MoFTraitsFull") %>% 
   rename(verbatimTraitName_new = verbatimTraitName_new_new) %>% 
   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
-  mutate_all(trimws)
+  mutate_all(trimws) %>% 
+  # add double quotes to avoid problems with commas contained in two columns
+  mutate(samplingProtocol = paste0("\"", samplingProtocol,"\"" )) %>%
+  mutate(measurementMethod = paste0("\"", measurementMethod,"\"" ))
+
+
+# change ; into ,
+# MoFTraits$measurementMethod <- MoFTraits$measurementMethod %>%
+#   gsub(";",",",.)
 
 # MoFTraits <- read.csv2("data/MoFTraitsFull_jan2024.csv",fileEncoding = "latin1") %>% 
 #   rename(verbatimTraitName_new = verbatimTraitName_new_new) %>% 
@@ -173,6 +181,8 @@ setdiff(colnames(DF_commontraits_completed),colnames(DF_differingtraits_complete
 dim(TIDY4)
 dim(TIDY5)
 
+
+
 #_______________
 # Pourquoi augmentation du nombre de lignes ?
 # D1 <- DF_differingtraits_completed %>% 
@@ -208,22 +218,22 @@ write.csv2(missing_MoFTraitsFull,"output/2023_12_missing_MoFTraitsFull.csv",row.
 # TIDY5 <- TIDY5 %>% 
 #   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,Plot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntity,sep = "_"))
 #   
-TIDY6 <- TIDY5 %>% 
-  filter(inFinalFile == "yes")
-
-TIDY6 %>% filter(is.na(traitName))
-TIDY6 %>% colnames()
+TIDY6 <- TIDY5 %>% unique()
+  # filter(inFinalFile == "yes")
 
 # Export ####
-data.table::fwrite(TIDY6,"output/TIDY_MoFTraits.csv")
+data.table::fwrite(TIDY6,"output/TIDY_MoFTraits.csv",sep="\t")
 # write.table(TIDY6 ,"output/TIDY_MoFTraits.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 
 
 # vérifs
 dim(TIDY4)
 dim(TIDY5)
-dim(TIDY5 %>% unique()) # il y a 5 lignes dupliquées. Pourquoi ?!?:?!
+dim(TIDY5 %>% unique()) # il y a quelques lignes dupliquées. Pourquoi ?!?:?!
 dim(TIDY6)
 
 TIDY6 %>% select(verbatimTraitUnit) %>% unique()
-colnames(TIDY5)
+colnames(TIDY6)
+
+# TEMPORAIRE
+TIDY6 %>% pull(Plot) %>% unique()
