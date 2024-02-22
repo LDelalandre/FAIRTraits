@@ -23,5 +23,4 @@ sp_info_name_URL_id <- sp_info_name_URL %>%
 taxon_extension <- sp_info_name_URL_id %>% 
   select(-Remarques)
 
-write.csv2(taxon_extension,"output/FAIRTraits_Taxon.csv",row.names=F,fileEncoding = "Latin1")
-
+data.table::fwrite(taxon_extension,"output/FAIRTraits_Taxon.csv",sep="\t")

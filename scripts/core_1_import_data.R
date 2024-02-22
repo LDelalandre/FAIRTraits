@@ -92,10 +92,39 @@ for (focalsite in sites){
 }
 
 # Change verbatimTraitValue to numeric
+TIDY_backup <- TIDY # keep the version imported
+
 TIDY$verbatimTraitValue <- as.numeric(TIDY$verbatimTraitValue)
 TIDY$Year <- as.numeric(TIDY$Year)
 TIDY$Month <- as.numeric(TIDY$Month)
 TIDY$Day <- as.numeric(TIDY$Day)
+
+# problems with dates
+test <- TIDY %>% filter(verbatimTraitName == "timeOfDay") %>% 
+  # pull(verbatimTraitValue)
+  filter(!(is.na(verbatimTraitValue))) %>% 
+  mutate(verbatimTraitValue2 = chron::chron(as.numeric(verbatimTraitValue)) ) %>% # choixir fonction chron ou times
+  # mutate(verbatimTraitValue2 = chron::times(as.numeric(verbatimTraitValue)) ) %>% 
+  select(verbatimTraitValue,verbatimTraitValue2) 
+
+test2 <- test %>% pull(verbatimTraitValue2)
+test2[1] %>% chron::hours()
+test2[1] %>% chron::minutes()
+test2[1] %>% chron::seconds()
+
+# try to change to a character
+TIDY %>% filter(verbatimTraitName == "timeOfDay") %>% 
+  # filter(!(is.na(verbatimTraitValue))) %>% 
+  mutate(verbatimTraitValue2 = chron::times(as.numeric(verbatimTraitValue)) ) %>% # choixir fonction chron ou times
+  mutate(hour = chron::hours(verbatimTraitValue2)) %>% View
+  select(verbatimTraitValue,verbatimTraitValue2) 
+
+class(test$verbatimTraitValue2)
+lubridate::hms(test$verbatimTraitValue2)
+
+
+# write.csv2(test,"output/WorkingFiles/test_heure.csv")
+data.table::fwrite(test,"output/WorkingFiles/test_heure.csv",sep="\t")
 
 # Corrections (typos) ####
 TIDY2 <- TIDY %>% 

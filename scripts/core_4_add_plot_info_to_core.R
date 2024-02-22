@@ -34,14 +34,18 @@ envPlots <- read.csv2("data/Plots.csv",fileEncoding = "latin1",sep=";") %>%
 traitPlots <- read.csv2("data/traitPlots_georeferences.csv",fileEncoding = "latin1")
 Infos_Plots <- traitPlots %>% 
   select(traitPlot,plotLatitude,plotLongitude,plotAltitude) %>% 
-  unique()
+  unique() %>% 
+  # Duplicated lines
+  filter(!(traitPlot == "FAG_C1C2Cc" & plotAltitude == 772)) %>% 
+  filter(!(traitPlot == "FAG_C1C2C3Cc" & plotAltitude == 772))
+
+Infos_Plots[which(duplicated(Infos_Plots$traitPlot)),]
 
 # Info to update plot and treatment names 
 # + correspondence between plots where traits were measured, and plots where 
 # environmental parameters were measured
 Plots_corresp_envt <- read.csv2("data/plots_corresp_envt.csv",fileEncoding = "latin1") %>% 
   unique()
-
 
 # Modify the Core dataframe ####
 
@@ -68,7 +72,10 @@ TIDY5_plots <- TIDY5 %>%
 
 ## add plot latitude, longitude, and altitude ####
 TIDY5_long <- TIDY5_plots %>%
-  left_join(Infos_Plots,by = c("traitPlot"))
+  left_join(Infos_Plots,by = c("traitPlot")) %>% 
+  mutate(countryCode = if_else(Site =="Garraf","ES","FR"))
+
+
 
 
 # Quality check ####

@@ -12,12 +12,16 @@ TIDY_occurrenceID <- TIDY_plot %>%
 # Quality check ####
 
 # Is occurrenceID unique ?
+which(duplicated(TIDY_occurrenceID$verbatimOccurrenceID))
 dupl_occ <- TIDY_occurrenceID[which(duplicated(TIDY_occurrenceID$verbatimOccurrenceID)),]
 
+TIDY_occurrenceID %>% pull(verbatimOccurrenceID) %>% length()
+TIDY_occurrenceID %>% pull(verbatimOccurrenceID) %>% unique() %>% length()
 
 
 # Export ####
 data.table::fwrite(TIDY_occurrenceID,"output/TIDY_occurrenceID.csv",sep="\t")
+
 data.table::fwrite(TIDY_occurrenceID %>% 
                      select(-c(measurementMethod)),
                    "output/TIDY_occurrenceID_no_sampling_measurement.csv",sep="\t")
@@ -81,25 +85,3 @@ purrr::imap(
 openxlsx::saveWorkbook(wb = wb, file = "output/WorkingFiles/2024_02_16_duplicated_occurrenceID_format_excel.xlsx")
 
 
-
-# TIDY_occurrenceID_nodupl <- TIDY_occurrenceID %>% 
-#   filter(!verbatimOccurrenceID %in% DUPL$verbatimOccurrenceID)
-# 
-# write.table(TIDY_occurrenceID_nodupl ,"output/TIDY_occurrenceID_nodupl.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
-# write.table(TIDY_occurrenceID ,"output/TIDY_occurrenceID.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
-
-# Info on treatments
-# TIDY_occurrenceID <- read.csv2("output/TIDY_occurrenceID.csv",sep="\t")
-# treatment <- TIDY_occurrenceID_nodupl %>% 
-#   select(Site, Treatment) %>% 
-#   unique() 
-# write.csv2(treatment,"output/treatments_per_site.csv",row.names=F)
-
-
-# JE REGARDE QUAND LE DUPLICAT ARRIVE
-TIDY5_plots %>% 
-  filter(Site=="La Fage" & Code_Sp == "VICISATI-SATI"&Rep == "Rlm1" & verbatimTraitName_old  == "LDMC")
-
-# Problème à partir de l'ajout des infos de longitude
-TIDY5_long %>% 
-  filter(Site=="La Fage" & Code_Sp == "VICISATI-SATI"&Rep == "Rlm1" & verbatimTraitName_old  == "LDMC") %>% View

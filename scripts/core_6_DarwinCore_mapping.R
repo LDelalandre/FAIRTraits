@@ -2,31 +2,87 @@ library(tidyverse)
 
 # importer TIDY_plot, mais pour l'instant pas au point
 core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8") %>% 
-  select(-c(verbatimTraitName_old,inFinalFile,
-            traitEntityDataFile)) %>% 
-  rename(traitEntity = traitEntityValid,
-         verbatimTraitName = verbatimTraitName_new)
+  rename(siteName = Site)
+taxon <- data.table::fread("output/FAIRTraits_Taxon.csv",encoding = "UTF-8")
 
-dim <- core %>% filter(measurementDeterminedBy == "Catherine Roumet") %>%  dim()
-dim[1]/length(core$verbatimOccurrenceID)
-core %>% pull(verbatimOccurrenceID) %>% unique() %>% length()
+mapping_core <- readxl::read_excel("data/FAIRTraits_MappingGBIF.xlsx", sheet = "Core")
+mapping_taxon <- readxl::read_excel("data/FAIRTraits_MappingGBIF.xlsx", sheet = "Taxon")
 
-core %>% group_by(measurementDeterminedBy) %>% 
-  summarize(n = n()) %>% 
-  arrange(n) %>% 
-  mutate(prop = n / length(core$verbatimOccurrenceID) ) %>% 
-  View()
-  
-mapping <- read.csv("data/MappingDwC_SP.csv",header=T,sep = ";",fileEncoding = "latin1")
 
-# New columns for GBIF ####
+# Core ####
+
+# Are columns of the core described in the mapping file?
+setdiff(mapping_core$verbatimVariableName , colnames(core) )
+setdiff(colnames(core) , mapping_core$verbatimVariableName )
+
+
+## InDoRES ####
+col_indores <- mapping_core %>% 
+  filter(Status_InDoRES == "keep") %>% 
+  arrange(orderInFinalOccurenceFile) %>% 
+  pull(verbatimVariableName)
+
+core_indores <- core %>% 
+  select(all_of(col_indores))
+
+
+## GBIF ####
+### Manually ####
+core_GBIF1 <- core %>% 
+  mutate(measurementType = paste(traitEntityValid,traitQuality,sep="_")) %>% 
+  mutate(measurementID = paste(termSource, localIdentifier,sep="_"))
+
+### With mapping file ####
+
+col_GBIF_names <- mapping_core %>% 
+  filter(Status_GBIF == "keep") %>% 
+  filter(!(verbatimVariableName %in% c("traitEntityValid","traitQuality","termSource","locaIdentifyer"))) %>% 
+  arrange(orderInFinalOccurenceFile) %>% 
+  select(verbatimVariableName,variableNameStandard)
+
+core_GBIF2 <- core_GBIF1 %>% 
+  select(all_of(col_GBIF_names$verbatimVariableName),measurementType,measurementID)
+
+colnames(core_GBIF2) <- c(col_GBIF_names$variableNameStandard,"measurementType","measurementID")
+
+core_GBIF2
+
+# Taxon ####
+
+# Are columns of the taxon file described in the mapping file?
+setdiff(mapping_taxon$verbatimVariableName , colnames(taxon) )
+setdiff(colnames(taxon) , mapping_taxon$verbatimVariableName )
+
+## GBIF ####
+var_taxon_GBIF <- mapping_taxon %>% 
+  filter(Status_GBIF == "keep") %>% 
+  arrange(orderInFinalTaxonFile) %>% 
+  select(verbatimVariableName,variableNameStandard)
+
+taxon_GBIF <- taxon %>% 
+  select(all_of(var_taxon_GBIF$verbatimVariableName))
+
+colnames(taxon_GBIF) <- var_taxon_GBIF$variableNameStandard
+
+
+# Export ####
+data.table::fwrite(core_indores,"output/core_InDoRES.csv",sep="\t")
+data.table::fwrite(core_GBIF2,"output/core_GBIF.csv",sep="\t")
+
+data.table::fwrite(taxon_GBIF,"output/taxon_GBIF.csv",sep="\t")
+
+
+
+#ANCIEN, A VIRER (?) ####
+
+## New columns for GBIF ####
 GBIF <- core %>% 
   mutate(countryCode = if_else(Site == "Garraf", "ES","FR"),
          basisOfRecord = "Human Observation",
          dynamicProperties = paste(verbatimTraitName,verbatimTraitValue,verbatimTraitUnit,sep="_"),
          plotAltitude_min = plotAltitude,
          plotAltitude_max = plotAltitude
-         ) 
+  ) 
 
 #_____________________________________
 #  Core Occurrences and extension ####
