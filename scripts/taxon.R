@@ -3,6 +3,8 @@ library(tidyverse)
 
 source("scripts/functions/TAXREF.R")
 
+
+
 # Import data completed from Flore Méditerranéenne (Tison) ####
 # sp_info <- read.xlsx("data/Species_completed_Tison.xlsx", startRow = 1, colNames = TRUE)
 sp_info <- read.csv2("data/FAIRTraits_taxon_raw.csv")

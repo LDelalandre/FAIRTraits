@@ -84,7 +84,69 @@ core %>% select(Site,traitPlot) %>% unique()
 ## fields empty ####
 empty_block <- core %>% filter(Block == "") %>% pull(verbatimOccurrenceID) # Block empty
 empty_project <- core %>% filter(nameOfProject == "") %>% pull(verbatimOccurrenceID) # nameOfProject empty
-empty_quality <- core %>% filter(Quality == "") %>% pull(verbatimOccurrenceID) # Quality empty : many (110460) entries !
-empty_method <- core %>% filter(measurementMethod == "") %>% pull(verbatimOccurrenceID) # measurementMethod empty
 empty_determinedBy <- core %>% filter(measurementDeterminedBy == "") %>% pull(verbatimOccurrenceID) # measurementMethod empty
+
+core_empty_fields <- core %>% 
+  filter(verbatimOccurrenceID %in% c(empty_block,empty_project,empty_determinedBy))
+core_empty_fields %>% dim()
+
+# due to pb in MoFTraits (?) : none observed
+empty_quality <- core %>% filter(traitQuality == "") %>% pull(verbatimOccurrenceID) # Quality empty : many (110460) entries !
+empty_method <- core %>% filter(measurementMethod == "") %>% pull(verbatimOccurrenceID) # measurementMethod empty
+
+core_empty_fields_MoFTraits <- core %>% 
+  filter(verbatimOccurrenceID %in% c(empty_quality,empty_method))
+core_empty_fields_MoFTraits %>% dim()
+
+# IN any column :
+DIM <- c()
+for (i in c(1:length(colnames(core)))){
+  fcol <- colnames(core)[i]
+  dim_empty <- core %>% filter(get(fcol) == "") %>% dim()
+  DIM <- c(DIM,dim_empty[1])
+}
+DIM
+data.frame(colnames(core),DIM)
+
+
+
+## Into spreadsheets ####
+
+source("scripts/functions/regenerate_spreadsheet.R")
+
+SITES <- core_empty_fields %>% 
+  pull(siteName) %>% 
+  unique()
+
+# Supprimer les fichiers excel avant (le code ne parvient pas à les écraser)
+for (fsite in SITES){
+  # names of spreadsheets
+  names_spreadsheet <- core_empty_fields %>%
+    filter(siteName == fsite) %>% 
+    arrange(feuillet) %>% 
+    pull(feuillet) %>% 
+    unique()
+  # mutate(site_feuillet = paste(Site,feuillet,sep = "_")) %>% 
+  # mutate(site_feuillet = str_sub(site_feuillet,start = 1, end = 31)) %>%  # # maximum length of excel worksheet names
+  # pull(site_feuillet)
+  
+  # list of spreadsheets to export
+  list_tidy_spreadsheet <- core_empty_fields %>% 
+    filter(siteName == fsite) %>% 
+    group_split(siteName,feuillet) %>% 
+    setNames(names_spreadsheet)
+  
+  list_spreadsheet <- lapply(list_tidy_spreadsheet,regenerate_spreadsheet)
+  
+  lst_data <- list_spreadsheet
+  wb <- openxlsx::createWorkbook()
+  purrr::imap(
+    .x = lst_data,
+    .f = function(df, object_name) {
+      openxlsx::addWorksheet(wb = wb, sheetName = object_name)
+      openxlsx::writeData(wb = wb, sheet = object_name, x = df)
+    }
+  )
+  saveWorkbook(wb = wb, file = paste0("output/WorkingFiles/empty_fields",fsite,".xlsx"))
+}
 

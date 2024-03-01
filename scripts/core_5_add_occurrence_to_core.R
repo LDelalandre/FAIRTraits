@@ -1,5 +1,10 @@
 library(tidyverse)
 
+# This script generates occurrenceIDs, defined at three levels: 
+# the level of data record (verbatimOccurrenceID) ; 
+# the level of the replicate on which a specific data record was taken (verbatimOccurrenceId_sample);
+# the level of the population (species x site x plot x treatment x date) in which the measured individual was sampled.
+
 TIDY_plot <- data.table::fread("output/TIDY_plot.csv",encoding="UTF-8")
 
 
