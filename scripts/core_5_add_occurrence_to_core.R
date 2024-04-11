@@ -7,12 +7,16 @@ library(tidyverse)
 
 TIDY_plot <- data.table::fread("output/TIDY_plot.csv",encoding="UTF-8")
 
+TIDY_occurrenceID %>% 
+  select(Site,Block,traitPlot) %>% 
+  unique() %>% View
 
 # Generate OccurrenceIDs ####
 TIDY_occurrenceID <- TIDY_plot %>%
-  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,verbatimTraitName,traitEntityValid,sep = "_")) %>% 
-  mutate(verbatimOccurrenceID_sample = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
-  mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,Block,traitPlot,Treatment,Year,Month,Day,sep = "_"))
+  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,Rep,
+                                      verbatimTraitName,sep = "_")) %>% 
+  mutate(verbatimOccurrenceID_sample = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
+  mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,sep = "_"))
 
 # Quality check ####
 

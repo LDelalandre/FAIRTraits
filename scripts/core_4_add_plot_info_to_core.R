@@ -73,8 +73,8 @@ TIDY5_plots <- TIDY5 %>%
 ## add plot latitude, longitude, and altitude ####
 TIDY5_long <- TIDY5_plots %>%
   left_join(Infos_Plots,by = c("traitPlot")) %>% 
-  mutate(countryCode = if_else(Site =="Garraf","ES","FR"))
-
+  mutate(countryCode = if_else(Site =="Garraf","ES","FR")) %>% 
+  mutate(Treatment = str_sub(Treatment,start = 11, end = -1)) # remove "Treatment
 
 
 
@@ -114,3 +114,4 @@ setdiff(GPSplots,Coreplots)
 
 # Export ####
 data.table::fwrite(TIDY5_long,"output/TIDY_plot.csv",sep="\t")
+

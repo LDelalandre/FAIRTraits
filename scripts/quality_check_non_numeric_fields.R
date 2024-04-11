@@ -55,7 +55,9 @@ list_values_per_column$Species %>% sort()
 
 ## environment ####
 list_values_per_column$traitPlot %>% sort()
-list_values_per_column$Treatment %>% sort()
+list_values_per_column$treatmentOriginal %>% sort()
+core %>% filter(treatmentOriginal == "")
+
 list_values_per_column$envPlot %>% sort()
 list_values_per_column$countryCode %>% sort()
 

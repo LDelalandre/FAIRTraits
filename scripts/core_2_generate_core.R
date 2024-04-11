@@ -20,7 +20,7 @@ TIDY3 <- TIDY2 %>%
                           Site == "Garraf" ~ paste("GAR",Plot,sep = "_"),
                           Site == "Hautes Garrigues" ~ paste("HGM",Plot,sep = "_"),
                           Site == "Les Agros" ~ paste("AGR",Plot,sep = "_"))) %>% 
-  mutate(Treatment = paste("Treatment",Treatment,sep="_")) %>% 
+  mutate(Treatment = paste("Treatment",Treatment,sep="_")) %>%
   
   # correct typos
   mutate(verbatimTraitName = str_replace_all(verbatimTraitName, " ", "")) %>% 
@@ -32,7 +32,6 @@ TIDY3 <- TIDY2 %>%
 
 # Export ####
 data.table::fwrite(TIDY3,"output/TIDY_corrected_typos.csv",sep="\t")
-
 
 
 
