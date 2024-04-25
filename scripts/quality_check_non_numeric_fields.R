@@ -65,6 +65,10 @@ list_values_per_column$countryCode %>% sort()
 list_values_per_column$Rep %>% sort()
 list_values_per_column$feuillet %>% sort()
 
+## Date and hour
+core %>% 
+  filter(is.na(Year)) %>% View # /!\ pb pheno Marie-Laure
+
 ## metadata ####
 list_values_per_column$measurementDeterminedBy
 list_values_per_column$nameOfProject

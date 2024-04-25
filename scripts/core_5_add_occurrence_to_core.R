@@ -13,8 +13,7 @@ TIDY_occurrenceID %>%
 
 # Generate OccurrenceIDs ####
 TIDY_occurrenceID <- TIDY_plot %>%
-  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,Rep,
-                                      verbatimTraitName,sep = "_")) %>% 
+  mutate(verbatimOccurrenceID = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,Rep,verbatimTraitName,sep = "_")) %>% 
   mutate(verbatimOccurrenceID_sample = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
   mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,sep = "_"))
 

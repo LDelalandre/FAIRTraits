@@ -27,7 +27,7 @@ for (fsite in sites){
   # campaings_per_year_and_treatement
   camp<-fcore %>% 
     ggplot(aes(x = day_of_year)) +
-    geom_density() +
+    geom_histogram() +
     facet_grid(rows = vars(Treatment),cols = vars(Year)) +
     ggtitle(fsite)
   
@@ -54,7 +54,7 @@ core %>%
   filter(Year == 2012) %>% 
   # group_by(Code_Sp) %>% summarize(n = n())
   ggplot(aes(x=day_of_year)) +
-  geom_density() +
+  geom_histogram() +
   facet_wrap(~Code_Sp)
 
 core %>% 
@@ -74,34 +74,82 @@ core %>%
 
 ## PDM ####
 
-# en 2004, même échantillonnage temporel pour tout le monde
-# en 2005, pas tout à fait
-# voir comment on gère ça : est-ce qu'il faut considérer qu'on a plusieurs populations (statistiques) ou pas ?
+# en 2004, même échantillonnage temporel pour tout le monde. 3 campagnes de mesure différentes
 core %>% 
   filter(Site == "CRE_PDM") %>% 
-  filter(Treatment == "LoN") %>% 
+  filter(Treatment == "HiN") %>% 
   filter(Year == 2004) %>% 
   ggplot(aes(x=day_of_year)) +
-  geom_density() +
+  geom_histogram() +
+  facet_wrap(~Code_Sp)
+
+# en 2005
+core %>% 
+  filter(Site == "CRE_PDM") %>% 
+  filter(Treatment == "HiN") %>% 
+  filter(Year == 2005) %>% 
+  filter(!(feuillet == "Biovolume")) %>% 
+  # filter(verbatimTraitName %in% c("Dmax_vsh","Hrep_rsh")) %>% 
+  ggplot(aes(x=day_of_year)) +
+  geom_histogram() +
   facet_wrap(~Code_Sp)
 
 core %>% 
   filter(Site == "CRE_PDM") %>% 
+  filter(Treatment == "HiN") %>% 
+  filter(Year == 2005) %>% 
+  filter(!(feuillet == "Biovolume")) %>% 
+  select(verbatimTraitName, day_of_year) %>% 
+  unique() %>% View
+
+core %>% 
+  filter(Site == "CRE_PDM") %>% 
+  filter(Treatment == "HiN") %>% 
+  filter(Year == 2005) %>% 
+  filter(Code_Sp == "ARENSERP") %>% 
+  group_by(verbatimTraitName,day_of_year) %>% 
+  summarize(n = n()) %>% View
+  ggplot(aes(x=day_of_year)) +
+  geom_histogram() +
+  facet_wrap(~Code_Sp)
+  
+# Le suivi d'encombrement est fait en continu (hauteur et diamètre) (pour LoN et HiN)
+  # Pour une espèce donnée, les 10 reps sont mesurées le même jour
+  # Chacune des mesures = une population différente
+# Pour les autres traits, deux dates, ou une date
+
+# En 2006 : deux campagnes dans le LoN. Une seule dans le HiN.
+core %>% 
+  filter(Site == "CRE_PDM") %>% 
   filter(Treatment == "LoN") %>% 
-  filter(Year == 2004) %>% 
-  filter(day_of_year > 115) %>% pull(verbatimTraitName) %>% unique()
-  select(Code_Sp, day_of_year) %>% unique() %>% View
+  filter(Year == 2006) %>% 
+  ggplot(aes(x=day_of_year)) +
+  geom_histogram() +
+  facet_wrap(~Code_Sp)
 
 ## Cazarils ####
 
-# Pour chacune des années, chaque espèce est mesurée un et un seul jour
-caz<-core %>% 
+# En 1998, on a deux moments de mesure pour pas mal d'espèces
+core %>% 
   filter(Site == "Cazarils") %>% 
-  filter(Year == 2001) %>% 
-  group_by(Code_Sp,day_of_year) %>%
-  summarize(n = n())
-
-duplicated(caz) 
+  filter(Year == 1999) %>%
+  filter(!(feuillet %in% c("GasExchangeLeaf","GasExchangeChamber"))) %>% 
+  ggplot(aes(x=day_of_year)) +
+  geom_histogram() +
+  facet_wrap(~Code_Sp)
+  
+  core %>% 
+    filter(Site == "Cazarils") %>% 
+    filter(Year == 1998) %>%
+    filter(Code_Sp == "PRUNMAHA") %>% 
+    ggplot(aes(x=day_of_year)) +
+    geom_histogram()
+  
+  core %>% 
+    filter(Site == "Cazarils") %>% 
+    filter(Year == 1999) %>%
+    filter(Code_Sp == "ARISROTU") %>% 
+    pull(day_of_year) %>% unique()
 
 ## La Fage ####
 fsite<-"La Fage"
@@ -113,7 +161,7 @@ fcore<-core %>%
 # campaings_per_year_and_treatement
 camp<-fcore %>% 
   ggplot(aes(x = day_of_year)) +
-  geom_density() +
+  geom_histogram() +
   facet_grid(rows = vars(Treatment),cols = vars(Year)) +
   ggtitle(fsite)
 
@@ -126,7 +174,7 @@ fag<-core %>%
   filter(Treatment == "GF_Clc") %>%
   filter(Year == 2013) %>% 
   ggplot(aes(x = day_of_year)) +
-  geom_density() +
+  geom_histogram() +
   facet_wrap(~Code_Sp)+
   ggtitle("La Fage")
 fag
@@ -142,7 +190,45 @@ core %>%
   filter(Site == "La Fage") %>% 
   filter(Treatment == "GF_Clc") %>%
   filter(Year == 2013) %>% 
-  select(day_of_year) %>% unique() %>% View
+  select(day_of_year,verbatimTraitName) %>% unique() %>% View
+
+core %>% 
+  filter(Site == "La Fage") %>% 
+  # filter(Treatment == "GU_Deep") %>%
+  filter(Year == 2007) %>% 
+  ggplot(aes(x = day_of_year)) +
+  geom_histogram(binwidth = 1) +
+  ggtitle("La Fage") +
+  facet_wrap(~Treatment)
+
+
+core %>% 
+  filter(Site == "La Fage") %>% 
+  filter(Treatment == "GF_Clc") %>%
+  filter(Year == 2007) %>%
+  pull(day_of_year) %>% unique()
+
+# GF_Clc : à partir du jour 172, "SdDM_msd" "Hrep_rsh" mesurés
+core %>% 
+  filter(Site == "La Fage") %>% 
+  filter(Treatment == "GF_Clc") %>%
+  filter(Year == 2006) %>% 
+  filter(day_of_year %in% c( 172, 179,180, 186 ,192, 193, 201, 205, 207)) %>%
+  pull(verbatimTraitName) %>% unique()
+
+
+core %>% 
+  filter(Site == "La Fage") %>% 
+  filter(Treatment == "GU_Clc") %>%
+  filter(Year == 2007) %>% 
+  filter(day_of_year >199) %>%
+  pull(verbatimTraitName) %>% unique()
+
+core %>% 
+  filter(Site == "La Fage") %>% 
+  filter(Treatment == "GF_Clc") %>%
+  filter(Year == 2006) %>% 
+  pull(day_of_year) %>% unique()
 
 # Un petit peu en 2010 (mais je peux utiliser les critères établis ailleurs)
 fag<-core %>% 
@@ -150,7 +236,7 @@ fag<-core %>%
   filter(Treatment == "GU_Deep") %>%
   filter(Year == 2010) %>% 
   ggplot(aes(x = day_of_year)) +
-  geom_density() +
+  geom_histogram() +
   facet_wrap(~Code_Sp)+
   ggtitle("La Fage")
 fag
@@ -161,7 +247,7 @@ fag<-core %>%
   filter(Treatment == "GF_Dlm") %>%
   filter(Year == 2006) %>% 
   ggplot(aes(x = day_of_year)) +
-  geom_density() +
+  geom_histogram() +
   facet_wrap(~Code_Sp)+
   ggtitle("La Fage")
 fag
@@ -173,22 +259,45 @@ fcore<-core %>%
   filter(Site == fsite)
 camp<-fcore %>% 
   ggplot(aes(x = day_of_year)) +
-  geom_density() +
+  geom_histogram() +
   facet_grid(rows = vars(Treatment),cols = vars(Year)) +
   ggtitle(fsite)
+
+fcore %>% 
+  ggplot(aes(x = day_of_year)) +
+  geom_histogram() +
+  facet_wrap(~Year) +
+  ggtitle(fsite)
+
+fcore %>% 
+  filter(Year == "2002") %>% 
+  ggplot(aes(x = day_of_year)) +
+  geom_histogram() +
+  facet_wrap(~Treatment)+
+  ggtitle(fsite)
+
+fcore %>% 
+  filter(Year == "2002") %>% 
+  filter(Treatment == "FieldAge_2") %>% 
+  select(day_of_year,verbatimTraitName) %>% View
 
 ggsave(paste0("output/plot/campaings_",fsite,".png"), camp,width = 8,height=12)
 
 # Deux campagnes en 2002, pour FieldAge_42
 hgm<-core %>% 
   filter(Site == "Hautes Garrigues") %>% 
-  filter(Treatment == "FieldAge_12") %>%
+  filter(Treatment == "FieldAge_11") %>%
   filter(Year == 2002) %>% 
   ggplot(aes(x = day_of_year)) +
-  geom_density() +
+  geom_histogram() +
   facet_wrap(~Code_Sp)+
-  ggtitle("La Fage")
+  ggtitle("LHGM")
 hgm
+
+core %>% 
+  filter(Site == "Hautes Garrigues") %>% 
+  filter(Year == 2000) %>% 
+  filter(day_of_year<50) %>% View
 
 core %>% 
   filter(Site == "Hautes Garrigues") %>% 
@@ -207,5 +316,55 @@ core %>%
   filter(Year == 2012) %>% 
   # group_by(Code_Sp) %>% summarize(n = n())
   ggplot(aes(x=day_of_year)) +
-  geom_density() +
+  geom_histogram() +
   facet_wrap(~Code_Sp)
+
+
+# Sur Cazarils
+core %>% 
+  filter(Site == "Cazarils") %>% dim()
+
+# FC = field campaign
+core %>% 
+  filter(Site == "Cazarils") %>% pull(Year) %>% unique()
+  mutate(verbatimOccurrenceID_field_campaign = 
+           case_when(# 1997: one field campaign
+                     Year == 1997 ~ paste0(verbatimOccurrenceID_population,"_FC1"),
+                     
+                     # 1998: three field campaigns
+                     Year == 1998 & day_of_year %in% c(28,29) ~ 
+                       paste0(verbatimOccurrenceID_population,"_FC1"),
+                     Year == 1998 & day_of_year %in% seq(124,157, by = 1) ~ 
+                       paste0(verbatimOccurrenceID_population,"_FC2"),
+                     Year == 1998 & day_of_year %in% seq(180,196, by = 1) ~ 
+                       paste0(verbatimOccurrenceID_population,"_FC3"),
+                     
+                     # 1999: one FC for gas exchange
+                     Year == 1999 & feuillet %in% c("GasExchangeLeaf","GasExchangeChamber") ~ 
+                       paste0(verbatimOccurrenceID_population,"_FC1"),
+                     Year == 1999 & !(feuillet %in% c("GasExchangeLeaf","GasExchangeChamber")) ~ 
+                       paste0(verbatimOccurrenceID_population,"_FC2"),
+                     Year == 1999 & !(feuillet %in% c("GasExchangeLeaf","GasExchangeChamber") & 
+                                        Code_Sp == "ARISROTU" & day_of_year > 155) ~ 
+                       paste0(str_sub(verbatimOccurrenceID_population, end = -2),"3"),
+                     Year == 1999 & !(feuillet %in% c("GasExchangeLeaf","GasExchangeChamber") & 
+                                        Code_Sp == "KICKSPUR" & day_of_year > 150) ~ 
+                       paste0(str_sub(verbatimOccurrenceID_population, end = -2),"3"),
+                     
+                     
+                     ) 
+)%>% 
+  filter(Year == 1998) %>%
+  filter(is.na(verbatimOccurrenceID_field_campaign)) %>%
+  View
+
+
+
+
+str_sub("abcd",end = -2)
+
+
+
+
+
+
