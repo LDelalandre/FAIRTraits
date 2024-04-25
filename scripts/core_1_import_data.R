@@ -109,86 +109,6 @@ TIDY$Year <- as.numeric(TIDY$Year)
 TIDY$Month <- as.numeric(TIDY$Month)
 TIDY$Day <- as.numeric(TIDY$Day)
 
-# Correct hour problems
-TIDY_hour <- TIDY %>% 
-  # filter(is.na(verbatimTraitValue)) %>%
-  mutate(verbatimTraitValue2 = case_when(verbatimTraitName == "timeOfDay" ~ chron::times(as.numeric(verbatimTraitValue)),
-                                         TRUE ~ verbatimTraitValue))
-
-
-#_____________________________________
-# problems with dates ####
-
-# Passer en numérique conserve bien la valeur de trait pour les heures
-TIDY %>% filter(verbatimTraitName == 'timeOfDay') %>% View
-  mutate(vtv2 = chron::times(as.numeric(verbatimTraitValue))) %>% View
-
-TIDY_backup %>% 
-  mutate(vtv2= as.numeric (verbatimTraitValue)) %>% View()
-pull(verbatimTraitValue) %>% class()
-
-test <- TIDY %>% filter(verbatimTraitName == "timeOfDay") %>% 
-  # pull(verbatimTraitValue)
-  filter(!(is.na(verbatimTraitValue))) %>% 
-  mutate(verbatimTraitValue2 = chron::chron(as.numeric(verbatimTraitValue)) ) %>% # choixir fonction chron ou times
-  # mutate(verbatimTraitValue2 = chron::times(as.numeric(verbatimTraitValue)) ) %>% 
-  select(verbatimTraitValue,verbatimTraitValue2) 
-
-test2 <- test %>% pull(verbatimTraitValue2)
-test2[1] %>% chron::hours()
-test2[1] %>% chron::minutes()
-test2[1] %>% chron::seconds()
-
-# try to change to a character
-TIDY %>% filter(verbatimTraitName == "timeOfDay") %>% 
-  # filter(!(is.na(verbatimTraitValue))) %>% 
-  mutate(verbatimTraitValue2 = chron::times(as.numeric(verbatimTraitValue)) ) %>% # choixir fonction chron ou times
-  mutate(hour = chron::hours(verbatimTraitValue2)) %>% 
-  select(verbatimTraitValue,verbatimTraitValue2) 
-
-class(test$verbatimTraitValue2)
-lubridate::hms(test$verbatimTraitValue2)
-
-
-# write.csv2(test,"output/WorkingFiles/test_heure.csv")
-data.table::fwrite(test,"output/WorkingFiles/test_heure.csv",sep="\t")
-
-
-# 2024_04_25
-TIDY %>% 
-  filter(verbatimTraitName == "timeOfDay") %>% 
-  select(feuillet,Site) %>% unique()
-
-### Cazarils ####
-TIDY %>% filter(verbatimTraitName == "timeOfDay") %>% 
-  # pull(verbatimTraitValue)
-  filter(!(is.na(verbatimTraitValue))) %>% View
-
-# Sur excel, 12:45:00, donne 0.5312500 sous R. Je sais le reproduire
-chron::times(0.5312500)
-chron::hours(0.5312500)
-chron::minutes(0.5312500)
-
-# Sur excel, 12:45:00, donne 0.5312500 sous R. Je sais le reproduire
-chron::times(0.5312500)
-chron::hours(0.5312500)
-chron::minutes(0.5312500)
-#Idem :
-chron::times(5.381944e-01)
-
-gas_caz<-readxl::read_excel(paste0("data/","Data_Cazarils_FAIRTraits.xlsx"), sheet = "GasExchangeChamber")
-gas_caz %>% View
-
-### Les agros ####
-chron::times(-2209027800)
-
-gas<-readxl::read_excel(paste0("data/","Data_Garraf_FAIRTraits.xlsx"), sheet = "GasExchangeChamber")
-gas %>% pull(timeOfDay) %>% as.character %>% str_sub(start = 12L,end =19L)
-
-### Garraf ####
-chron::times(-2.209035e+09)
-
-#_______________________________________
 # Corrections (typos) ####
 TIDY2 <- TIDY %>% 
   filter(!(Species %in% c("Geranium dissectum - p\xe9tiole","Geranium dissectum - pétiole"))) %>% 
@@ -231,3 +151,6 @@ data.table::fwrite(TIDY2,"output/TIDY.csv",sep="\t")
 
 TIDY2 %>% 
   filter(is.na(Year)) %>% View
+
+TIDY2 %>% 
+  filter(verbatimTraitName == "timeOfDay") %>% View

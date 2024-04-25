@@ -88,7 +88,7 @@ core %>%
   filter(Site == "CRE_PDM") %>% 
   filter(Treatment == "HiN") %>% 
   filter(Year == 2005) %>% 
-  filter(!(feuillet == "Biovolume")) %>% 
+  filter((feuillet == "Biovolume")) %>% 
   # filter(verbatimTraitName %in% c("Dmax_vsh","Hrep_rsh")) %>% 
   ggplot(aes(x=day_of_year)) +
   geom_histogram() +
@@ -320,51 +320,133 @@ core %>%
   facet_wrap(~Code_Sp)
 
 
-# Sur Cazarils
+# Pour Cazarils
 core %>% 
   filter(Site == "Cazarils") %>% dim()
 
-# FC = field campaign
-core %>% 
-  filter(Site == "Cazarils") %>% pull(Year) %>% unique()
+
+
+
+
+
+#_______________________
+# For ALL THE SITES
+
+core2 <- core %>% 
   mutate(verbatimOccurrenceID_field_campaign = 
-           case_when(# 1997: one field campaign
-                     Year == 1997 ~ paste0(verbatimOccurrenceID_population,"_FC1"),
-                     
-                     # 1998: three field campaigns
-                     Year == 1998 & day_of_year %in% c(28,29) ~ 
-                       paste0(verbatimOccurrenceID_population,"_FC1"),
-                     Year == 1998 & day_of_year %in% seq(124,157, by = 1) ~ 
-                       paste0(verbatimOccurrenceID_population,"_FC2"),
-                     Year == 1998 & day_of_year %in% seq(180,196, by = 1) ~ 
-                       paste0(verbatimOccurrenceID_population,"_FC3"),
-                     
-                     # 1999: one FC for gas exchange
-                     Year == 1999 & feuillet %in% c("GasExchangeLeaf","GasExchangeChamber") ~ 
-                       paste0(verbatimOccurrenceID_population,"_FC1"),
-                     Year == 1999 & !(feuillet %in% c("GasExchangeLeaf","GasExchangeChamber")) ~ 
-                       paste0(verbatimOccurrenceID_population,"_FC2"),
-                     Year == 1999 & !(feuillet %in% c("GasExchangeLeaf","GasExchangeChamber") & 
-                                        Code_Sp == "ARISROTU" & day_of_year > 155) ~ 
-                       paste0(str_sub(verbatimOccurrenceID_population, end = -2),"3"),
-                     Year == 1999 & !(feuillet %in% c("GasExchangeLeaf","GasExchangeChamber") & 
-                                        Code_Sp == "KICKSPUR" & day_of_year > 150) ~ 
-                       paste0(str_sub(verbatimOccurrenceID_population, end = -2),"3"),
-                     
-                     
-                     ) 
-)%>% 
-  filter(Year == 1998) %>%
-  filter(is.na(verbatimOccurrenceID_field_campaign)) %>%
-  View
+           case_when(
+             
+             # In CAZARILS
+             # 1997: one field campaign
+             Site == "Cazarils" & Year == 1997 ~ paste0(verbatimOccurrenceID_population,"_FC1"),
+             
+             # 1998: three field campaigns
+             Site == "Cazarils" & Year == 1998 & day_of_year %in% c(28,29) ~ 
+               paste0(verbatimOccurrenceID_population,"_FC1"),
+             Site == "Cazarils" & Year == 1998 & day_of_year %in% seq(124,157, by = 1) ~ 
+               paste0(verbatimOccurrenceID_population,"_FC2"),
+             Site == "Cazarils" & Year == 1998 & day_of_year %in% seq(180,196, by = 1) ~ 
+               paste0(verbatimOccurrenceID_population,"_FC3"),
+             
+             # 1999: one FC for gas exchange
+             Site == "Cazarils" & Year == 1999 & feuillet %in% c("GasExchangeLeaf","GasExchangeChamber") ~ 
+               paste0(verbatimOccurrenceID_population,"_FC1"),
+             Site == "Cazarils" & Year == 1999 & !(feuillet %in% c("GasExchangeLeaf","GasExchangeChamber")) ~ 
+               paste0(verbatimOccurrenceID_population,"_FC2"),
+             Site == "Cazarils" & Year == 1999 & !(feuillet %in% c("GasExchangeLeaf","GasExchangeChamber") & 
+                                Code_Sp == "ARISROTU" & day_of_year > 155) ~ 
+               paste0(str_sub(verbatimOccurrenceID_population, end = -2),"3"),
+             Site == "Cazarils" & Year == 1999 & !(feuillet %in% c("GasExchangeLeaf","GasExchangeChamber") & 
+                                Code_Sp == "KICKSPUR" & day_of_year > 150) ~ 
+               paste0(str_sub(verbatimOccurrenceID_population, end = -2),"3"),
+             
+             # 2001, 2017 and 2023
+             Site == "Cazarils" & Year %in% c(2001,2017,2023)  ~ 
+               paste0(verbatimOccurrenceID_population,"_FC1"),
+             
+             TRUE ~ "not done yet"
+           ) 
+  )
+
+
+core2 %>% 
+  select(Site, verbatimOccurrenceID_field_campaign) %>% unique() %>% View
 
 
 
+# EN COURS ####
 
-str_sub("abcd",end = -2)
+core %>% pull(Site) %>% unique()
+core %>% 
+  filter(Site == "CRE_PDM") %>% pull(Year) %>% sort() %>%  unique()
+
+core %>% 
+  filter(Site == "CRE_PDM") %>%
+  filter(Year == 2006) %>% 
+  select(Year,Month,Day) %>% View
+
+# For biovolume in 2005 at PDM
+core_biovolume_PDM <-   core %>% 
+  filter(Site == "CRE_PDM" & Year == 2005 & feuillet=="Biovolume" ) %>%
+  select(Site,traitPlot,Treatment,Year,Code_Sp,feuillet,day_of_year,verbatimOccurrenceID_population) %>%
+  unique() %>%
+  arrange(Code_Sp) %>% 
+  group_by(Site,feuillet,Code_Sp,traitPlot,Treatment) %>% 
+  mutate(numbering = row_number()) %>% 
+  mutate(verbatimOccurrenceID_field_campaign = paste0(verbatimOccurrenceID_population,"_FC",numbering)) %>% 
+  select(-numbering) %>% 
+  ungroup() %>% 
+  select(traitPlot,feuillet,verbatimOccurrenceID_population, day_of_year,verbatimOccurrenceID_field_campaign)
 
 
+core_biovolume_PDM <- core %>% full_join(core_biovolume_PDM) 
 
 
+core_biovolume_PDM %>% 
+  filter(Site == "CRE_PDM" & Year == 2005 & feuillet=="Biovolume" ) %>% View()
 
+
+core2 <- core_biovolume_PDM %>% 
+  # remove biovolume in 2005 /!\ ADD IT AFTER (merge)
+  filter(!(Site == "CRE_PDM" & Year == 2005 & feuillet=="Biovolume" )) %>% 
+  mutate(verbatimOccurrenceID_field_campaign = 
+           case_when(
+             
+             # In CRE_PDM
+             # 2004: three field campaigns, identical for every species
+             Site == "CRE_PDM" & Year == 2004 & day_of_year < 100 ~ 
+               paste0(verbatimOccurrenceID_population,"_FC1"),
+             Site == "CRE_PDM" & Year == 2004 & day_of_year %in% seq(100,150, by = 1) ~ 
+               paste0(verbatimOccurrenceID_population,"_FC2"),
+             Site == "CRE_PDM" & Year == 2004 & day_of_year > 150 ~ 
+               paste0(verbatimOccurrenceID_population,"_FC3"),
+             
+             # 2005: four field campaigns, identical for every species, plus a temporal sequence (in the biovolume spreadsheet)
+             Site == "CRE_PDM" & Year == 2005 & !(feuillet=="Biovolume") & day_of_year < 100 ~ 
+               paste0(verbatimOccurrenceID_population,"_FC1"),
+             Site == "CRE_PDM" & Year == 2005 & !(feuillet=="Biovolume") & day_of_year %in% seq(100,150, by = 1) ~ 
+               paste0(verbatimOccurrenceID_population,"_FC2"),
+             Site == "CRE_PDM" & Year == 2005 & !(feuillet=="Biovolume") & day_of_year %in% seq(150,200, by = 1) ~ 
+               paste0(verbatimOccurrenceID_population,"_FC3"),
+             Site == "CRE_PDM" & Year == 2005 & !(feuillet=="Biovolume") & day_of_year > 200 ~ 
+               paste0(verbatimOccurrenceID_population,"_FC4"),
+             
+             # 2005: temporal sequence (for the Biovolume sheet)
+             Site == "CRE_PDM" & Year == 2005 & feuillet=="Biovolume" ~
+               verbatimOccurrenceID_field_campaign,
+             
+             # 2006: one field campaign in the HiN, and two in the LoN
+             Site == "CRE_PDM" & Year == 2006 & Treatment == "HiN" ~ 
+               paste0(verbatimOccurrenceID_population,"_FC1"),
+             
+             Site == "CRE_PDM" & Year == 2006 & Treatment == "LoN" & day_of_year < 90 ~ 
+               paste0(verbatimOccurrenceID_population,"_FC1"),
+             Site == "CRE_PDM" & Year == 2006 & Treatment == "LoN" & day_of_year >= 90 ~ 
+               paste0(verbatimOccurrenceID_population,"_FC2"),
+
+             
+             TRUE ~ "not done yet"
+           ) 
+  )  %>% 
+  select(Site, verbatimOccurrenceID_field_campaign) %>% unique() %>% View
 

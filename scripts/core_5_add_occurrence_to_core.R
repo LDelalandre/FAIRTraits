@@ -15,7 +15,7 @@ TIDY_occurrenceID %>%
 TIDY_occurrenceID <- TIDY_plot %>%
   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,Rep,verbatimTraitName,sep = "_")) %>% 
   mutate(verbatimOccurrenceID_sample = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,Rep,sep = "_")) %>% 
-  mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,sep = "_"))
+  mutate(verbatimOccurrenceID_population = paste(Code_Sp,Site,traitPlot,Treatment,Year,sep = "_"))
 
 # Quality check ####
 
@@ -90,6 +90,7 @@ purrr::imap(
     openxlsx::writeData(wb = wb, sheet = object_name, x = df)
   }
 )
-openxlsx::saveWorkbook(wb = wb, file = "output/WorkingFiles/2024_02_16_duplicated_occurrenceID_format_excel.xlsx")
+
+# openxlsx::saveWorkbook(wb = wb, file = "output/WorkingFiles/2024_02_16_duplicated_occurrenceID_format_excel.xlsx")
 
 
