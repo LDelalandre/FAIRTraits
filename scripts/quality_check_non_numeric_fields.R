@@ -66,8 +66,18 @@ list_values_per_column$Rep %>% sort()
 list_values_per_column$feuillet %>% sort()
 
 ## Date and hour
-core %>% 
-  filter(is.na(Year)) %>% View # /!\ pb pheno Marie-Laure
+
+# Control that Year, Month, Day, is (correctly) filled in
+
+# NAs ?
+core %>% filter(is.na(Year)) %>% View # /!\ pb pheno Marie-Laure
+core %>% filter(is.na(Month)) %>% View
+core %>% filter(is.na(Day))
+
+# No impossible values:
+core %>% pull(Year) %>% unique() %>% sort()
+core %>% pull(Month) %>% unique() %>% sort()
+core %>% pull(Day) %>% unique() %>% sort()
 
 ## metadata ####
 list_values_per_column$measurementDeterminedBy
