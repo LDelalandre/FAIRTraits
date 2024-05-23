@@ -28,13 +28,13 @@ TIDY3 <- TIDY2 %>%
   mutate(verbatimTraitName = case_when(verbatimTraitName == "R_prod" ~ "Rprod",
                                            verbatimTraitName == "R_DM_84" ~ "R_DM_ab_84",
                                            verbatimTraitName == "R_DM_0" ~ "R_DM_ab_0",
-                                           TRUE ~ verbatimTraitName)) #verbatimTraitName == "R_Cellulose" ~"R_cellulose",
-
+                                           TRUE ~ verbatimTraitName)) %>%  #verbatimTraitName == "R_Cellulose" ~"R_cellulose",
+  
+  # Remove empty lines (no trait value)
+  filter(!(is.na(verbatimTraitValue)))
+  
 # Export ####
 data.table::fwrite(TIDY3,"output/TIDY_corrected_typos.csv",sep="\t")
-
-
-
 
 
 

@@ -38,7 +38,7 @@ list_values_per_column$traitName %>% sort()
 list_values_per_column$verbatimTraitUnit %>% sort()
 
 list_values_per_column$traitEntityDataFile  %>% sort()
-list_values_per_column$traitEntity  %>% sort()
+list_values_per_column$traitEntityValid  %>% sort()
 
 list_values_per_column$variableType
 list_values_per_column$traitID %>% sort()

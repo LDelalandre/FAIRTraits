@@ -7,10 +7,6 @@ library(tidyverse)
 
 TIDY_plot <- data.table::fread("output/TIDY_plot.csv",encoding="UTF-8")
 
-TIDY_occurrenceID %>% 
-  select(Site,Block,traitPlot) %>% 
-  unique() %>% View
-
 # Generate OccurrenceIDs ####
 TIDY_occurrenceID <- TIDY_plot %>%
   mutate(verbatimOccurrenceID = paste(Code_Sp,Site,traitPlot,Treatment,Year,Month,Day,Rep,verbatimTraitName,sep = "_")) %>% 
@@ -47,7 +43,7 @@ DUPL %>%
 DUPLcplet <- TIDY_occurrenceID %>% 
   filter(verbatimOccurrenceID %in% DUPL$verbatimOccurrenceID) %>% 
   arrange(Site,feuillet)
-write.csv2(DUPLcplet,"output/WorkingFiles/2023_09_12_duplicated_occurrenceID_format_core.csv",row.names=F,fileEncoding = "latin1")
+write.csv2(DUPLcplet,"output/WorkingFiles/2024_05_23_duplicated_occurrenceID_format_core.csv",row.names=F,fileEncoding = "latin1")
 
 DUPLcplet %>% 
   unique() %>% 

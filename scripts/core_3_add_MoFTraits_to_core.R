@@ -10,7 +10,7 @@ TIDY4 <- data.table::fread("output/TIDY_corrected_typos.csv",encoding="UTF-8") %
   rename(verbatimTraitName_old = verbatimTraitName) %>% 
   rename(traitEntityDataFile = traitEntity)
 
-MoFTraits <- readxl::read_excel("data/MoFTraitsFull_jan2024_clean.xlsx", sheet = "MoFTraitsFull") %>% 
+MoFTraits <- readxl::read_excel("data/MoFTraitsFull_may2024_clean.xlsx", sheet = "MoFTraitsFull") %>% 
   rename(verbatimTraitName_new = verbatimTraitName_new_new) %>% 
   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
   mutate_all(trimws)
@@ -78,6 +78,8 @@ DF_commontraits_completed %>%
 dim(TIDY4)
 dim(TIDY5)
 dim(TIDY5 %>% unique())
+
+# Remove traits whose 
 
 # Export ####
 data.table::fwrite(TIDY5,"output/TIDY_MoFTraits.csv",sep="\t")
