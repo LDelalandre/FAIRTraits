@@ -38,6 +38,14 @@ read_file <- function(fsite){
   x
 }
 
+# Function to modify hour of the form "13:10:00" to numeric (here, 13.17)
+change_time_to_numeric <- function(time_string){
+  data.frame(time_string= time_string) %>% 
+    separate(col = time_string, into = c("hour","minut","second"),sep = ":") %>% 
+    mutate(hour = as.numeric(hour), minut = as.numeric(minut)) %>% 
+    mutate(time_num = round(hour + minut/60,digits = 2)) %>% 
+    pull(time_num)
+}
 
 # Centralize data in one "tidy" data frame with one record per row ####
 
@@ -71,11 +79,18 @@ for (focalsite in sites){
     # Correct hour problems
     # Garraf and Les Agros
     if( names(files[i]) == "GasExchangeChamber" & focalsite %in% c("Garraf", "LesAgros") ){
-      focus$timeOfDay <- focus$timeOfDay %>% as.character() %>% str_sub(start = 12L,end =19L)
+      focus$timeOfDay <- focus$timeOfDay %>% 
+        as.character() %>% 
+        str_sub(start = 12L,end =19L) %>% 
+        change_time_to_numeric()
     }
     #Cazarils
     if( names(files[i]) == "GasExchangeChamber" & focalsite %in% c("Cazarils") ){
-      focus$timeOfDay <- focus$timeOfDay %>% as.numeric() %>% chron::times() %>% as.character()
+      focus$timeOfDay <- focus$timeOfDay %>% 
+        as.numeric() %>% 
+        chron::times() %>% 
+        as.character() %>% 
+        change_time_to_numeric()
     }
     
     if (!(names(files[i]) %in% feuillets_to_remove)){
@@ -140,13 +155,14 @@ TIDY2 <- TIDY %>%
                               Species == "Chamærops humilis" ~ "Chamaerops humilis",
                               Species == "Cirsium acaule" ~ "Cirsium acaulon",
                               Species == "Inula conyza" ~ "Inula conyzae",
+                              Species == "Festuca ovina (sp.)?" ~ "Festuca ovina",
                               # "Linum tenuifolium subsp. tenuifolium" n'existe pas dans TAXREF
                               TRUE ~ Species)) %>% 
 # remove NAs ####
+  mutate(verbatimTraitValue = as.numeric(verbatimTraitValue)) %>% 
   filter(!is.na(verbatimTraitValue)) %>% 
-  unique()
+  unique() 
 
 # Export ####
 # write.table(TIDY2 ,"output/TIDY.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
 data.table::fwrite(TIDY2,"output/TIDY.csv",sep="\t")
-

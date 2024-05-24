@@ -10,6 +10,27 @@ taxon <- data.table::fread("output/FAIRTraits_Taxon.csv",encoding = "UTF-8")
 mapping_core <- readxl::read_excel("data/FAIRTraits_MappingGBIF.xlsx", sheet = "Core")
 mapping_taxon <- readxl::read_excel("data/FAIRTraits_MappingGBIF.xlsx", sheet = "Taxon")
 
+# Update taxon in core ####
+intersect(colnames(core), colnames(taxon))
+
+core_upd_taxon <- core %>% 
+  select(-c("Code_Sp"  , "Family" ,   "LifeForm1", "LifeForm2")) %>% 
+  merge(taxon %>% select("Species","Code_Sp"  , "Family" ,   "LifeForm1", "LifeForm2"))
+
+A<-taxon %>% pull(Species)
+B<-core %>% pull(Species) %>% unique()
+setdiff(A,B) # in taxon, but not in core (not a problem?)
+setdiff(B,A) # in core, but not in taxon (generates a loss of rows in core)
+
+# update names of columns in the files ####
+core_upd_nm <- core_upd_taxon %>% 
+  rename(traitEntity = traitEntityValid) %>% 
+  rename(traitPlotLatitude = plotLatitude) %>% 
+  rename(traitPlotLongitude = plotLongitude) %>% 
+  rename(traitPlotAltitude = plotAltitude) 
+  
+
+
 
 # Core ####
 
@@ -24,8 +45,8 @@ col_indores <- mapping_core %>%
   arrange(orderInFinalOccurenceFile) %>% 
   pull(verbatimVariableName)
 
-core_indores <- core %>% 
-  select(all_of(col_indores))
+core_indores <- core_upd_nm %>% 
+  select(any_of(col_indores))
 
 
 ## GBIF ####
@@ -67,8 +88,14 @@ taxon_GBIF <- taxon %>%
 colnames(taxon_GBIF) <- var_taxon_GBIF$variableNameStandard
 
 
+
+
+
 # Export ####
+data.table::fwrite(core_upd_nm,"output/core_raw.csv",sep="\t")
+
 data.table::fwrite(core_indores,"output/core_InDoRES.csv",sep="\t")
+
 data.table::fwrite(core_GBIF2,"output/core_GBIF.csv",sep="\t")
 
 data.table::fwrite(taxon_GBIF,"output/taxon_GBIF.csv",sep="\t")
