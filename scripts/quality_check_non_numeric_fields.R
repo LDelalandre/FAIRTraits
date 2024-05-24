@@ -4,7 +4,7 @@ library(tidyverse)
 # (checks of trait values to be found in another script)
 
 # Import data ####
-core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8")
+core <-  data.table::fread("output/TIDY_ID_field_campaign.csv",encoding = "UTF-8")
 
 # Class of columns ####
 # check the class of the different columns
@@ -43,7 +43,7 @@ list_values_per_column$traitEntityValid  %>% sort()
 list_values_per_column$variableType
 list_values_per_column$traitID %>% sort()
 
-list_values_per_column$Quality %>% sort()
+list_values_per_column$traitQuality %>% sort()
 
 list_values_per_column$basisOfRecord %>% sort()
 list_values_per_column$measurementMethod %>% sort() 
@@ -74,7 +74,7 @@ core %>% filter(is.na(Year)) %>% View # /!\ pb pheno Marie-Laure
 core %>% filter(is.na(Month)) %>% View
 core %>% filter(is.na(Day))
 
-# No impossible values:
+# Check if impossible values:
 core %>% pull(Year) %>% unique() %>% sort()
 core %>% pull(Month) %>% unique() %>% sort()
 core %>% pull(Day) %>% unique() %>% sort()
@@ -114,7 +114,7 @@ core_empty_fields_MoFTraits <- core %>%
   filter(verbatimOccurrenceID %in% c(empty_quality,empty_method))
 core_empty_fields_MoFTraits %>% dim()
 
-# IN any column :
+# Are there empty fields in any column?
 DIM <- c()
 for (i in c(1:length(colnames(core)))){
   fcol <- colnames(core)[i]

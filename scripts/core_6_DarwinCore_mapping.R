@@ -3,7 +3,7 @@ library(tidyverse)
 # This script changes column names of the database to DarwinCore names
 
 # importer TIDY_plot, mais pour l'instant pas au point
-core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8") %>% 
+core <-  data.table::fread("output/TIDY_ID_field_campaign.csv",encoding = "UTF-8") %>% 
   rename(siteName = Site)
 taxon <- data.table::fread("output/FAIRTraits_Taxon.csv",encoding = "UTF-8")
 
