@@ -10,6 +10,9 @@ taxon <- data.table::fread("output/FAIRTraits_Taxon.csv",encoding = "UTF-8")
 mapping_core <- readxl::read_excel("data/FAIRTraits_MappingGBIF.xlsx", sheet = "Core")
 mapping_taxon <- readxl::read_excel("data/FAIRTraits_MappingGBIF.xlsx", sheet = "Taxon")
 
+column_order_indores <- readxl::read_excel("data/OrdreColonnes_TraitValues.xlsx", sheet = "Feuil1") %>% 
+  select(Colonne,Ordre,Status)
+
 # Update taxon in core ####
 intersect(colnames(core), colnames(taxon))
 
@@ -40,19 +43,25 @@ setdiff(colnames(core) , mapping_core$verbatimVariableName )
 
 
 ## InDoRES ####
-col_indores <- mapping_core %>% 
-  filter(Status_InDoRES == "keep") %>% 
-  arrange(orderInFinalOccurenceFile) %>% 
-  pull(verbatimVariableName)
+# col_indores <- mapping_core %>% 
+#   filter(Status_InDoRES == "keep") %>% 
+#   arrange(orderInFinalOccurenceFile) %>% 
+#   pull(verbatimVariableName)
+
+col_indores <- column_order_indores %>% 
+  filter(Status == "keep") %>% 
+  arrange(Ordre) %>%
+  pull(Colonne)
 
 core_indores <- core_upd_nm %>% 
-  select(any_of(col_indores))
+  select(any_of(col_indores)) 
 
+setdiff(col_indores , colnames(core_indores)) # identiques
 
 ## GBIF ####
 ### Manually ####
-core_GBIF1 <- core %>% 
-  mutate(measurementType = paste(traitEntityValid,traitQuality,sep="_")) %>% 
+core_GBIF1 <- core_indores %>% 
+  mutate(measurementType = paste(traitEntity,traitQuality,sep="_")) %>% 
   mutate(measurementID = paste(termSource, localIdentifier,sep="_"))
 
 ### With mapping file ####
@@ -60,11 +69,14 @@ core_GBIF1 <- core %>%
 col_GBIF_names <- mapping_core %>% 
   filter(Status_GBIF == "keep") %>% 
   filter(!(verbatimVariableName %in% c("traitEntityValid","traitQuality","termSource","locaIdentifyer"))) %>% 
-  arrange(orderInFinalOccurenceFile) %>% 
+  arrange(as.numeric(orderInFinalOccurenceFile)) %>% 
   select(verbatimVariableName,variableNameStandard)
 
+setdiff(col_GBIF_names$verbatimVariableName,colnames(core_GBIF1))
+setdiff(colnames(core_GBIF1),col_GBIF_names$verbatimVariableName) # OK, columns that should not be kept in GBIF
+
 core_GBIF2 <- core_GBIF1 %>% 
-  select(all_of(col_GBIF_names$verbatimVariableName),measurementType,measurementID)
+  select(any_of(col_GBIF_names$verbatimVariableName),measurementType,measurementID)
 
 colnames(core_GBIF2) <- c(col_GBIF_names$variableNameStandard,"measurementType","measurementID")
 

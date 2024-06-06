@@ -155,14 +155,28 @@ core2 <- core_biovolume_PDM %>%
              Site == "La Fage" & Year == 2013 & day_of_year > 250 ~ 
                paste0(verbatimOccurrenceID_population,"_FC4"),
              
-             is.na(Month) & !(feuillet == "ReproPheno") ~ "no Month",
+             # is.na(Month) & !(feuillet == "ReproPheno") ~ "no Month",
              
-             TRUE ~ paste0(verbatimOccurrenceID_population,"_FC_not_defined"),
+             # TRUE ~ paste0(verbatimOccurrenceID_population,"_FC_not_defined"),
+             TRUE ~ paste0(verbatimOccurrenceID_population),
            ) 
-  )
+  ) 
+
+core3 <- core2 %>% 
+  select(-verbatimOccurrenceID_population) %>% 
+  rename(verbatimOccurrenceID_population = verbatimOccurrenceID_field_campaign)
 
 # Export ####
-data.table::fwrite(core2,"output/TIDY_ID_field_campaign.csv",sep="\t")
+data.table::fwrite(core3,"output/TIDY_ID_field_campaign.csv",sep="\t")
 
 dim(core)
-dim(core2)
+dim(core3)
+
+# A FINIR
+pb_FC <- core2 %>% filter(grepl("_FC_not_defined",verbatimOccurrenceID_field_campaign)) 
+data.table::fwrite(pb_FC,"output/TIDY_ID_field_campaign_no_field_campaign.csv",sep="\t")
+
+pb_FC %>% 
+  pull(feuillet) %>% unique()
+
+pb_FC %>% dim()
