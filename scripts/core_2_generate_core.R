@@ -5,7 +5,7 @@ library(tidyverse)
 # - updates the values in some columns (Plot, Treatment), and corrects typos
 
 # TIDY2 <- read.csv2("output/TIDY.csv",fileEncoding = "latin1",sep="\t",dec = ".")
-TIDY2 <- data.table::fread("output/TIDY.csv",encoding="UTF-8")
+TIDY2 <- data.table::fread("output/TIDY_1.csv",encoding="UTF-8")
 
 # Operations on columns ####
 TIDY3 <- TIDY2 %>% 
@@ -34,7 +34,7 @@ TIDY3 <- TIDY2 %>%
   filter(!(is.na(verbatimTraitValue)))
   
 # Export ####
-data.table::fwrite(TIDY3,"output/TIDY_corrected_typos.csv",sep="\t")
+data.table::fwrite(TIDY3,"output/TIDY_2_corrected_typos.csv",sep="\t")
 
 
 

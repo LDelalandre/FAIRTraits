@@ -6,7 +6,7 @@ library(tidyverse)
 
 # Import data ####
 # TIDY4 <-  read.csv2("output/TIDY_trait_entity_updated.csv",fileEncoding = "latin1",sep="\t",dec = ".")
-TIDY4 <- data.table::fread("output/TIDY_corrected_typos.csv",encoding="UTF-8") %>% 
+TIDY4 <- data.table::fread("output/TIDY_2_corrected_typos.csv",encoding="UTF-8") %>% 
   rename(verbatimTraitName_old = verbatimTraitName) %>% 
   rename(traitEntityDataFile = traitEntity)
 
@@ -14,9 +14,6 @@ MoFTraits <- readxl::read_excel("data/MoFTraitsFull_may2024_clean.xlsx", sheet =
   rename(verbatimTraitName_new = verbatimTraitName_new_new) %>% 
   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
   mutate_all(trimws)
-  # add double quotes to avoid problems with commas contained in two columns
-  # mutate(samplingProtocol = paste0("\"", samplingProtocol,"\"" )) %>%
-  # mutate(measurementMethod = paste0("\"", measurementMethod,"\"" ))
 
 
 # Combine core data with MoFTraits ####
@@ -82,6 +79,6 @@ dim(TIDY5 %>% unique())
 # Remove traits whose 
 
 # Export ####
-data.table::fwrite(TIDY5,"output/TIDY_MoFTraits.csv",sep="\t")
+data.table::fwrite(TIDY5,"output/TIDY_3_MoFTraits.csv",sep="\t")
 
 

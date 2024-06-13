@@ -3,7 +3,7 @@ library(tidyverse)
 day_month<-read.table("data/day_month.txt",header=T) %>% 
   rename(Month = month, Day = day_of_month)
 
-core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8") %>% 
+core <-  data.table::fread("output/TIDY_5_occurrenceID.csv",encoding = "UTF-8") %>% 
   filter(inFinalFile == "yes") %>% 
   # When day not filled in : add arbitrarily the middle of the month, except when we expect no month (e.g. for ReproPheno)
   mutate(Day = case_when( !is.na(Month) & is.na(Day)  ~ 15,
@@ -157,26 +157,28 @@ core2 <- core_biovolume_PDM %>%
              
              # is.na(Month) & !(feuillet == "ReproPheno") ~ "no Month",
              
-             # TRUE ~ paste0(verbatimOccurrenceID_population,"_FC_not_defined"),
-             TRUE ~ paste0(verbatimOccurrenceID_population),
+             TRUE ~ paste0(verbatimOccurrenceID_population,"_FC_not_defined"),
+             # TRUE ~ paste0(verbatimOccurrenceID_population),
            ) 
   ) 
 
 core3 <- core2 %>% 
-  select(-verbatimOccurrenceID_population) %>% 
+  rename(verbatimOccurrenceID_population_old = verbatimOccurrenceID_population) %>% 
   rename(verbatimOccurrenceID_population = verbatimOccurrenceID_field_campaign)
 
 # Export ####
-data.table::fwrite(core3,"output/TIDY_ID_field_campaign.csv",sep="\t")
+data.table::fwrite(core3,"output/TIDY_6_ID_field_campaign.csv",sep="\t")
 
 dim(core)
 dim(core3)
 
 # A FINIR
-pb_FC <- core2 %>% filter(grepl("_FC_not_defined",verbatimOccurrenceID_field_campaign)) 
-data.table::fwrite(pb_FC,"output/TIDY_ID_field_campaign_no_field_campaign.csv",sep="\t")
+pb_FC <- core3 %>% 
+  filter(grepl("_FC_not_defined",verbatimOccurrenceID_population)) %>% 
+  select(verbatimOccurrenceID_population_old) %>% 
+  unique()
+data.table::fwrite(pb_FC,"output/TIDY_ID_field_campaign_no_field_campaign_compacté.csv",sep="\t")
 
-pb_FC %>% 
-  pull(feuillet) %>% unique()
+
 
 pb_FC %>% dim()

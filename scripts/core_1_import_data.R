@@ -56,7 +56,8 @@ feuillets_to_remove <- c("LeafDimensions (àsupprimer)","Climate data","Leaf_Thi
 
 # colmuns other than traits used for building the "tidy" csv (i.e. data in row)
 columns_other_than_traits <- 
-  c("Site", "Block" ,"Plot", "Treatment", "Year" ,  "Month"  ,   "Day"       ,       "Species" , "Code_Sp"   ,    "Family" ,
+  c("Site", "Block" ,"Plot", "Treatment", "Year" ,  "Month"  ,   "Day"       ,
+    "Species" , "Code_Sp"   ,    "Family" ,
     "Individual",
     "LifeForm1" ,"LifeForm2" , 
     "Entity",    "Rep",
@@ -165,4 +166,4 @@ TIDY2 <- TIDY %>%
 
 # Export ####
 # write.table(TIDY2 ,"output/TIDY.csv",fileEncoding = "latin1",row.names=F,sep="\t",dec = ".")
-data.table::fwrite(TIDY2,"output/TIDY.csv",sep="\t")
+data.table::fwrite(TIDY2,"output/TIDY_1.csv",sep="\t")

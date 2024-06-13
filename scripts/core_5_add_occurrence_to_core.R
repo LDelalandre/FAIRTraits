@@ -5,7 +5,7 @@ library(tidyverse)
 # the level of the replicate on which a specific data record was taken (verbatimOccurrenceId_sample);
 # the level of the population (species x site x plot x treatment x date) in which the measured individual was sampled.
 
-TIDY_plot <- data.table::fread("output/TIDY_plot.csv",encoding="UTF-8")
+TIDY_plot <- data.table::fread("output/TIDY_4_plot.csv",encoding="UTF-8")
 
 # Generate OccurrenceIDs ####
 TIDY_occurrenceID <- TIDY_plot %>%
@@ -24,11 +24,8 @@ TIDY_occurrenceID %>% pull(verbatimOccurrenceID) %>% unique() %>% length()
 
 
 # Export ####
-data.table::fwrite(TIDY_occurrenceID,"output/TIDY_occurrenceID.csv",sep="\t")
+data.table::fwrite(TIDY_occurrenceID,"output/TIDY_5_occurrenceID.csv",sep="\t")
 
-data.table::fwrite(TIDY_occurrenceID %>% 
-                     select(-c(measurementMethod)),
-                   "output/TIDY_occurrenceID_no_sampling_measurement.csv",sep="\t")
 
 
 

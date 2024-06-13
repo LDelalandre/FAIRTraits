@@ -4,7 +4,7 @@ library(tidyverse)
 # (checks of trait values to be found in another script)
 
 # Import data ####
-core <-  data.table::fread("output/TIDY_ID_field_campaign.csv",encoding = "UTF-8")
+core <-  data.table::fread("output/TIDY_6_ID_field_campaign.csv",encoding = "UTF-8")
 
 # Class of columns ####
 # check the class of the different columns
@@ -16,7 +16,7 @@ class(core$verbatimTraitValue)
 # Check that the values taken by each attribute (= within each column)
 # remove numeric columns, and occurrence
 col_names <- core %>% 
-  select(!(is.numeric)) %>% 
+  select(!(where(is.numeric))) %>% 
   select(- c("verbatimOccurrenceID" ,"verbatimOccurrenceID_sample" ,"verbatimOccurrenceID_population" )) %>% 
   colnames()
 
