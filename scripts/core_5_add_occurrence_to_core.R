@@ -186,8 +186,8 @@ core2 <- core_biovolume_PDM %>%
              
              # is.na(Month) & !(feuillet == "ReproPheno") ~ "no Month",
              
-             TRUE ~ paste0(verbatimOccurrenceID_population,"_FC_not_defined"),
-             # TRUE ~ paste0(verbatimOccurrenceID_population),
+             # TRUE ~ paste0(verbatimOccurrenceID_population,"_FC_not_defined"),
+             TRUE ~ paste0(verbatimOccurrenceID_population),
            ) 
   ) 
 
@@ -197,28 +197,25 @@ core3 <- core2 %>%
 
 
 ## Complete with manually-filled file ####
-missing_id_field_campaing <- readxl::read_excel("data/TIDY_ID_field_campaign_no_field_campaign.xlsx", sheet = "WithoutRep") %>% 
+missing_id_field_campaing <- readxl::read_excel("data/TIDY_ID_field_campaign_no_field_campaign.xlsx", sheet = "WithoutRep") %>%
   rename(verbatimOccurrenceID_population_old = verbatimOccurrenceID_population) %>% 
-  select(verbatimOccurrenceID_population_old,FC) %>% 
+  select(-verbatimOccurrenceID_field_campaign) %>% 
   unique()
 
 core4 <- left_join(core3, missing_id_field_campaing)
 
-DUPL <- missing_id_field_campaing[which(duplicated(missing_id_field_campaing$verbatimOccurrenceID_population_old)),] %>% 
-  pull(verbatimOccurrenceID_population_old)
-
-subset_DUPL <- missing_id_field_campaing %>% 
-  filter(verbatimOccurrenceID_population_old %in% DUPL) %>% 
-  arrange(verbatimOccurrenceID_population_old)
-
-write.csv2(subset_DUPL ,"output/field_campaign_to_correct.csv",row.names = F)
+core5 <- core4 %>% 
+  mutate(verbatimOccurrenceID_population = case_when(is.na(FC) ~ verbatimOccurrenceID_population,
+                                                     TRUE ~ paste(verbatimOccurrenceID_population,FC,sep = "_"))) %>% 
+  select(-FC)
 
 # Export ####
-data.table::fwrite(core3 ,"output/TIDY_6_ID_field_campaign.csv",sep="\t")
+data.table::fwrite(core5 ,"output/TIDY_6_ID_field_campaign.csv",sep="\t")
 
 dim(core)
 dim(core3)
 dim(core4)
+dim(core5)
 
 # A FINIR
 pb_FC <- core3 %>% 
