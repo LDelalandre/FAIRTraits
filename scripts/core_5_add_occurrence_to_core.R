@@ -27,7 +27,7 @@ TIDY_occurrenceID %>% pull(verbatimOccurrenceID) %>% unique() %>% length()
 data.table::fwrite(TIDY_occurrenceID,"output/TIDY_5_occurrenceID.csv",sep="\t")
 
 
-# Modify population identifyer so that it includes field campaign ####
+# Modify population identifier so that it includes field campaign ####
 
 day_month<-read.table("data/day_month.txt",header=T) %>% 
   rename(Month = month, Day = day_of_month)
@@ -212,10 +212,24 @@ core5 <- core4 %>%
 # Export ####
 data.table::fwrite(core5 ,"output/TIDY_6_ID_field_campaign.csv",sep="\t")
 
+# Quality Check ####
+dim(TIDY_occurrenceID)
 dim(core)
 dim(core3)
 dim(core4)
 dim(core5)
+
+core5 %>% pull(verbatimOccurrenceID) %>% length()
+core5 %>% pull(verbatimOccurrenceID) %>% unique() %>% length()
+
+
+# nombre de pops
+core5 %>% 
+  pull(verbatimOccurrenceID_population) %>% unique() %>% length()
+
+core5 %>% 
+  select(Site,verbatimOccurrenceID_population) %>% unique() %>% 
+  filter(grepl("NA",verbatimOccurrenceID_population)) %>% View
 
 # A FINIR
 pb_FC <- core3 %>% 
@@ -227,5 +241,43 @@ data.table::fwrite(pb_FC,"output/TIDY_ID_field_campaign_no_field_campaign_compac
 
 
 pb_FC %>% dim()
+
+## Check distrib of FC ####
+
+plot <- core5 %>% 
+  mutate(FC = str_sub(verbatimOccurrenceID_population,-3L,-1L)) %>% 
+  # filter(Year==2004) %>% 
+  ggplot(aes(x=FC,y=day_of_year))+
+  geom_point(aes(colour = Site),size = 3) +
+  facet_wrap(~Year)
+
+ggsave(filename = "output/plot_FC.png",plot,width = 40,height = 40,units = "cm")
+# Removed 4721 rows containing missing values or values outside the scale range (`geom_point()`).
+# These rows are the ones for which we do not have day_of_year
+core5 %>% 
+  mutate(FC = str_sub(verbatimOccurrenceID_population,-3L,-1L)) %>% 
+  filter(is.na(day_of_year)) %>% dim()
+
+core5 %>% 
+  mutate(FC = str_sub(verbatimOccurrenceID_population,-3L,-1L)) %>% 
+  filter(is.na(day_of_year)) %>% 
+  ggplot(aes(x=FC,y=Year))+
+  geom_point()
+
+core5 %>% 
+  mutate(FC = str_sub(verbatimOccurrenceID_population,-3L,-1L)) %>% 
+  filter(is.na(day_of_year)) %>% 
+  filter(FC=="FC3") %>% pull(Site) %>% unique()
+
+core5 %>% 
+  mutate(FC = str_sub(verbatimOccurrenceID_population,-3L,-1L)) %>% 
+  filter(is.na(day_of_year)) %>% 
+  filter(FC=="FC2") %>% pull(Site) %>% unique()
+
+## FC==NA ####
+# 48 records, in Cazarils
+core5 %>% 
+  mutate(FC = str_sub(verbatimOccurrenceID_population,-3L,-1L)) %>% 
+  filter(FC=="_NA") %>% View()
 
 

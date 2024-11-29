@@ -76,8 +76,6 @@ dim(TIDY4)
 dim(TIDY5)
 dim(TIDY5 %>% unique())
 
-# Remove traits whose 
-
 # Export ####
 data.table::fwrite(TIDY5,"output/TIDY_3_MoFTraits.csv",sep="\t")
 
