@@ -7,8 +7,16 @@ source("scripts/functions/TAXREF.R")
 
 # Import data completed from Flore Méditerranéenne (Tison) ####
 # sp_info <- read.xlsx("data/Species_completed_Tison.xlsx", startRow = 1, colNames = TRUE)
-sp_info <- read.csv2("data/FAIRTraits_taxon_raw.csv") %>% 
+sp_info <- read.csv2("data/FAIRTraits_taxon_raw_GBIF.csv") %>% 
   filter(!(Species == "Lolium perenne")) 
+
+sp_info_2 <- read.csv2("data/FAIRTraits_taxon_raw.csv") %>% 
+  filter(!(Species == "Lolium perenne")) %>% 
+  select(Species,Height1,Height2)
+
+sp_info <- sp_info %>% merge(sp_info_2) %>% 
+  relocate(Height1,.after = NaturalHistoryUnstructured) %>% 
+  relocate(Height2,.after=Height1)
 
 # Add info from TAXREF ####
 taxref <- read.table("data/TAXREF_v16/TAXREFv16.txt",header=T,sep = "\t")

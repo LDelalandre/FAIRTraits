@@ -32,9 +32,22 @@ TIDY3 <- TIDY2 %>%
   
   # Remove empty lines (no trait value)
   filter(!(is.na(verbatimTraitValue)))
+
+
+# Update LifeForm, from abbreviation to full word ####
+sp_info <- read.csv2("data/FAIRTraits_taxon_raw_GBIF.csv") %>% 
+  filter(!(Species == "Lolium perenne")) %>% 
+  select(Species,LifeForm1) %>% 
+  rename(LifeForm_long = LifeForm1)
+
+TIDY4 <- TIDY3 %>% 
+  left_join(sp_info) %>% 
+  select(-LifeForm1) %>% 
+  rename(LifeForm1 = LifeForm_long) %>% 
+  relocate(LifeForm1,.before = LifeForm2)
   
 # Export ####
-data.table::fwrite(TIDY3,"output/TIDY_2_corrected_typos.csv",sep="\t")
+data.table::fwrite(TIDY4,"output/TIDY_2_corrected_typos.csv",sep="\t")
 
 
 
