@@ -4,14 +4,62 @@ library(tidyverse)
 
 # importer TIDY_plot, mais pour l'instant pas au point
 core <-  data.table::fread("output/TIDY_6_ID_field_campaign.csv",encoding = "UTF-8") %>% 
-  rename(siteName = Site)
+  rename(site = Site) %>% 
+  rename(traitEntity = traitEntityValid) %>% 
+  rename(traitPlotLatitude = plotLatitude,traitPlotLongitude = plotLongitude, traitPlotAltitude = plotAltitude)
+
 taxon <- data.table::fread("output/FAIRTraits_Taxon.csv",encoding = "UTF-8")
+
+mapping_occurrence <- readxl::read_excel("data/Mapping&Ordre_DwCArchives.xlsx", sheet = "Mapping_Occurence")
+mapping_taxa <- readxl::read_excel("data/Mapping&Ordre_DwCArchives.xlsx", sheet = "Mapping_Taxa")
+
+# Occurrence ####
+
+A <- colnames(core)
+B <- mapping_occurrence %>% pull(Colonne)
+
+setdiff(A,B)
+setdiff(B,A)
+
+core_InDoRES <- core %>% 
+  select(all_of(mapping_occurrence$Colonne))
+core_GBIF <- core_InDoRES
+
+colnames(core_GBIF) <- mapping_occurrence$`DwC Term`
+
+# Taxa ####
+A <- colnames(taxon)
+B <- mapping_taxa %>% pull(Colonne)
+
+setdiff(A,B)
+setdiff(B,A)
+
+taxon_InDoRES <- taxon %>% select(all_of(mapping_taxa$Colonne))
+
+mapping_taxa$Colonne[11] <- "NaturalHistoryUnstructured"
+mapping_taxa <- mapping_taxa %>% 
+  filter(!(Colonne == "Height2"))
+taxon_GBIF <- taxon %>% select(all_of(mapping_taxa$Colonne))
+colnames(taxon_GBIF) <- mapping_taxa$`DwC Term`
+
+
+# Export ####
+data.table::fwrite(core_InDoRES ,"output/InDoRES_occurrence.csv",sep="\t")
+data.table::fwrite(core_GBIF ,"output/GBIF_occurrence.csv",sep="\t")
+data.table::fwrite(taxon_InDoRES ,"output/InDoRES_taxa.csv",sep="\t")
+data.table::fwrite(taxon_GBIF ,"output/GBIF_taxa.csv",sep="\t")
+
+#_____________
+
+
 
 mapping_core <- readxl::read_excel("data/FAIRTraits_MappingGBIF.xlsx", sheet = "Core")
 mapping_taxon <- readxl::read_excel("data/FAIRTraits_MappingGBIF.xlsx", sheet = "Taxon")
 
 column_order_indores <- readxl::read_excel("data/OrdreColonnes_TraitValues.xlsx", sheet = "Feuil1") %>% 
   select(Colonne,Ordre,Status)
+
+
 
 # Update taxon in core ####
 intersect(colnames(core), colnames(taxon))
