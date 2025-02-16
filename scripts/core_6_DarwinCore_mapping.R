@@ -3,12 +3,84 @@ library(tidyverse)
 # This script changes column names of the database to DarwinCore names
 
 # importer TIDY_plot, mais pour l'instant pas au point
-core <-  data.table::fread("output/TIDY_occurrenceID.csv",encoding = "UTF-8") %>% 
-  rename(siteName = Site)
+core <-  data.table::fread("output/TIDY_6_ID_field_campaign.csv",encoding = "UTF-8") %>% 
+  rename(site = Site) %>% 
+  rename(traitEntity = traitEntityValid) %>% 
+  rename(traitPlotLatitude = plotLatitude,traitPlotLongitude = plotLongitude, traitPlotAltitude = plotAltitude)
+
 taxon <- data.table::fread("output/FAIRTraits_Taxon.csv",encoding = "UTF-8")
+
+mapping_occurrence <- readxl::read_excel("data/Mapping&Ordre_DwCArchives.xlsx", sheet = "Mapping_Occurence")
+mapping_taxa <- readxl::read_excel("data/Mapping&Ordre_DwCArchives.xlsx", sheet = "Mapping_Taxa")
+
+# Occurrence ####
+
+A <- colnames(core)
+B <- mapping_occurrence %>% pull(Colonne)
+
+setdiff(A,B)
+setdiff(B,A)
+
+core_InDoRES <- core %>% 
+  select(all_of(mapping_occurrence$Colonne))
+core_GBIF <- core_InDoRES
+
+colnames(core_GBIF) <- mapping_occurrence$`DwC Term`
+
+# Taxa ####
+A <- colnames(taxon)
+B <- mapping_taxa %>% pull(Colonne)
+
+setdiff(A,B)
+setdiff(B,A)
+
+taxon_InDoRES <- taxon %>% select(all_of(mapping_taxa$Colonne))
+
+mapping_taxa$Colonne[11] <- "NaturalHistoryUnstructured"
+mapping_taxa <- mapping_taxa %>% 
+  filter(!(Colonne == "Height2"))
+taxon_GBIF <- taxon %>% select(all_of(mapping_taxa$Colonne))
+colnames(taxon_GBIF) <- mapping_taxa$`DwC Term`
+
+
+# Export ####
+data.table::fwrite(core_InDoRES ,"output/InDoRES_occurrence.csv",sep="\t")
+data.table::fwrite(core_GBIF ,"output/GBIF_occurrence.csv",sep="\t")
+data.table::fwrite(taxon_InDoRES ,"output/InDoRES_taxa.csv",sep="\t")
+data.table::fwrite(taxon_GBIF ,"output/GBIF_taxa.csv",sep="\t")
+
+#_____________
+
+
 
 mapping_core <- readxl::read_excel("data/FAIRTraits_MappingGBIF.xlsx", sheet = "Core")
 mapping_taxon <- readxl::read_excel("data/FAIRTraits_MappingGBIF.xlsx", sheet = "Taxon")
+
+column_order_indores <- readxl::read_excel("data/OrdreColonnes_TraitValues.xlsx", sheet = "Feuil1") %>% 
+  select(Colonne,Ordre,Status)
+
+
+
+# Update taxon in core ####
+intersect(colnames(core), colnames(taxon))
+
+core_upd_taxon <- core %>% 
+  select(-c("Code_Sp"  , "Family" ,   "LifeForm1", "LifeForm2")) %>% 
+  merge(taxon %>% select("Species","Code_Sp"  , "Family" ,   "LifeForm1", "LifeForm2"))
+
+A<-taxon %>% pull(Species)
+B<-core %>% pull(Species) %>% unique()
+setdiff(A,B) # in taxon, but not in core (not a problem?)
+setdiff(B,A) # in core, but not in taxon (generates a loss of rows in core)
+
+# update names of columns in the files ####
+core_upd_nm <- core_upd_taxon %>% 
+  rename(traitEntity = traitEntityValid) %>% 
+  rename(traitPlotLatitude = plotLatitude) %>% 
+  rename(traitPlotLongitude = plotLongitude) %>% 
+  rename(traitPlotAltitude = plotAltitude) 
+  
+
 
 
 # Core ####
@@ -19,19 +91,25 @@ setdiff(colnames(core) , mapping_core$verbatimVariableName )
 
 
 ## InDoRES ####
-col_indores <- mapping_core %>% 
-  filter(Status_InDoRES == "keep") %>% 
-  arrange(orderInFinalOccurenceFile) %>% 
-  pull(verbatimVariableName)
+# col_indores <- mapping_core %>% 
+#   filter(Status_InDoRES == "keep") %>% 
+#   arrange(orderInFinalOccurenceFile) %>% 
+#   pull(verbatimVariableName)
 
-core_indores <- core %>% 
-  select(all_of(col_indores))
+col_indores <- column_order_indores %>% 
+  filter(Status == "keep") %>% 
+  arrange(Ordre) %>%
+  pull(Colonne)
 
+core_indores <- core_upd_nm %>% 
+  select(any_of(col_indores)) 
+
+setdiff(col_indores , colnames(core_indores)) # identiques
 
 ## GBIF ####
 ### Manually ####
-core_GBIF1 <- core %>% 
-  mutate(measurementType = paste(traitEntityValid,traitQuality,sep="_")) %>% 
+core_GBIF1 <- core_indores %>% 
+  mutate(measurementType = paste(traitEntity,traitQuality,sep="_")) %>% 
   mutate(measurementID = paste(termSource, localIdentifier,sep="_"))
 
 ### With mapping file ####
@@ -39,11 +117,14 @@ core_GBIF1 <- core %>%
 col_GBIF_names <- mapping_core %>% 
   filter(Status_GBIF == "keep") %>% 
   filter(!(verbatimVariableName %in% c("traitEntityValid","traitQuality","termSource","locaIdentifyer"))) %>% 
-  arrange(orderInFinalOccurenceFile) %>% 
+  arrange(as.numeric(orderInFinalOccurenceFile)) %>% 
   select(verbatimVariableName,variableNameStandard)
 
+setdiff(col_GBIF_names$verbatimVariableName,colnames(core_GBIF1))
+setdiff(colnames(core_GBIF1),col_GBIF_names$verbatimVariableName) # OK, columns that should not be kept in GBIF
+
 core_GBIF2 <- core_GBIF1 %>% 
-  select(all_of(col_GBIF_names$verbatimVariableName),measurementType,measurementID)
+  select(any_of(col_GBIF_names$verbatimVariableName),measurementType,measurementID)
 
 colnames(core_GBIF2) <- c(col_GBIF_names$variableNameStandard,"measurementType","measurementID")
 
@@ -67,8 +148,14 @@ taxon_GBIF <- taxon %>%
 colnames(taxon_GBIF) <- var_taxon_GBIF$variableNameStandard
 
 
+
+
+
 # Export ####
+data.table::fwrite(core_upd_nm,"output/core_raw.csv",sep="\t")
+
 data.table::fwrite(core_indores,"output/core_InDoRES.csv",sep="\t")
+
 data.table::fwrite(core_GBIF2,"output/core_GBIF.csv",sep="\t")
 
 data.table::fwrite(taxon_GBIF,"output/taxon_GBIF.csv",sep="\t")

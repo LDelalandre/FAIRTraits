@@ -6,7 +6,7 @@ library(tidyverse)
 # Import data ####
 
 ## Traits ####
-TIDY5 <-  data.table::fread("output/TIDY_MoFTraits.csv",encoding = "UTF-8") %>% 
+TIDY5 <-  data.table::fread("output/TIDY_3_MoFTraits.csv",encoding = "UTF-8") %>% 
 # Correct typos on plots
   mutate(Plot = if_else(Plot == "HGM_P7,  P9, P10", "HGM_P7, P9, P10",Plot)) %>% 
 # Correct typos on Treatment
@@ -110,8 +110,9 @@ GPSplots <- Infos_Plots %>%
   unique()
 
 setdiff(Coreplots, GPSplots)
-setdiff(GPSplots,Coreplots)
+setdiff(GPSplots,Coreplots) # Some names of plots in the mapping file are not present 
+# in the core file (these are relicts of old plot names that we have since corrected)
 
 # Export ####
-data.table::fwrite(TIDY5_long,"output/TIDY_plot.csv",sep="\t")
+data.table::fwrite(TIDY5_long,"output/TIDY_4_plot.csv",sep="\t")
 
