@@ -115,4 +115,3 @@ setdiff(GPSplots,Coreplots) # Some names of plots in the mapping file are not pr
 
 # Export ####
 data.table::fwrite(TIDY5_long,"output/TIDY_4_plot.csv",sep="\t")
-

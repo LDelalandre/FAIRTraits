@@ -279,5 +279,3 @@ core5 %>%
 core5 %>% 
   mutate(FC = str_sub(verbatimOccurrenceID_population,-3L,-1L)) %>% 
   filter(FC=="_NA") %>% View()
-
-

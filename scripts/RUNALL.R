@@ -8,3 +8,4 @@ source("scripts/core_3_add_MoFTraits_to_core.R")
 source("scripts/core_4_add_plot_info_to_core.R")
 source("scripts/core_5_add_occurrence_to_core.R")
 source("scripts/core_6_DarwinCore_mapping.R")
+

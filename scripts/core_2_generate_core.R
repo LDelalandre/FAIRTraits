@@ -35,7 +35,7 @@ TIDY3 <- TIDY2 %>%
 
 
 # Update LifeForm, from abbreviation to full word ####
-sp_info <- read.csv2("data/FAIRTraits_taxon_raw_GBIF.csv") %>% 
+sp_info <- read.csv2("data/FAIRTraits_Taxon_raw_GBIF.csv") %>% 
   filter(!(Species == "Lolium perenne")) %>% 
   select(Species,LifeForm1) %>% 
   rename(LifeForm_long = LifeForm1)
@@ -48,7 +48,4 @@ TIDY4 <- TIDY3 %>%
   
 # Export ####
 data.table::fwrite(TIDY4,"output/TIDY_2_corrected_typos.csv",sep="\t")
-
-
-
 
