@@ -207,7 +207,8 @@ core4 <- left_join(core3, missing_id_field_campaing)
 core5 <- core4 %>% 
   mutate(verbatimOccurrenceID_population = case_when(is.na(FC) ~ verbatimOccurrenceID_population,
                                                      TRUE ~ paste(verbatimOccurrenceID_population,FC,sep = "_"))) %>% 
-  select(-FC)
+  select(-FC) %>% 
+  rename(CodeSp = Code_Sp, SpeciesName = Species)
 
 # Export ####
 data.table::fwrite(core5 ,"output/TIDY_6_ID_field_campaign.csv",sep="\t")

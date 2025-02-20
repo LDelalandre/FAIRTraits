@@ -77,22 +77,22 @@ for (focalsite in sites){
     if(focalsite == "PDM") {focus$Site <- "PDM"}
     if(focalsite == "O2LA") {focus$Site <- "O2LA"}
     
-    # # Correct hour problems
-    # # Garraf and Les Agros
-    # if( names(files[i]) == "GasExchangeChamber" & focalsite %in% c("Garraf", "LesAgros") ){
-    #   focus$timeOfDay <- focus$timeOfDay %>% 
-    #     as.character() %>% 
-    #     str_sub(start = 12L,end =19L) %>% 
-    #     change_time_to_numeric()
-    # }
-    # #Cazarils
-    # if( names(files[i]) == "GasExchangeChamber" & focalsite %in% c("Cazarils") ){
-    #   focus$timeOfDay <- focus$timeOfDay %>% 
-    #     as.numeric() %>% 
-    #     chron::times() %>% 
-    #     as.character() %>% 
-    #     change_time_to_numeric()
-    # }
+    # Correct hour problems
+    # Garraf and Les Agros
+    if( names(files[i]) == "GasExchangeChamber" & focalsite %in% c("Garraf", "LesAgros") ){
+      focus$timeOfDay <- focus$timeOfDay %>%
+        as.character() %>%
+        str_sub(start = 12L,end =19L) %>%
+        change_time_to_numeric()
+    }
+    #Cazarils
+    if( names(files[i]) == "GasExchangeChamber" & focalsite %in% c("Cazarils") ){
+      focus$timeOfDay <- focus$timeOfDay %>%
+        as.numeric() %>%
+        chron::times() %>%
+        as.character() %>%
+        change_time_to_numeric()
+    }
     
     if (!(names(files[i]) %in% feuillets_to_remove)){
       # names of the traits in the focal sheet

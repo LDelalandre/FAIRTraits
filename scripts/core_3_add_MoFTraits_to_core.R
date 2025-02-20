@@ -10,11 +10,12 @@ TIDY4 <- data.table::fread("output/TIDY_2_corrected_typos.csv",encoding="UTF-8")
   rename(verbatimTraitName_old = verbatimTraitName) %>% 
   rename(traitEntityDataFile = traitEntity)
 
-MoFTraits <- readxl::read_excel("data/MoFTraitsFull_may2024_clean.xlsx", sheet = "MoFTraitsFull") %>% 
+MoFTraits <- readxl::read_excel("data/MoFTraitsFull_clean.xlsx", sheet = "MoFTraitsFull") %>% 
   rename(verbatimTraitName_new = verbatimTraitName_new_new) %>% 
   mutate(Site = if_else (Site == "HGM", "Hautes Garrigues",Site)) %>% 
   mutate_all(trimws)
-
+# MoFTraits2 <- MoFTraits %>% dplyr::select(-c("traitCategory"))
+# MoFTraits2 == MoFTraitsMay
 
 # Combine core data with MoFTraits ####
 # (information on traits : names, measurement method, etc.)
@@ -40,7 +41,8 @@ DF_commontraits <- TIDY4_differingtraits_completed %>%
              inFinalFile,traitEntityAbbreviation,
              verbatimTraitName_new, traitEntityValid,
              variableType,      entityCategory,    traitQuality,     
-             verbatimTraitUnit, termSource,        localIdentifier,   traitID,basisOfRecord )) # remove the columns added by left-joining with MoFTraits !!
+             verbatimTraitUnit, termSource,        localIdentifier,   traitID,basisOfRecord,
+             traitCategory)) # remove the columns added by left-joining with MoFTraits !!
 
 
 ## traits whose samplingProtocol and measurementMethod are identical whatever the site ####
@@ -79,3 +81,13 @@ dim(TIDY5 %>% unique())
 # Export ####
 data.table::fwrite(TIDY5,"output/TIDY_3_MoFTraits.csv",sep="\t")
 
+
+
+# Look at the traitCategory defined by Eric ------------------------------------
+
+traitCategory <- readxl::read_excel("data/TraitCategories.xlsx", sheet = "traitCategory")
+traitCategoryName <- MoFTraits %>% select(verbatimTraitName_new,traitName, verbatimTraitUnit, traitQuality) %>% 
+  rename(measurementTraitID = verbatimTraitName_new) %>% 
+  merge(traitCategory)
+
+traitCategoryName %>% pull(traitCategory) %>% unique()
